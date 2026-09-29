@@ -34,10 +34,7 @@ export function applyWorshipPlan(
   if (afterItemId && anchor < 0)
     throw new Error('El punto de inserción del repertorio ya no existe.')
   const start = anchor + 1
-  let end = start
-  while (withoutManaged[end]?.kind === 'SONG') end += 1
-  const kept = [...withoutManaged.slice(0, start), ...withoutManaged.slice(end)]
-  const occupied = new Set(kept.map((item) => item.id))
+  const occupied = new Set(withoutManaged.map((item) => item.id))
   const songs: ServiceItem[] = plan.songs.map((song, index) => {
     const base = `${prefix}${index + 1}`
     let id = base
@@ -57,6 +54,10 @@ export function applyWorshipPlan(
   return {
     ...service,
     setlist: { id: plan.setlistId, name: plan.name },
-    items: [...kept.slice(0, start), ...songs, ...kept.slice(start)],
+    items: [
+      ...withoutManaged.slice(0, start),
+      ...songs,
+      ...withoutManaged.slice(start),
+    ],
   }
 }

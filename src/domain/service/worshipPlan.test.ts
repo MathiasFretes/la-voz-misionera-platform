@@ -89,10 +89,12 @@ describe('WorshipPlan 0.1', () => {
     })
   })
 
-  it('replaces the contiguous music block and keeps nonmusic and closing song intact', () => {
+  it('inserts Worship songs while preserving every manual service item', () => {
     const merged = applyWorshipPlan(service, plan, 'welcome')
     expect(merged.items.map((item) => item.kind)).toEqual([
       'ANNOUNCEMENT',
+      'SONG',
+      'SONG',
       'SONG',
       'SONG',
       'SONG',
@@ -102,6 +104,8 @@ describe('WorshipPlan 0.1', () => {
     ])
     expect(merged.items[0]).toEqual(announcement)
     expect(merged.items.slice(4)).toEqual([
+      oldSong('a'),
+      oldSong('b'),
       scripture,
       sermon,
       oldSong('closing'),
@@ -117,6 +121,35 @@ describe('WorshipPlan 0.1', () => {
     expect(merged.items[2]).toMatchObject({ song: { id: 'same', key: 'D' } })
     expect(merged.setlist).toEqual({ id: 'set-1', name: 'Adoración' })
     expect(applyWorshipPlan(merged, plan, 'welcome')).toEqual(merged)
+  })
+
+  it('keeps a manual song next to the anchor when replacing an earlier Worship import', () => {
+    const withManualSong = {
+      ...service,
+      items: [announcement, oldSong('special'), scripture],
+    }
+    const first = applyWorshipPlan(withManualSong, plan, 'welcome')
+    expect(first.items.map((item) => item.id)).toEqual([
+      'welcome',
+      'lvm-worship:culto-1:1',
+      'lvm-worship:culto-1:2',
+      'lvm-worship:culto-1:3',
+      'special',
+      'bible',
+    ])
+
+    const changedPlan = { ...plan, songs: plan.songs.slice(1) }
+    const second = applyWorshipPlan(first, changedPlan, 'welcome')
+    expect(second.items.map((item) => item.id)).toEqual([
+      'welcome',
+      'lvm-worship:culto-1:1',
+      'lvm-worship:culto-1:2',
+      'special',
+      'bible',
+    ])
+    expect(second.items.slice(3)).toEqual([oldSong('special'), scripture])
+    expect(second.items[1]).toMatchObject({ song: { id: 'same', key: 'D' } })
+    expect(second.items[2]).toMatchObject({ song: { id: 'third', key: 'A' } })
   })
 
   it('rejects a different service and corrupt plans without mutating input', () => {

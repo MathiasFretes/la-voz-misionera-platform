@@ -1,6 +1,6 @@
 # Worship handoff 0.1
 
-Platform owns the service and sends Worship a small JSON context file. Worship returns a `WorshipPlan 0.1` file containing only music. Platform applies it to the selected musical block and exports the unchanged `Service 0.1` format to Presenter.
+Platform owns the service and sends Worship a small JSON context file. Worship returns a `WorshipPlan 0.1` file containing only music. Platform inserts it after the selected service item and exports the unchanged `Service 0.1` format to Presenter.
 
 ## Context: Platform → Worship
 
@@ -70,7 +70,7 @@ The context carries no service items, people, permissions, or Presenter settings
 
 `songs` preserves setlist order and may repeat `songId`. Each number in `arrangement` is a one-based index into the source song's lyric sections; `sections` contains the expanded occurrences in exactly that order. Its length must equal `arrangement.length`. Chord `index` is a UTF-16 code unit offset in `text`, including the end position. An offset cannot split a surrogate pair.
 
-Platform validates every field and checks `service.id === plan.serviceId` before changing the saved service. It creates a distinct Service item ID for each song occurrence, even when `songId` repeats. Applying the same plan again replaces the previously imported musical block. Other service items, including Scripture, announcements, sermons, and a closing song outside the selected block, remain in place. Presenter consumes only the resulting Service 0.1 file.
+Platform validates every field and checks `service.id === plan.serviceId` before changing the saved service. It creates a distinct Service item ID for each song occurrence, even when `songId` repeats. The selected point means “insert the Worship repertoire after this item.” Applying another plan removes only items previously created by Worship for this service (`lvm-worship:<serviceId>:`) and inserts the new repertoire at that point. Every manually created service item remains in place, including songs immediately after the selected point. Presenter consumes only the resulting Service 0.1 file.
 
 ## Local workflow
 
