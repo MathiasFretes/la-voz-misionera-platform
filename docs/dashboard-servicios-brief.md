@@ -1,6 +1,6 @@
 # M7.5 — Dashboard / Servicios: brief de diseño
 
-Estado: **listo para diseñar en MagicPath**; aún no es una pantalla productiva. Debe compartir los fundamentos de [Design System 0.1](design-system-0.1.md) con el Editor de Servicio y ocupar un frame independiente en el canvas de M7.5.
+Estado: **concepto validado en [Design Lab](../design-lab/dashboard.html)**; aún no es una pantalla productiva. Comparte los fundamentos de [Design System 0.1](design-system-0.1.md) con el Editor de Servicio.
 
 ## Objetivo
 
@@ -68,4 +68,4 @@ Los estados de **guardado local**, **repertorio importado** y **validez para Pre
 4. El contraste AA y el foco de teclado funcionan en acciones, texto secundario y badges.
 5. Los ejemplos no agregan capacidades fuera del dominio actual de Platform.
 
-Tras diseñar ambos frames, revisar coherencia antes de congelar Design System 0.1 o llevarlo a Figma/CSS.
+La revisión de coherencia y responsive se completó en el Design Lab. La implementación productiva debe derivar los estados del dominio real, no de los datos de ejemplo de esta página.

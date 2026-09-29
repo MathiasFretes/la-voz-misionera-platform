@@ -1,6 +1,6 @@
-# LVM Design System 0.1 — borrador de fundamentos
+# LVM Design System 0.1
 
-Estado: **aprobado como base de trabajo; aún no congelado**. Este documento describe la pantalla pública [LVM Platform — Editor de Servicio](https://designs.magicpath.ai/v1/fresh-valley-5681) y fija reglas para diseñar Dashboard / Servicios. No cambia la UI productiva ni los contratos `WorshipPlan 0.1` y `Service 0.1`.
+Estado: **congelado — Design System 0.1**. La especificación visual ejecutable está en [Design Lab](../design-lab/README.md): [Dashboard](../design-lab/dashboard.html), [Editor](../design-lab/editor.html) y [tokens compartidos](../design-lab/tokens.css). MagicPath y Figma quedan como referencias de exploración; no son dependencias ni gates de implementación. Esta versión no cambia la UI productiva ni los contratos `WorshipPlan 0.1` y `Service 0.1`.
 
 ## Principios
 
@@ -12,7 +12,7 @@ Estado: **aprobado como base de trabajo; aún no congelado**. Este documento des
 
 ## Color
 
-Los valores base se observaron en el CSS compilado del prototipo público. La asignación semántica siguiente es una propuesta para la suite; requiere verificación de contraste antes de implementarse.
+Los valores siguientes están definidos en `design-lab/tokens.css`. La aplicación productiva debe consumir estos roles semánticos cuando se implemente la nueva UI.
 
 | Token semántico          | Valor inicial | Uso                                     |
 | ------------------------ | ------------- | --------------------------------------- |
@@ -28,9 +28,9 @@ Los valores base se observaron en el CSS compilado del prototipo público. La as
 
 Definir aparte `success`, `warning` y `danger` con pares fondo/texto que alcancen WCAG AA. No usar solo color para expresar estado. En superficie dorada, elegir texto oscuro según contraste medido; evitar blanco por defecto.
 
-Chequeo inicial de contraste: `#C89B3C` como texto sobre blanco da **2.56:1** y no sirve para texto normal; `#172033` sobre dorado da **6.36:1**; `#475467` sobre blanco da **7.69:1**; `#7C5B16` sobre `#FFF9ED` da **5.95:1**. Mantener el dorado como fondo de acción o indicador, con texto navy. Estos cálculos cubren combinaciones concretas, no sustituyen la revisión de todos los estados finales.
+Contraste verificado en el Design Lab: `#172033` sobre dorado **6.36:1**; texto secundario sobre blanco **7.69:1**; éxito **6.81:1**, advertencia **5.95:1** y error **6.05:1** sobre sus fondos. `#C89B3C` como texto sobre blanco da **2.56:1** y no sirve para texto normal; el dorado se usa como fondo de acción o indicador con texto navy.
 
-Al llevar los tokens al código, los componentes consumirán **roles semánticos**, no colores físicos. La capa de tema resolverá valores como `--lvm-bg-app`, `--lvm-bg-surface`, `--lvm-text-primary`, `--lvm-text-muted`, `--lvm-border-subtle`, `--lvm-action-primary`, `--lvm-action-primary-hover`, `--lvm-status-success`, `--lvm-status-warning` y `--lvm-status-danger` hacia la paleta navy/dorado. Estos nombres son el contrato visual propuesto; todavía no se añaden al CSS productivo.
+Los componentes consumirán **roles semánticos**, no colores físicos. `design-lab/tokens.css` define `--lvm-bg-app`, `--lvm-bg-surface`, `--lvm-text-primary`, `--lvm-text-secondary`, `--lvm-border-subtle`, `--lvm-action-primary`, `--lvm-action-primary-hover` y los estados. Es el contrato visual 0.1; todavía no se añade al CSS productivo.
 
 ## Tipografía y escala
 
@@ -72,7 +72,7 @@ El prototipo usa sombras suaves cercanas a `0 8px 30px #1720330D`. No convertir 
 - Las canciones importadas muestran `Worship` y pueden reordenarse dentro del servicio. Sus letras, acordes, tonalidad y arreglo se editan en Worship. Platform muestra esos datos como referencia de solo lectura y ofrece una acción clara para volver a Worship.
 - Las canciones manuales conservan su identidad y no adquieren la marca Worship por estar junto a una canción importada.
 - Mostrar estados separados para **guardado local**, **repertorio importado** y **Service 0.1 válido para Presenter**. Son hechos distintos.
-- Todos los contadores de la pantalla deben derivar del mismo servicio. El prototipo público muestra 7 elementos en «Orden» y 8 en «Presentación»; corregirlo antes de tomar capturas finales o implementar.
+- Todos los contadores de la pantalla productiva deben derivar del mismo servicio. El Design Lab muestra 7 elementos de ejemplo de forma coherente.
 - Exportar `Service 0.1` es una acción sobre un archivo local, no una publicación ni una conexión en vivo con Presenter.
 - En la sidebar, mostrar solo rutas existentes. Ocultar Personas, Equipos y Contenido mientras no existan como módulos; una navegación deshabilitada requiere una razón visible y no debe parecer operativa.
 - Copy del flujo por archivos: **Exportar contexto para Worship**, **Importar repertorio de Worship** y **Exportar para Presenter**. Evitar «Abrir / preparar en Worship» y «Preparar Presenter» mientras no existan deep links o integración directa.
@@ -84,13 +84,11 @@ El prototipo usa sombras suaves cercanas a `0 8px 30px #1720330D`. No convertir 
 - Evitar movimiento decorativo continuo. Respetar `prefers-reduced-motion: reduce` y desactivar desplazamientos no esenciales.
 - Usar transiciones CSS para color, sombra, borde y opacidad. Reservar Motion for React para cambios de layout, reordenamiento, entradas/salidas, drawers y diálogos.
 
-## Validación antes de congelar 0.1
+## Gate cumplido para 0.1
 
-1. Corregir copy, navegación y contadores del Editor con datos derivados del mismo servicio.
-2. Diseñar **Dashboard / Servicios** en un frame independiente, reutilizando los tokens y componentes anteriores y solo capacidades actuales.
-3. Verificar ambas pantallas en escritorio y móvil, incluida sidebar/drawer.
-4. Medir contraste AA de dorado, texto secundario y badges en todos sus fondos.
-5. Hacer evidente la propiedad funcional de Worship, Platform y Presenter sin explicación externa.
-6. Consolidar tokens y componentes en Figma sin contradicciones entre las dos pantallas.
+1. Dashboard y Editor usan la misma hoja de tokens, sidebar y barra/drawer móvil.
+2. Se revisaron a 1440, 1024, 768 y 390 px: sin desbordamiento horizontal ni errores de ejecución; drawer móvil funcional en ambas páginas.
+3. Los pares de texto, dorado y estados indicados arriba superan WCAG AA para texto normal.
+4. El Editor conserva el orden como columna dominante y la tarjeta termina después de «Agregar elemento al culto». `Miércoles de oración` muestra que un servicio puede ser válido sin canciones.
 
-Solo después de estos seis puntos se congela Design System 0.1 y se autoriza llevarlo al CSS productivo. El orden de M7.5 es Foundations → Platform core screens → Responsive → Figma → implementación Platform → productización Worship → productización Presenter. No rediseñar los forks antes de validar Platform.
+La siguiente etapa es implementar Platform por capas: tokens → componentes base → shell → Dashboard → Editor → responsive → Motion. El producto seguirá usando `ServiceRepository`, `WorshipPlan` y `parseService()` como fuentes del dominio. Worship y Presenter permanecen fuera de este cambio.

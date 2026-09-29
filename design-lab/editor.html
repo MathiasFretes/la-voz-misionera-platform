@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Editor de Servicio · LVM Design Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" aria-label="Navegación principal">
+        <a class="brand" href="./dashboard.html"
+          ><span class="brand-mark">LV</span
+          ><span
+            ><span class="brand-name">La Voz Misionera</span
+            ><span class="brand-product">Platform</span></span
+          ></a
+        >
+        <nav aria-label="Secciones">
+          <ul class="nav-list">
+            <li>
+              <a class="nav-link" href="./index.html"
+                ><span class="nav-icon" aria-hidden="true">⌂</span>Inicio</a
+              >
+            </li>
+            <li>
+              <a class="nav-link" href="./dashboard.html" aria-current="page"
+                ><span class="nav-icon" aria-hidden="true">▱</span>Servicios</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="offline-note">
+            <span class="offline-dot" aria-hidden="true"></span
+            ><span>Flujo local · disponible sin conexión</span>
+          </div>
+          <p class="version">Service 0.1</p>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="mobile-header">
+          <details class="mobile-nav">
+            <summary>
+              <span class="menu-icon" aria-hidden="true">≡</span
+              ><span>Servicios</span>
+            </summary>
+            <nav class="mobile-drawer" aria-label="Navegación móvil">
+              <a class="brand" href="./dashboard.html"
+                ><span class="brand-mark">LV</span
+                ><span
+                  ><span class="brand-name">La Voz Misionera</span
+                  ><span class="brand-product">Platform</span></span
+                ></a
+              >
+              <ul class="nav-list">
+                <li>
+                  <a class="nav-link" href="./index.html"
+                    ><span class="nav-icon" aria-hidden="true">⌂</span>Inicio</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="nav-link"
+                    href="./dashboard.html"
+                    aria-current="page"
+                    ><span class="nav-icon" aria-hidden="true">▱</span
+                    >Servicios</a
+                  >
+                </li>
+              </ul>
+              <div class="offline-note">
+                <span class="offline-dot" aria-hidden="true"></span
+                ><span>Flujo local · disponible sin conexión</span>
+              </div>
+              <p class="version">Service 0.1</p>
+            </nav>
+          </details>
+        </header>
+        <header class="page-header editor-header">
+          <div>
+            <p class="eyebrow">
+              <a href="./dashboard.html">Servicios</a> · Domingo
+            </p>
+            <h1>Culto General</h1>
+            <p class="meta">Domingo, 4 de octubre · 19:00 · Sede Central</p>
+          </div>
+          <div class="header-actions">
+            <button class="button button-secondary" type="button">
+              Guardar</button
+            ><button class="button button-primary" type="button">
+              Exportar para Presenter
+            </button>
+          </div>
+          <div
+            class="editor-statuses"
+            aria-label="Estados independientes del servicio"
+          >
+            <div class="status-panel status-success">
+              <span class="status-symbol" aria-hidden="true">✓</span>
+              <div>
+                <strong>Guardado en este navegador</strong
+                ><span>Estado local</span>
+              </div>
+            </div>
+            <div class="status-panel status-warning">
+              <span class="status-symbol" aria-hidden="true">⇩</span>
+              <div>
+                <strong>Repertorio importado</strong
+                ><span>2 de 3 canciones desde archivo</span>
+              </div>
+            </div>
+            <div class="status-panel">
+              <span class="status-symbol" aria-hidden="true">✓</span>
+              <div>
+                <strong>Service 0.1 — válido para Presenter</strong
+                ><span>Exportación</span>
+              </div>
+            </div>
+          </div>
+        </header>
+        <nav class="tabs" aria-label="Secciones del editor">
+          <a class="tab" href="#orden">Orden</a
+          ><a class="tab" href="#informacion">Información</a
+          ><a class="tab" href="#presentacion">Presentación</a>
+        </nav>
+        <div class="editor-layout">
+          <section
+            class="card order-card"
+            id="orden"
+            aria-labelledby="order-title"
+          >
+            <div class="order-head">
+              <div>
+                <h2 id="order-title">Orden del culto</h2>
+                <p class="muted small">
+                  7 elementos · 3 canciones (2 Worship · 1 Platform)
+                </p>
+              </div>
+              <button class="button button-secondary" type="button">
+                + Agregar
+              </button>
+            </div>
+            <ol class="service-list">
+              <li class="service-row">
+                <span class="item-number">01</span>
+                <div>
+                  <p class="item-type">Bienvenida</p>
+                  <p class="item-title">Bienvenida y oración</p>
+                  <p class="item-detail">5 min</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir Bienvenida y oración"
+                    disabled
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar Bienvenida y oración"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+              <li class="service-row is-selected">
+                <span class="item-number">02</span>
+                <div>
+                  <p class="item-type">
+                    Canción <span class="origin origin-worship">Worship</span>
+                    <span class="origin origin-worship">solo lectura</span>
+                  </p>
+                  <p class="item-title">Eres Fiel</p>
+                  <p class="item-detail">G · 4 secciones</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir Eres Fiel"
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar Eres Fiel"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+              <li class="service-row">
+                <span class="item-number">03</span>
+                <div>
+                  <p class="item-type">
+                    Canción <span class="origin origin-worship">Worship</span>
+                    <span class="origin origin-worship">solo lectura</span>
+                  </p>
+                  <p class="item-title">Santo por Siempre</p>
+                  <p class="item-detail">A · 6 secciones</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir Santo por Siempre"
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar Santo por Siempre"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+              <li class="service-row">
+                <span class="item-number">04</span>
+                <div>
+                  <p class="item-type">
+                    Canción <span class="origin">Platform</span>
+                  </p>
+                  <p class="item-title">Cuán Grande es Él</p>
+                  <p class="item-detail">G · 5 secciones</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir Cuán Grande es Él"
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar Cuán Grande es Él"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+              <li class="service-row">
+                <span class="item-number">05</span>
+                <div>
+                  <p class="item-type">Biblia</p>
+                  <p class="item-title">Salmo 23:1–4</p>
+                  <p class="item-detail">RVR1960</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir Salmo 23"
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar Salmo 23"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+              <li class="service-row">
+                <span class="item-number">06</span>
+                <div>
+                  <p class="item-type">Anuncio</p>
+                  <p class="item-title">Encuentro de jóvenes</p>
+                  <p class="item-detail">Sábado · 18:00</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir Encuentro de jóvenes"
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar Encuentro de jóvenes"
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+              <li class="service-row">
+                <span class="item-number">07</span>
+                <div>
+                  <p class="item-type">Predicación</p>
+                  <p class="item-title">El buen pastor</p>
+                  <p class="item-detail">Pastoral</p>
+                </div>
+                <div class="row-actions">
+                  <button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Subir El buen pastor"
+                  >
+                    ↑</button
+                  ><button
+                    class="icon-button"
+                    type="button"
+                    aria-label="Bajar El buen pastor"
+                    disabled
+                  >
+                    ↓
+                  </button>
+                </div>
+              </li>
+            </ol>
+            <div class="add-row">
+              <button class="button button-secondary" type="button">
+                + Agregar elemento al culto
+              </button>
+            </div>
+          </section>
+          <div class="editor-side">
+            <section class="card side-card" aria-labelledby="item-title">
+              <div class="side-head">
+                <div>
+                  <p class="section-kicker">Elemento</p>
+                  <h2 id="item-title">Eres Fiel</h2>
+                </div>
+                <span class="origin">Canción</span>
+              </div>
+              <p class="readonly">♙ Campos de Worship · solo lectura</p>
+              <dl class="field-list">
+                <div class="field">
+                  <dt>Título</dt>
+                  <dd>Eres Fiel</dd>
+                </div>
+                <div class="field">
+                  <dt>Tonalidad</dt>
+                  <dd>G</dd>
+                </div>
+                <div class="field">
+                  <dt>Letra</dt>
+                  <dd>Verso 1 · Coro · Puente · Coro final</dd>
+                </div>
+                <div class="field">
+                  <dt>Arreglo</dt>
+                  <dd>Banda completa · final suave para oración</dd>
+                </div>
+              </dl>
+              <p class="explain">
+                Platform puede reordenar esta canción. Su contenido musical se
+                edita en Worship.
+              </p>
+              <button class="button button-danger" type="button">
+                Quitar elemento
+              </button>
+            </section>
+            <section
+              class="card side-card integration"
+              id="informacion"
+              aria-labelledby="worship-title"
+            >
+              <div class="side-head">
+                <div>
+                  <h2 id="worship-title">LVM Worship</h2>
+                  <p class="summary">
+                    2 canciones importadas de Worship; 1 manual en Platform.
+                  </p>
+                </div>
+                <span class="brand-mark" aria-hidden="true">W</span>
+              </div>
+              <span class="status-badge status-success"
+                ><span class="dimension">Estado</span
+                ><strong>Repertorio importado</strong></span
+              ><button class="button button-dark" type="button">
+                Exportar contexto para Worship</button
+              ><button class="button button-secondary" type="button">
+                Importar repertorio de Worship
+              </button>
+            </section>
+            <section
+              class="card side-card presenter"
+              id="presentacion"
+              aria-labelledby="presenter-title"
+            >
+              <p class="section-kicker">Presentación</p>
+              <h2 id="presenter-title">LVM Presenter</h2>
+              <p>Service 0.1 validado para Presenter.</p>
+              <button class="button button-secondary" type="button">
+                Revisar contrato
+              </button>
+            </section>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Servicios · LVM Design Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" aria-label="Navegación principal">
+        <a class="brand" href="./dashboard.html"
+          ><span class="brand-mark">LV</span
+          ><span
+            ><span class="brand-name">La Voz Misionera</span
+            ><span class="brand-product">Platform</span></span
+          ></a
+        >
+        <nav aria-label="Secciones">
+          <ul class="nav-list">
+            <li>
+              <a class="nav-link" href="./index.html"
+                ><span class="nav-icon" aria-hidden="true">⌂</span>Inicio</a
+              >
+            </li>
+            <li>
+              <a class="nav-link" href="./dashboard.html" aria-current="page"
+                ><span class="nav-icon" aria-hidden="true">▱</span>Servicios</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="offline-note">
+            <span class="offline-dot" aria-hidden="true"></span
+            ><span>Flujo local · disponible sin conexión</span>
+          </div>
+          <p class="version">Service 0.1</p>
+        </div>
+      </aside>
+      <main class="main">
+        <header class="mobile-header">
+          <details class="mobile-nav">
+            <summary>
+              <span class="menu-icon" aria-hidden="true">≡</span
+              ><span>Servicios</span>
+            </summary>
+            <nav class="mobile-drawer" aria-label="Navegación móvil">
+              <a class="brand" href="./dashboard.html"
+                ><span class="brand-mark">LV</span
+                ><span
+                  ><span class="brand-name">La Voz Misionera</span
+                  ><span class="brand-product">Platform</span></span
+                ></a
+              >
+              <ul class="nav-list">
+                <li>
+                  <a class="nav-link" href="./index.html"
+                    ><span class="nav-icon" aria-hidden="true">⌂</span>Inicio</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="nav-link"
+                    href="./dashboard.html"
+                    aria-current="page"
+                    ><span class="nav-icon" aria-hidden="true">▱</span
+                    >Servicios</a
+                  >
+                </li>
+              </ul>
+              <div class="offline-note">
+                <span class="offline-dot" aria-hidden="true"></span
+                ><span>Flujo local · disponible sin conexión</span>
+              </div>
+              <p class="version">Service 0.1</p>
+            </nav>
+          </details>
+          <a class="button button-primary" href="./editor.html"
+            >+ Crear servicio</a
+          >
+        </header>
+        <header class="page-header dashboard-header">
+          <div>
+            <p class="eyebrow">LVM Platform</p>
+            <h1>Servicios</h1>
+          </div>
+          <div class="header-actions">
+            <a class="button button-primary" href="./editor.html"
+              >+ Crear servicio</a
+            >
+          </div>
+        </header>
+        <div class="page-content dashboard-content">
+          <section class="card hero" aria-labelledby="next-title">
+            <div>
+              <p class="section-kicker">Próximo servicio</p>
+              <h2 id="next-title">Culto General</h2>
+              <p class="meta">Domingo · 19:00 · Sede Central</p>
+              <div class="status-grid" aria-label="Estados del servicio">
+                <span class="status-badge status-success"
+                  ><span class="dimension">Persistencia</span
+                  ><strong>Guardado local</strong></span
+                ><span class="status-badge"
+                  ><span class="dimension">Worship</span
+                  ><strong>Repertorio importado</strong></span
+                ><span class="status-badge status-success"
+                  ><span class="dimension">Presenter</span
+                  ><strong>Service válido</strong></span
+                >
+              </div>
+            </div>
+            <a class="button button-primary hero-action" href="./editor.html"
+              >Abrir servicio <span aria-hidden="true">→</span></a
+            >
+          </section>
+          <section aria-labelledby="recent-title">
+            <div class="collection-heading">
+              <div>
+                <p class="section-kicker">Colección local</p>
+                <h2 id="recent-title">Servicios recientes</h2>
+              </div>
+              <span class="muted small">3 servicios</span>
+            </div>
+            <div class="service-grid">
+              <article class="card service-card">
+                <div>
+                  <h3>Culto General</h3>
+                  <p class="meta">Domingo · 19:00 · Sede Central</p>
+                </div>
+                <div class="status-grid" aria-label="Estados de Culto General">
+                  <span class="status-badge status-success"
+                    ><span class="dimension">Persistencia</span
+                    ><strong>Guardado local</strong></span
+                  ><span class="status-badge"
+                    ><span class="dimension">Worship</span
+                    ><strong>Repertorio importado</strong></span
+                  ><span class="status-badge status-success"
+                    ><span class="dimension">Presenter</span
+                    ><strong>Service válido</strong></span
+                  >
+                </div>
+                <a class="button button-secondary" href="./editor.html"
+                  >Abrir <span aria-hidden="true">→</span></a
+                >
+              </article>
+              <article class="card service-card">
+                <div>
+                  <h3>Miércoles de oración</h3>
+                  <p class="meta">Miércoles · 18:30 · Sede Norte</p>
+                </div>
+                <div
+                  class="status-grid"
+                  aria-label="Estados de Miércoles de oración"
+                >
+                  <span class="status-badge status-success"
+                    ><span class="dimension">Persistencia</span
+                    ><strong>Guardado local</strong></span
+                  ><span class="status-badge status-warning"
+                    ><span class="dimension">Worship</span
+                    ><strong>Sin repertorio</strong></span
+                  ><span class="status-badge status-success"
+                    ><span class="dimension">Presenter</span
+                    ><strong>Service válido</strong></span
+                  >
+                </div>
+                <a class="button button-secondary" href="./editor.html"
+                  >Abrir <span aria-hidden="true">→</span></a
+                >
+              </article>
+              <article class="card service-card">
+                <div>
+                  <h3>Reunión juvenil</h3>
+                  <p class="meta">Viernes · 19:30 · Sede Sur</p>
+                </div>
+                <div
+                  class="status-grid"
+                  aria-label="Estados de Reunión juvenil"
+                >
+                  <span class="status-badge status-warning"
+                    ><span class="dimension">Persistencia</span
+                    ><strong>Cambios pendientes</strong></span
+                  ><span class="status-badge status-warning"
+                    ><span class="dimension">Worship</span
+                    ><strong>Sin repertorio</strong></span
+                  ><span class="status-badge status-warning"
+                    ><span class="dimension">Presenter</span
+                    ><strong>No validado</strong></span
+                  >
+                </div>
+                <a class="button button-secondary" href="./editor.html"
+                  >Abrir <span aria-hidden="true">→</span></a
+                >
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
