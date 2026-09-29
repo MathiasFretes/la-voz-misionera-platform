@@ -52,7 +52,7 @@ Fuente: `C:\la-voz-misionera-v0\src\screens\*Screen.tsx` y navegación en `src/s
 - **Archivo / usuarios:** `src/screens/EnVivoScreen.tsx`; audiencia de transmisión.
 - **Layout / secciones:** cabecera, gran panel de reproducción y accesos YouTube/Facebook.
 - **Acciones / estados:** los botones principales muestran toasts («Abriendo YouTube», «YouTube», «Facebook»); no hay reproductor/estado en vivo verificado.
-- **Datos / Firebase:** `useRadios` importado, pero el flujo visible de video está mayormente hardcodeado. Separar estado real de emisión y enlaces confirmados.
+- **Datos / Firebase:** se invoca `useRadios`, pero `radios`/`radiosLoading` no alimentan la pantalla. El flujo visible de video está hardcodeado. Separar radio de video, estado real de emisión y enlaces confirmados.
 - **Assets / responsive:** bloque oscuro con play visual; botones envuelven en móvil. Preservar prioridad de transmisión; rehacer integración, offline/no emisión/error y accesibilidad.
 - **Capturas:** [desktop](screenshots/envivo-desktop.jpg) · [móvil](screenshots/envivo-mobile.jpg).
 
@@ -69,8 +69,8 @@ Fuente: `C:\la-voz-misionera-v0\src\screens\*Screen.tsx` y navegación en `src/s
 
 - **Archivo / usuarios:** `src/screens/SedesScreen.tsx`; visitante que busca comunidad local.
 - **Layout / secciones:** cabecera, selector de sede, detalle de dirección/pastor/horarios y CTA de mapa.
-- **Acciones / estados:** seleccionar sede, volver, «abrir Google Maps» vía toast; carga con fallback.
-- **Datos / Firebase:** `useSedes`: nombre, dirección, pastor, teléfono, email, horarios, central y orden.
+- **Acciones / estados:** seleccionar sede, volver, «abrir Google Maps» vía toast; pantalla de carga y lista vacía si faltan datos.
+- **Datos / Firebase:** `useSedes`: nombre, dirección, pastor, teléfono, email, horarios, central y orden. Si la colección está vacía, `displaySedes` queda vacío; no hay sedes fallback.
 - **Assets / responsive:** paneles según `isDesktop`; mapa es visual/enlace a validar. Conservar selector y detalle; definir URL de mapas verificable y relación con horarios de Operación.
 - **Capturas:** [desktop](screenshots/sedes-desktop.jpg) · [móvil](screenshots/sedes-mobile.jpg).
 

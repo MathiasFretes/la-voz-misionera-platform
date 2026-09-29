@@ -13,6 +13,7 @@ Este mapa registra decisiones de producto, estructura y campos; **no autoriza** 
 - `assets/` contiene iconos/splash de Expo. Las imágenes de hero, retratos y portadas se referencian por URL o fallback; deben inventariarse/licenciarse antes de reutilizarlas. El contenido de V0 puede ser demo y exige verificación editorial antes de publicación.
 - El hero público toma cuatro slides fijos de `src/data/fallback.ts`: tres fotos remotas de Unsplash y un video remoto de Pexels. El tipo `HeroSlide` y su servicio Firebase no prueban que esos datos controlen la pantalla actual. No mover URL ni imagen al producto sin origen/licencia/uso editorial confirmados.
 - En el drawer móvil de `App.tsx`, la opción «BOLETÍN» cae en el `else` de la cadena de navegación y abre `privacidad`; es una contradicción de flujo observada en código. El nuevo router debe cubrir todas las entradas con pruebas de navegación.
+- `src/constants/platform.ts` calcula `isDesktop`/`isMobile` una vez con `Dimensions.get('window')` al cargar el módulo. No reacciona al redimensionamiento del navegador. `AdminLayout` elige el navegador admin por `isWeb`, así que a 390 px sigue usando el shell web. Las capturas con viewport inicial no demuestran transición responsive en caliente.
 
 ## Matriz maestra
 
@@ -65,4 +66,4 @@ Ninguna pantalla V0 escribe el repertorio de Worship ni proyecta en Presenter. W
 
 Una pantalla queda migrada cuando conserva las decisiones UX valiosas de su ficha, usa el Design System LVM vigente, funciona en desktop/móvil, tiene estados de carga/vacío/error/éxito donde apliquen, no importa Firebase/NativeBase V0, está conectada al dominio nuevo y supera pruebas significativas. Si el backend no existe, la UX puede aprobarse, pero su implementación productiva permanece pendiente.
 
-**Regla de PR:** toda pantalla nueva LVM que reemplace una pantalla V0 debe enlazar su ficha y explicar en la descripción **qué se preservó, qué cambió y por qué**. Debe mostrar evidencia desktop/móvil y el resultado del gate. Si se propone DESCARTAR, justificar la pérdida funcional y el destino del contenido/datos.
+**Regla de PR:** toda pantalla nueva LVM que reemplace una pantalla V0 debe enlazar su ficha y explicar en la descripción **qué se preservó, qué cambió y por qué**. Debe mostrar evidencia desktop/móvil y el resultado del gate. Si se propone DESCARTAR, justificar la pérdida funcional y el destino del contenido/datos. La [plantilla de PR](../.github/pull_request_template.md) solicita esa comparación.
