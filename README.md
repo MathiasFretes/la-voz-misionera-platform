@@ -1,5 +1,7 @@
 # LVM Platform
 
+The documentary M7.6 audit of the read-only legacy site lives in [the V0 migration map](docs/v0-migration-map.md). It inventories public/admin screens, data fields and migration gates; it does not add legacy runtime dependencies to Platform.
+
 M7 connects Platform, Worship, and Presenter by local files. Platform exports a [Worship context](contracts/worship-plan-0.1.md) for the service; Worship returns a music-only WorshipPlan 0.1; Platform merges the selected musical block and exports the existing Service 0.1 to Presenter. The three-product workflow requires no account, API, or Internet connection. Worship's offline draft accepts local ChordPro songs.
 
 LVM Platform owns the order of a church service. M6 is a local React + TypeScript + Vite application: create a service, add and reorder its items, reopen it from the same browser, then export a strict [Service 0.1](contracts/service-0.1.md) JSON for LVM Presenter. It needs no account, database, API, or Internet service.
