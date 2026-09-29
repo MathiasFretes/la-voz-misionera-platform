@@ -1,6 +1,6 @@
 # LVM Design System 0.1 — borrador de fundamentos
 
-Estado: **propuesto para revisión visual**. Este documento describe la pantalla pública [LVM Platform — Editor de Servicio](https://designs.magicpath.ai/v1/fresh-valley-5681) y fija reglas para diseñar Dashboard / Servicios. No cambia la UI productiva ni los contratos `WorshipPlan 0.1` y `Service 0.1`.
+Estado: **aprobado como base de trabajo; aún no congelado**. Este documento describe la pantalla pública [LVM Platform — Editor de Servicio](https://designs.magicpath.ai/v1/fresh-valley-5681) y fija reglas para diseñar Dashboard / Servicios. No cambia la UI productiva ni los contratos `WorshipPlan 0.1` y `Service 0.1`.
 
 ## Principios
 
@@ -28,9 +28,13 @@ Los valores base se observaron en el CSS compilado del prototipo público. La as
 
 Definir aparte `success`, `warning` y `danger` con pares fondo/texto que alcancen WCAG AA. No usar solo color para expresar estado. En superficie dorada, elegir texto oscuro según contraste medido; evitar blanco por defecto.
 
+Chequeo inicial de contraste: `#C89B3C` como texto sobre blanco da **2.56:1** y no sirve para texto normal; `#172033` sobre dorado da **6.36:1**; `#475467` sobre blanco da **7.69:1**; `#7C5B16` sobre `#FFF9ED` da **5.95:1**. Mantener el dorado como fondo de acción o indicador, con texto navy. Estos cálculos cubren combinaciones concretas, no sustituyen la revisión de todos los estados finales.
+
+Al llevar los tokens al código, los componentes consumirán **roles semánticos**, no colores físicos. La capa de tema resolverá valores como `--lvm-bg-app`, `--lvm-bg-surface`, `--lvm-text-primary`, `--lvm-text-muted`, `--lvm-border-subtle`, `--lvm-action-primary`, `--lvm-action-primary-hover`, `--lvm-status-success`, `--lvm-status-warning` y `--lvm-status-danger` hacia la paleta navy/dorado. Estos nombres son el contrato visual propuesto; todavía no se añaden al CSS productivo.
+
 ## Tipografía y escala
 
-- Fuente de trabajo: **Inter** con fallback `system-ui, sans-serif`, pendiente de confirmar como decisión de marca. El CSS público importa Inter; no se observa aún una familia distintiva de títulos.
+- Fuente de interfaz: **Inter** con fallback `system-ui, sans-serif`, aprobada provisionalmente. Una fuente distintiva para comunicación pública puede decidirse después sin cambiar la interfaz del software.
 - Escala inicial: 12 / 14 / 16 / 20 / 24 / 32 px. Cuerpo 16 px; metadatos 14 px; 12 px solo para etiquetas auxiliares con contraste suficiente.
 - Pesos: 400 para cuerpo, 600 para controles y subtítulos, 700 para títulos. Reservar mayúsculas con tracking ligero para etiquetas cortas como «ORDEN DEL CULTO».
 - Los títulos y nombres de canciones pueden ocupar dos líneas antes de truncarse. No esconder referencias bíblicas importantes tras puntos suspensivos.
@@ -70,19 +74,23 @@ El prototipo usa sombras suaves cercanas a `0 8px 30px #1720330D`. No convertir 
 - Mostrar estados separados para **guardado local**, **repertorio importado** y **Service 0.1 válido para Presenter**. Son hechos distintos.
 - Todos los contadores de la pantalla deben derivar del mismo servicio. El prototipo público muestra 7 elementos en «Orden» y 8 en «Presentación»; corregirlo antes de tomar capturas finales o implementar.
 - Exportar `Service 0.1` es una acción sobre un archivo local, no una publicación ni una conexión en vivo con Presenter.
+- En la sidebar, mostrar solo rutas existentes. Ocultar Personas, Equipos y Contenido mientras no existan como módulos; una navegación deshabilitada requiere una razón visible y no debe parecer operativa.
+- Copy del flujo por archivos: **Exportar contexto para Worship**, **Importar repertorio de Worship** y **Exportar para Presenter**. Evitar «Abrir / preparar en Worship» y «Preparar Presenter» mientras no existan deep links o integración directa.
 
 ## Motion 0.1
 
 - 120–180 ms para hover, foco y selección; 180–240 ms para apertura de paneles y cambio de pestaña. Easing `ease-out` para entrada y `ease-in` para salida.
 - En reordenamiento, animar la posición de filas y preservar la referencia del elemento tomado. El resultado debe ser comprensible sin animación.
 - Evitar movimiento decorativo continuo. Respetar `prefers-reduced-motion: reduce` y desactivar desplazamientos no esenciales.
-- Motion for React se incorpora al implementar interacciones que lo necesiten; no hace falta para cambios simples de color o borde.
+- Usar transiciones CSS para color, sombra, borde y opacidad. Reservar Motion for React para cambios de layout, reordenamiento, entradas/salidas, drawers y diálogos.
 
 ## Validación antes de congelar 0.1
 
-1. Confirmar en MagicPath la tipografía final, los tokens de estado y la variante responsiva de sidebar.
-2. Medir contraste de texto dorado, badges y metadatos en todos sus fondos.
-3. Corregir el contador 7/8 y el texto «sincronizado localmente» del prototipo.
-4. Confirmar el tratamiento de canciones gestionadas por Worship como referencia de solo lectura en Platform.
-5. Diseñar **Dashboard / Servicios** en un frame independiente, reutilizando los tokens y componentes anteriores. Debe incluir servicio reciente, CTA «Crear servicio», estado local, lista vacía y al menos un servicio listo para Presenter.
-6. Comparar Editor y Dashboard en escritorio y móvil; luego consolidar en Figma y recién entonces llevar los tokens al CSS productivo.
+1. Corregir copy, navegación y contadores del Editor con datos derivados del mismo servicio.
+2. Diseñar **Dashboard / Servicios** en un frame independiente, reutilizando los tokens y componentes anteriores y solo capacidades actuales.
+3. Verificar ambas pantallas en escritorio y móvil, incluida sidebar/drawer.
+4. Medir contraste AA de dorado, texto secundario y badges en todos sus fondos.
+5. Hacer evidente la propiedad funcional de Worship, Platform y Presenter sin explicación externa.
+6. Consolidar tokens y componentes en Figma sin contradicciones entre las dos pantallas.
+
+Solo después de estos seis puntos se congela Design System 0.1 y se autoriza llevarlo al CSS productivo. El orden de M7.5 es Foundations → Platform core screens → Responsive → Figma → implementación Platform → productización Worship → productización Presenter. No rediseñar los forks antes de validar Platform.
