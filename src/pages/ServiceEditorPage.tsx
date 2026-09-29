@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useParams } from '@tanstack/react-router'
 import type { ServiceItem } from '../contracts/service'
+import { parseService } from '../contracts/service'
 import { ItemEditor } from '../features/services/ItemEditor'
 import { useServices } from '../features/services/useServices'
 import {
@@ -9,6 +10,20 @@ import {
   localDateTime,
   type ServiceRecord,
 } from '../domain/service/service'
+import { applyWorshipPlan, worshipContext } from '../domain/service/worshipPlan'
+
+function downloadJson(value: unknown, filename: string) {
+  const url = URL.createObjectURL(
+    new Blob([`${JSON.stringify(value, null, 2)}\n`], {
+      type: 'application/json',
+    }),
+  )
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(url), 30_000)
+}
 
 function itemTitle(item: ServiceItem): string {
   if (item.kind === 'SONG') return item.song.title
@@ -84,6 +99,30 @@ export function ServiceEditorPage() {
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : 'El contrato aún no es válido',
+      )
+    }
+  }
+
+  const afterItemId =
+    record.worshipAfterItemId ??
+    (record.service.items[0]?.kind !== 'SONG'
+      ? record.service.items[0]?.id
+      : '') ??
+    ''
+
+  async function importWorshipPlan(file: File) {
+    try {
+      const plan: unknown = JSON.parse(await file.text())
+      const service = parseService(
+        applyWorshipPlan(record!.service, plan, afterItemId || undefined),
+      )
+      persist({ ...record!, worshipAfterItemId: afterItemId, service })
+      setNotice('Repertorio de Worship importado y guardado')
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : 'No se pudo importar el repertorio',
       )
     }
   }
@@ -251,6 +290,60 @@ export function ServiceEditorPage() {
                 </li>
               ))}
             </ol>
+            <div className="panel form-stack">
+              <h3>Repertorio de Worship</h3>
+              <p>
+                Platform conserva el culto. Worship prepara solo las canciones y
+                devuelve un archivo WorshipPlan 0.1.
+              </p>
+              <label>
+                Colocar el bloque musical después de
+                <select
+                  value={afterItemId}
+                  onChange={(event) =>
+                    persist({
+                      ...record,
+                      worshipAfterItemId: event.target.value,
+                    })
+                  }
+                >
+                  <option value="">Inicio del culto</option>
+                  {record.service.items
+                    .filter((item) => item.kind !== 'SONG')
+                    .map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {itemTitle(item)}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <div className="actions">
+                <button
+                  className="button secondary"
+                  onClick={() =>
+                    downloadJson(
+                      worshipContext(record.service),
+                      `${record.service.id}-worship-context.json`,
+                    )
+                  }
+                >
+                  Exportar contexto para Worship
+                </button>
+                <label className="button primary">
+                  Importar WorshipPlan 0.1
+                  <input
+                    type="file"
+                    accept=".json,application/json"
+                    hidden
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      if (file) void importWorshipPlan(file)
+                      event.target.value = ''
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
             {!record.service.items.length && (
               <p className="hint">
                 Agrega la bienvenida, canciones, Biblia, anuncios o predicación.
