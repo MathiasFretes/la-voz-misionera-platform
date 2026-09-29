@@ -1,6 +1,6 @@
 # LVM Platform Design Lab 0.1
 
-El navegador es la referencia visual ejecutable de [Dashboard](dashboard.html) y [Editor de Servicio](editor.html). Abre [index.html](index.html) directamente; no se necesita servidor, cuenta ni Internet. Las páginas usan [tokens.css](tokens.css) y [styles.css](styles.css), sin Tailwind ni dependencias de MagicPath o Figma.
+El navegador es la referencia visual ejecutable de [Dashboard](dashboard.html) y [Editor de Servicio](editor.html). Abre [index.html](index.html) directamente; no se necesita servidor, cuenta ni Internet. Las páginas usan los [tokens canónicos](../design-system/tokens.css) y [styles.css](styles.css), sin Tailwind ni dependencias de MagicPath o Figma. Platform consume el mismo archivo de tokens; el producto no importa estilos desde `design-lab/`.
 
 ## Alcance
 

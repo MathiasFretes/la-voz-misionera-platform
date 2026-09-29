@@ -1,6 +1,6 @@
 # LVM Design System 0.1
 
-Estado: **congelado — Design System 0.1**. La especificación visual ejecutable está en [Design Lab](../design-lab/README.md): [Dashboard](../design-lab/dashboard.html), [Editor](../design-lab/editor.html) y [tokens compartidos](../design-lab/tokens.css). MagicPath y Figma quedan como referencias de exploración; no son dependencias ni gates de implementación. Esta versión no cambia la UI productiva ni los contratos `WorshipPlan 0.1` y `Service 0.1`.
+Estado: **congelado — Design System 0.1**. La especificación visual ejecutable está en [Design Lab](../design-lab/README.md): [Dashboard](../design-lab/dashboard.html), [Editor](../design-lab/editor.html) y [tokens compartidos](../design-system/tokens.css). MagicPath y Figma quedan como referencias de exploración; no son dependencias ni gates de implementación. Los tokens ya son consumidos por Platform; los contratos `WorshipPlan 0.1` y `Service 0.1` no cambian.
 
 ## Principios
 
@@ -12,7 +12,7 @@ Estado: **congelado — Design System 0.1**. La especificación visual ejecutabl
 
 ## Color
 
-Los valores siguientes están definidos en `design-lab/tokens.css`. La aplicación productiva debe consumir estos roles semánticos cuando se implemente la nueva UI.
+Los valores siguientes están definidos en `design-system/tokens.css`. El Design Lab y la aplicación productiva consumen ese mismo archivo; sus roles semánticos son el contrato visual compartido.
 
 | Token semántico          | Valor inicial | Uso                                     |
 | ------------------------ | ------------- | --------------------------------------- |
@@ -30,7 +30,7 @@ Definir aparte `success`, `warning` y `danger` con pares fondo/texto que alcance
 
 Contraste verificado en el Design Lab: `#172033` sobre dorado **6.36:1**; texto secundario sobre blanco **7.69:1**; éxito **6.81:1**, advertencia **5.95:1** y error **6.05:1** sobre sus fondos. `#C89B3C` como texto sobre blanco da **2.56:1** y no sirve para texto normal; el dorado se usa como fondo de acción o indicador con texto navy.
 
-Los componentes consumirán **roles semánticos**, no colores físicos. `design-lab/tokens.css` define `--lvm-bg-app`, `--lvm-bg-surface`, `--lvm-text-primary`, `--lvm-text-secondary`, `--lvm-border-subtle`, `--lvm-action-primary`, `--lvm-action-primary-hover` y los estados. Es el contrato visual 0.1; todavía no se añade al CSS productivo.
+Los componentes consumen **roles semánticos**, no colores físicos. `design-system/tokens.css` define `--lvm-bg-app`, `--lvm-bg-surface`, `--lvm-text-primary`, `--lvm-text-secondary`, `--lvm-border-subtle`, `--lvm-action-primary`, `--lvm-action-primary-hover` y los estados. Es el contrato visual 0.1 y `src/styles.css` lo importa directamente.
 
 ## Tipografía y escala
 
@@ -65,6 +65,8 @@ El prototipo usa sombras suaves cercanas a `0 8px 30px #1720330D`. No convertir 
 | `IntegrationStatus` | Producto, estado, descripción y siguiente acción              | Distingue «archivo importado localmente» de sincronización remota    |
 | `EmptyState`        | Qué falta, por qué importa y una acción                       | Casos: sin servicios, orden vacío, repertorio vacío, sin exportación |
 | `LoadingState`      | Mensaje y progreso cuando aplique                             | Evitar loaders indefinidos para operaciones locales rápidas          |
+
+Los primitives React de esta primera capa están en `src/ui/`: `Button`, `Card`, `Badge`/`StatusBadge`, `Field`, `Tabs` y `PageHeader`. Comparten `design-system/tokens.css` con el Design Lab; Dashboard y Editor los adoptarán en las siguientes capas.
 
 ## Reglas del Editor de Servicio
 
