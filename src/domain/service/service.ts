@@ -1,6 +1,11 @@
 import { parseService, type Service } from '../../contracts/service'
 
-export type ServiceRecord = { id: string; venue: string; service: Service }
+export type ServiceRecord = {
+  id: string
+  venue: string
+  service: Service
+  worshipAfterItemId?: string
+}
 
 export function newService(
   title: string,
@@ -41,5 +46,5 @@ export function downloadService(service: Service): void {
   link.href = url
   link.download = `${service.id}.json`
   link.click()
-  setTimeout(() => URL.revokeObjectURL(url), 0)
+  setTimeout(() => URL.revokeObjectURL(url), 30_000)
 }
