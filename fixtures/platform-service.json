@@ -1,0 +1,155 @@
+{
+  "schemaVersion": "0.1",
+  "id": "platform-demo-2026-10-04",
+  "title": "Culto General",
+  "startsAt": "2026-10-04T19:00:00-03:00",
+  "setlist": {
+    "id": "platform-demo-setlist",
+    "name": "Culto General"
+  },
+  "items": [
+    {
+      "id": "welcome",
+      "kind": "ANNOUNCEMENT",
+      "announcement": {
+        "title": "Bienvenida",
+        "body": "Bienvenidos al culto de La Voz Misionera."
+      }
+    },
+    {
+      "id": "song-opening",
+      "kind": "SONG",
+      "song": {
+        "id": "opening",
+        "title": "Canto de apertura",
+        "key": "A",
+        "sections": [
+          {
+            "kind": "verse",
+            "label": "Verso 1",
+            "lines": [
+              {
+                "text": "Alzamos hoy la voz",
+                "chords": [
+                  {
+                    "symbol": "A",
+                    "index": 0
+                  }
+                ]
+              },
+              {
+                "text": "Con gratitud y fe",
+                "chords": [
+                  {
+                    "symbol": "E",
+                    "index": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "chorus",
+            "label": "Coro",
+            "lines": [
+              {
+                "text": "Cantamos juntos aquí",
+                "chords": [
+                  {
+                    "symbol": "D",
+                    "index": 0
+                  }
+                ]
+              },
+              {
+                "text": "Tu luz nos guiará",
+                "chords": [
+                  {
+                    "symbol": "A",
+                    "index": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "song-thanks",
+      "kind": "SONG",
+      "song": {
+        "id": "thanks",
+        "title": "Canto de gratitud",
+        "key": "G",
+        "sections": [
+          {
+            "kind": "verse",
+            "label": "Verso 1",
+            "lines": [
+              {
+                "text": "Gracias por este día",
+                "chords": [
+                  {
+                    "symbol": "G",
+                    "index": 0
+                  }
+                ]
+              },
+              {
+                "text": "Y por tu amor",
+                "chords": [
+                  {
+                    "symbol": "D",
+                    "index": 0
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "chorus",
+            "label": "Coro",
+            "lines": [
+              {
+                "text": "Seguimos con esperanza",
+                "chords": [
+                  {
+                    "symbol": "C",
+                    "index": 0
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "scripture",
+      "kind": "SCRIPTURE",
+      "scripture": {
+        "reference": "Juan 3:16",
+        "version": "RV1909",
+        "text": "Porque de tal manera amó Dios al mundo, que ha dado á su Hijo unigénito...",
+        "source": "https://ebible.org/spaRV1909/JHN03.htm"
+      }
+    },
+    {
+      "id": "announcement",
+      "kind": "ANNOUNCEMENT",
+      "announcement": {
+        "title": "Encuentro de jóvenes",
+        "body": "Sábado a las 18:00 en Sede Central."
+      }
+    },
+    {
+      "id": "sermon",
+      "kind": "SERMON",
+      "sermon": {
+        "title": "El buen pastor",
+        "body": "Lectura y reflexión del día."
+      }
+    }
+  ]
+}
