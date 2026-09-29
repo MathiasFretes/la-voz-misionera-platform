@@ -1,0 +1,50 @@
+:root {
+  color-scheme: light;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+
+  --lvm-brand-navy: #0e1a2b;
+  --lvm-brand-navy-raised: #172033;
+  --lvm-brand-gold: #c89b3c;
+  --lvm-brand-gold-hover: #b4872e;
+  --lvm-brand-gold-tint: #fff9ed;
+
+  --lvm-bg-app: #f7f9fc;
+  --lvm-bg-surface: #ffffff;
+  --lvm-text-primary: #172033;
+  --lvm-text-secondary: #475467;
+  --lvm-text-on-dark: #ffffff;
+  --lvm-border-subtle: #e1e6ef;
+
+  --lvm-status-success: #166534;
+  --lvm-status-success-bg: #f0fdf4;
+  --lvm-status-success-border: #86efac;
+  --lvm-status-warning: #7c5b16;
+  --lvm-status-warning-bg: #fff9ed;
+  --lvm-status-warning-border: #f5d481;
+  --lvm-status-danger: #b42318;
+  --lvm-status-danger-bg: #fef3f2;
+  --lvm-status-danger-border: #fda29b;
+
+  --lvm-action-primary: var(--lvm-brand-gold);
+  --lvm-action-primary-hover: var(--lvm-brand-gold-hover);
+
+  --lvm-space-1: 4px;
+  --lvm-space-2: 8px;
+  --lvm-space-3: 12px;
+  --lvm-space-4: 16px;
+  --lvm-space-6: 24px;
+  --lvm-space-8: 32px;
+  --lvm-space-12: 48px;
+
+  --lvm-radius-control: 8px;
+  --lvm-radius-card: 12px;
+  --lvm-radius-panel: 16px;
+  --lvm-sidebar-width: 244px;
+  --lvm-shadow-card: 0 8px 30px rgb(23 32 51 / 5%);
+}
