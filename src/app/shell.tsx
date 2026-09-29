@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
+import { Button } from '../ui/Button'
 
 function Navigation({ close }: { close?: () => void }) {
   return (
@@ -81,9 +82,9 @@ export function AppShell() {
       </aside>
       <div className="app-main">
         <header className="mobile-header">
-          <button
+          <Button
             ref={menuTrigger}
-            type="button"
+            variant="quiet"
             className="menu-trigger"
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={menuOpen}
@@ -91,7 +92,7 @@ export function AppShell() {
             onClick={() => setMenuOpen((open) => !open)}
           >
             <span aria-hidden="true">☰</span>
-          </button>
+          </Button>
           <span className="mobile-section">{section}</span>
         </header>
         {menuOpen && (

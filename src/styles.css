@@ -1,4 +1,4 @@
-@import url('../design-lab/tokens.css');
+@import url('../design-system/tokens.css');
 
 :root {
   color: var(--lvm-text-primary);
@@ -230,17 +230,81 @@ p {
 .button.secondary:hover {
   border-color: var(--lvm-brand-gold);
 }
+.button.quiet {
+  background: transparent;
+  color: var(--lvm-text-primary);
+}
+.button.quiet:hover {
+  background: var(--lvm-brand-gold-tint);
+}
+.button.danger {
+  border-color: var(--lvm-status-danger-border);
+  background: var(--lvm-bg-surface);
+  color: var(--lvm-status-danger);
+}
+.button.danger:hover {
+  background: var(--lvm-status-danger-bg);
+}
 .button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 .panel,
 .service-card,
-.empty-state {
+.empty-state,
+.ui-card {
   background: var(--lvm-bg-surface);
   border: 1px solid var(--lvm-border-subtle);
   border-radius: var(--lvm-radius-card);
   box-shadow: var(--lvm-shadow-card);
+}
+.ui-card-padded {
+  padding: var(--lvm-space-6);
+}
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lvm-space-1);
+  min-height: 24px;
+  padding: 3px 9px;
+  border: 1px solid var(--lvm-border-subtle);
+  border-radius: 999px;
+  background: var(--lvm-bg-app);
+  color: var(--lvm-text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.ui-badge-success {
+  border-color: var(--lvm-status-success-border);
+  background: var(--lvm-status-success-bg);
+  color: var(--lvm-status-success);
+}
+.ui-badge-warning {
+  border-color: var(--lvm-status-warning-border);
+  background: var(--lvm-status-warning-bg);
+  color: var(--lvm-status-warning);
+}
+.ui-badge-danger {
+  border-color: var(--lvm-status-danger-border);
+  background: var(--lvm-status-danger-bg);
+  color: var(--lvm-status-danger);
+}
+.ui-status-badge {
+  display: grid;
+  gap: 2px;
+  min-width: 105px;
+  padding: 8px 10px;
+  border-radius: var(--lvm-radius-control);
+}
+.ui-status-dimension {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ui-status-badge strong {
+  font-size: 12px;
 }
 .panel {
   padding: 1.5rem;
@@ -310,14 +374,42 @@ p {
   resize: vertical;
   line-height: 1.5;
 }
+.ui-field {
+  display: grid;
+  gap: var(--lvm-space-2);
+}
+.ui-field label {
+  color: var(--lvm-text-primary);
+  font-weight: 600;
+}
+.ui-field :is(input, select, textarea) {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--lvm-border-subtle);
+  border-radius: var(--lvm-radius-control);
+  background: var(--lvm-bg-surface);
+  color: var(--lvm-text-primary);
+}
+.ui-field [aria-invalid='true'] {
+  border-color: var(--lvm-status-danger);
+}
+.ui-field-hint {
+  color: var(--lvm-text-secondary);
+}
+.ui-field-error {
+  color: var(--lvm-status-danger);
+}
 .tabs {
   display: flex;
   gap: 0.3rem;
   border-bottom: 1px solid var(--lvm-border-subtle);
   margin: 0 0 1.5rem;
+  overflow-x: auto;
 }
 .tabs button {
   min-height: 44px;
+  flex: 0 0 auto;
   border: 0;
   border-bottom: 3px solid transparent;
   background: none;
