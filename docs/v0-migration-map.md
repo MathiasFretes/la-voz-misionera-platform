@@ -1,6 +1,6 @@
 # M7.6 — mapa de migración de producto y UX desde V0
 
-**Estado:** auditoría documental. **Fuente V0:** `C:\la-voz-misionera-v0`, commit `7ac8ae5dd4aa240c83f6cc411a53920d2ef97529` más los cambios locales enumerados abajo. V0 es de solo lectura. La nueva implementación vive en los repositorios LVM actuales.
+**Estado:** auditoría completada — referencia para migraciones V0. **Fuente V0:** `C:\la-voz-misionera-v0`, commit `7ac8ae5dd4aa240c83f6cc411a53920d2ef97529` más los cambios locales enumerados abajo. V0 es de solo lectura. La nueva implementación vive en los repositorios LVM actuales.
 
 Este mapa registra decisiones de producto, estructura y campos; **no autoriza** copiar Expo, React Native Web, NativeBase, Firebase/Firestore, navegación ni componentes del proyecto anterior. Las decisiones son propuestas de migración sujetas al gate de cada vertical slice. La auditoría no crea módulos ni backend.
 
