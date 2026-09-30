@@ -56,6 +56,10 @@ test('mobile drawer navigates and closes without horizontal overflow', async ({
   ).toBeFocused()
   await page.setViewportSize({ width: 1024, height: 900 })
   await expect(page.getByLabel('Navegación principal')).toBeVisible()
+  await expect(page.locator('.menu-trigger')).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  )
   await page.setViewportSize({ width: 390, height: 844 })
   await expect(page.getByRole('button', { name: 'Abrir menú' })).toBeVisible()
 

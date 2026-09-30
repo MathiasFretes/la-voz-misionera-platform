@@ -58,8 +58,8 @@ export function AppShell() {
 
   useEffect(() => {
     const mobile = window.matchMedia('(max-width: 850px)')
-    const closeOnDesktop = () => {
-      if (!mobile.matches) setMenuOpen(false)
+    const closeOnDesktop = (event: MediaQueryListEvent) => {
+      if (!event.matches) setMenuOpen(false)
     }
     mobile.addEventListener('change', closeOnDesktop)
     return () => mobile.removeEventListener('change', closeOnDesktop)

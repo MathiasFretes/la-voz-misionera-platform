@@ -7,6 +7,13 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean
 }
 
+export function buttonClass(
+  variant: ButtonVariant = 'secondary',
+  className = '',
+) {
+  return `button ${variant} ${className}`.trim()
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
     {
@@ -24,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         ref={ref}
         type={type}
-        className={`button ${variant} ${className}`.trim()}
+        className={buttonClass(variant, className)}
         disabled={disabled || loading}
         aria-busy={loading || undefined}
       />

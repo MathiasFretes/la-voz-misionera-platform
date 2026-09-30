@@ -551,6 +551,98 @@ p {
   color: #75839b;
   font-size: 0.8rem;
 }
+.dashboard-content {
+  display: grid;
+  gap: var(--lvm-space-8);
+}
+.dashboard-kicker {
+  margin: 0;
+  color: var(--lvm-text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.dashboard-meta {
+  margin: var(--lvm-space-2) 0 0;
+  color: var(--lvm-text-secondary);
+  font-size: 14px;
+}
+.dashboard-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lvm-space-8);
+  min-width: 0;
+  padding: 28px;
+}
+.dashboard-hero h2 {
+  margin: var(--lvm-space-3) 0 0;
+  font-size: clamp(28px, 3vw, 36px);
+  letter-spacing: -0.03em;
+}
+.dashboard-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lvm-space-2);
+}
+.dashboard-hero .dashboard-statuses {
+  margin-top: var(--lvm-space-6);
+}
+.dashboard-hero-action {
+  flex: 0 0 auto;
+}
+.dashboard-collection-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--lvm-space-4);
+  margin-bottom: var(--lvm-space-4);
+}
+.dashboard-collection-heading h2 {
+  margin: var(--lvm-space-2) 0 0;
+  font-size: 20px;
+}
+.dashboard-collection-heading > span {
+  color: var(--lvm-text-secondary);
+  font-size: 14px;
+  white-space: nowrap;
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--lvm-space-4);
+}
+.dashboard-service-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lvm-space-3);
+  min-width: 0;
+  min-height: 260px;
+  padding: 20px;
+}
+.dashboard-service-card h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.dashboard-service-card .dashboard-statuses {
+  margin-top: auto;
+  padding-top: var(--lvm-space-4);
+}
+.dashboard-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--lvm-space-4);
+  padding: var(--lvm-space-12);
+  text-align: center;
+}
+.dashboard-empty h2,
+.dashboard-empty p {
+  margin: 0;
+}
 @media (max-width: 850px) {
   .app-shell {
     display: block;
@@ -616,5 +708,17 @@ p {
   .item-actions {
     width: 100%;
     justify-content: flex-start;
+  }
+}
+@media (max-width: 650px) {
+  .dashboard-hero {
+    display: block;
+    padding: 20px;
+  }
+  .dashboard-hero-action {
+    margin-top: var(--lvm-space-6);
+  }
+  .dashboard-empty {
+    padding: var(--lvm-space-8) var(--lvm-space-4);
   }
 }
