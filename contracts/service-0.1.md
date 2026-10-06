@@ -11,7 +11,7 @@ Platform owns the service and exports a single JSON object with `schemaVersion`,
 | `ANNOUNCEMENT` | `announcement` | `title`, `body`                                   |
 | `SERMON`       | `sermon`       | `title`, `body`                                   |
 
-A song section has `{kind,label,lines}`. Each line has `{text,chords}`; a chord has `{symbol,index}`. `index` is a zero-based UTF-16 code-unit offset into `text`, between 0 and `text.length`, and must not split a surrogate pair. Repeated sections appear repeatedly in playback order. The contract has no venue, people, teams, media, timers, permissions, API identifiers, or FreeShow layout data. Platform stores venue locally as editor metadata and excludes it from the export.
+A song section has `{kind,label,lines}`. Each line has `{text,chords}`; a chord has `{symbol,index}`. `index` is a zero-based UTF-16 code-unit offset into `text`, between 0 and `text.length`, and must not split a surrogate pair. Repeated sections appear repeatedly in playback order. The contract has no venue, people, teams, media, timers, permissions, API identifiers, or third-party presentation-layout data. Platform stores venue locally as editor metadata and excludes it from the export.
 
 `src/contracts/service.ts` validates every nested field and rejects unknown fields or future versions before export/import. `src/fixtures/demoService.ts` demonstrates the six-item offline M6 service. The scripture sample is an excerpt for a local fixture; production service authors are responsible for the text and rights of their materials.
 
