@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link, useParams } from '@tanstack/react-router'
-import type { ServiceItem } from '../contracts/service'
+import type { Service, ServiceItem } from '../contracts/service'
 import { parseService } from '../contracts/service'
+import { parseWorshipPlan } from '../contracts/worshipPlan'
 import { ItemEditor } from '../features/services/ItemEditor'
 import { useServices } from '../features/services/useServices'
 import {
@@ -51,6 +52,12 @@ export function ServiceEditorPage() {
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [pendingPlan, setPendingPlan] = useState<{
+    filename: string
+    service: Service
+    songTitles: string[]
+    replacing: number
+  } | null>(null)
 
   if (!record)
     return (
@@ -60,13 +67,15 @@ export function ServiceEditorPage() {
       </div>
     )
 
-  function persist(next: ServiceRecord) {
+  function persist(next: ServiceRecord): boolean {
     try {
       save(next)
       setError('')
       setNotice('Guardado en este navegador')
+      return true
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo guardar')
+      return false
     }
   }
 
@@ -112,18 +121,48 @@ export function ServiceEditorPage() {
 
   async function importWorshipPlan(file: File) {
     try {
-      const plan: unknown = JSON.parse(await file.text())
+      const plan = parseWorshipPlan(JSON.parse(await file.text()))
       const service = parseService(
         applyWorshipPlan(record!.service, plan, afterItemId || undefined),
       )
-      persist({ ...record!, worshipAfterItemId: afterItemId, service })
-      setNotice('Repertorio de Worship importado y guardado')
+      setPendingPlan({
+        filename: file.name,
+        service,
+        songTitles: plan.songs.map((song) => song.title),
+        replacing: record!.service.items.filter((item) =>
+          item.id.startsWith(`lvm-worship:${record!.service.id}:`),
+        ).length,
+      })
+      setError('')
+      setNotice('Revisa el repertorio antes de aplicarlo')
     } catch (cause) {
+      setPendingPlan(null)
       setError(
         cause instanceof Error
           ? cause.message
           : 'No se pudo importar el repertorio',
       )
+    }
+  }
+
+  let presenterError = ''
+  try {
+    parseService(record.service)
+  } catch (cause) {
+    presenterError =
+      cause instanceof Error ? cause.message : 'El servicio no es válido'
+  }
+  let worshipHandoffUrl = ''
+  const configuredWorshipUrl = import.meta.env.VITE_WORSHIP_URL?.trim()
+  if (configuredWorshipUrl) {
+    try {
+      const url = new URL(configuredWorshipUrl)
+      if (url.protocol !== 'http:' && url.protocol !== 'https:')
+        throw new Error('Unsupported Worship URL')
+      url.searchParams.set('returnTo', window.location.href)
+      worshipHandoffUrl = url.toString()
+    } catch {
+      // The file exchange remains usable when the companion URL is absent.
     }
   }
 
@@ -247,7 +286,10 @@ export function ServiceEditorPage() {
                     {item.kind === 'SONG' && (
                       <small>
                         {item.song.key || 'Sin tono'} ·{' '}
-                        {item.song.sections.length} secciones
+                        {item.song.sections.length} secciones ·{' '}
+                        {item.id.startsWith(`lvm-worship:${record.service.id}:`)
+                          ? 'Worship'
+                          : 'Service'}
                       </small>
                     )}
                   </div>
@@ -293,8 +335,9 @@ export function ServiceEditorPage() {
             <div className="panel form-stack">
               <h3>Repertorio de Worship</h3>
               <p>
-                Platform conserva el culto. Worship prepara solo las canciones y
-                devuelve un archivo WorshipPlan 0.1.
+                Service conserva el culto. Descarga su contexto, prepáralo en
+                Worship y vuelve con el archivo WorshipPlan 0.1. Las canciones
+                creadas aquí se conservan.
               </p>
               <label>
                 Colocar el bloque musical después de
@@ -327,10 +370,20 @@ export function ServiceEditorPage() {
                     )
                   }
                 >
-                  Exportar contexto para Worship
+                  1. Descargar contexto para Worship
                 </button>
+                {worshipHandoffUrl && (
+                  <a
+                    className="button secondary"
+                    href={worshipHandoffUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Abrir LVM Worship
+                  </a>
+                )}
                 <label className="button primary">
-                  Importar WorshipPlan 0.1
+                  2. Seleccionar WorshipPlan 0.1
                   <input
                     type="file"
                     accept=".json,application/json"
@@ -343,6 +396,61 @@ export function ServiceEditorPage() {
                   />
                 </label>
               </div>
+              {!worshipHandoffUrl && (
+                <p className="hint">
+                  Abre LVM Worship y selecciona el contexto descargado. Esta
+                  instalación no tiene configurada la URL local de Worship.
+                </p>
+              )}
+              {pendingPlan && (
+                <div
+                  className="handoff-preview"
+                  role="region"
+                  aria-label="Vista previa del repertorio de Worship"
+                >
+                  <h4>Revisar antes de importar</h4>
+                  <p>
+                    Archivo: <strong>{pendingPlan.filename}</strong>
+                  </p>
+                  <p>
+                    Se reemplazarán {pendingPlan.replacing} canciones anteriores
+                    de Worship por {pendingPlan.songTitles.length} canciones.
+                    Los demás elementos del culto se conservarán.
+                  </p>
+                  <ol>
+                    {pendingPlan.songTitles.map((title, index) => (
+                      <li key={`${index}-${title}`}>{title}</li>
+                    ))}
+                  </ol>
+                  <div className="actions">
+                    <button
+                      className="button primary"
+                      onClick={() => {
+                        if (
+                          persist({
+                            ...record,
+                            worshipAfterItemId: afterItemId,
+                            service: pendingPlan.service,
+                          })
+                        ) {
+                          setPendingPlan(null)
+                          setNotice(
+                            'Repertorio de Worship importado y guardado',
+                          )
+                        }
+                      }}
+                    >
+                      Confirmar importación
+                    </button>
+                    <button
+                      className="button secondary"
+                      onClick={() => setPendingPlan(null)}
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
             {!record.service.items.length && (
               <p className="hint">
@@ -379,12 +487,26 @@ export function ServiceEditorPage() {
         <div className="panel narrow-page form-stack">
           <h2>Preparar Presenter</h2>
           <p>
-            Exporta el servicio como JSON 0.1. El archivo lleva letra, acordes y
-            texto bíblico para poder presentarlo sin red.
+            Revisa el orden y descarga Service 0.1. Abre el archivo desde LVM
+            Presenter para presentarlo sin red.
           </p>
+          <p role="status" className={presenterError ? 'error' : 'save-status'}>
+            {presenterError
+              ? `Service inválido: ${presenterError}`
+              : 'Service válido para Presenter'}
+          </p>
+          <ol className="handoff-order">
+            {record.service.items.map((item) => (
+              <li key={item.id}>{itemTitle(item)}</li>
+            ))}
+          </ol>
           <div className="actions">
-            <button className="button primary" onClick={download}>
-              Exportar Service 0.1
+            <button
+              className="button primary"
+              onClick={download}
+              disabled={!!presenterError}
+            >
+              Descargar para Presenter
             </button>
             <Link className="button secondary" to="/development/contract">
               Revisar contrato

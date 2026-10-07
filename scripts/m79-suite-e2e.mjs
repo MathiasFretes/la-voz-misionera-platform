@@ -51,7 +51,10 @@ run(
     VITE_SUPABASE_ANON_KEY: 'lvm-offline-contract-test',
   },
 )
-run('npm', ['run', 'build'], serviceRepo)
+run('npm', ['run', 'build'], serviceRepo, {
+  ...process.env,
+  VITE_WORSHIP_URL: 'http://127.0.0.1:4174/setlist',
+})
 run('npm', ['run', 'build:electron:dev'], presenterRepo)
 run(
   'npm',

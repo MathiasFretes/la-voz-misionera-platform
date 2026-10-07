@@ -66,13 +66,17 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
 
     const contextDownload = page.waitForEvent('download', { timeout: 10000 })
     await page
-      .getByRole('button', { name: 'Exportar contexto para Worship' })
+      .getByRole('button', { name: '1. Descargar contexto para Worship' })
       .click()
     const contextFile = join(folder, 'context.json')
     await (await contextDownload).saveAs(contextFile)
 
+    const worshipHandoffUrl = await page
+      .getByRole('link', { name: 'Abrir LVM Worship' })
+      .getAttribute('href')
+    expect(worshipHandoffUrl).toContain(`${process.env.WORSHIP_URL}/setlist`)
     const worshipPage = worship.pages()[0] ?? (await worship.newPage())
-    await worshipPage.goto(`${process.env.WORSHIP_URL}/setlist`, {
+    await worshipPage.goto(worshipHandoffUrl!, {
       waitUntil: 'domcontentloaded',
       timeout: 15000,
     })
@@ -86,6 +90,9 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     await expect(
       worshipPage.getByText('Culto M7 offline').first(),
     ).toBeVisible()
+    await expect(
+      worshipPage.getByRole('link', { name: /Return to LVM Service|Volver a LVM Service/ }),
+    ).toHaveAttribute('href', page.url())
     await worshipPage
       .locator('input[type=file]')
       .last()
@@ -159,6 +166,13 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     await page
       .locator('input[type=file]')
       .setInputFiles(planFile, { timeout: 5_000 })
+    await expect(
+      page.getByRole('region', {
+        name: 'Vista previa del repertorio de Worship',
+      }),
+    ).toContainText('3 canciones')
+    await expect(page.locator('.order-item')).toHaveCount(5)
+    await page.getByRole('button', { name: 'Confirmar importación' }).click()
     await expect(page.locator('.order-item')).toHaveCount(8)
     await expect(
       page.getByText('Repertorio de Worship importado y guardado'),
@@ -183,7 +197,7 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     await expect(page.locator('.order-item')).toHaveCount(8)
     await page.getByRole('tab', { name: 'Presentación' }).click()
     const serviceDownload = page.waitForEvent('download', { timeout: 10000 })
-    await page.getByRole('button', { name: 'Exportar Service 0.1' }).click()
+    await page.getByRole('button', { name: 'Descargar para Presenter' }).click()
     const serviceFile = join(folder, 'service.json')
     const finalDownload = await serviceDownload
     await finalDownload.saveAs(serviceFile)

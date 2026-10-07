@@ -430,6 +430,25 @@ p {
 .order-panel {
   min-width: 0;
 }
+.handoff-preview {
+  border: 1px solid var(--lvm-brand-gold);
+  border-radius: var(--lvm-radius-card);
+  padding: 1rem;
+  background: var(--lvm-bg-surface);
+}
+.handoff-preview h4,
+.handoff-preview p {
+  margin: 0 0 0.7rem;
+}
+.handoff-preview ol,
+.handoff-order {
+  margin: 0 0 1rem;
+  padding-left: 1.5rem;
+}
+.handoff-preview li,
+.handoff-order li {
+  margin: 0.25rem 0;
+}
 .section-heading {
   display: flex;
   justify-content: space-between;

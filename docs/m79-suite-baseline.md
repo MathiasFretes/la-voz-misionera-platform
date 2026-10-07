@@ -22,6 +22,8 @@ npm run test:suite
 
 The runner builds Worship Web with inert loopback Supabase values, builds Service, compiles Presenter Electron, starts all three local web processes, and runs `e2e/platform-worship.spec.ts`. The test blocks non-loopback HTTP requests. The temporary browser and Presenter profiles are removed after the run. The V0 `dev:mock` path is not used.
 
+For manual local use, configure `VITE_WORSHIP_URL` from `.env.example` when starting Service. The editor downloads WorshipContext 0.1, links to the local Worship workspace, previews an imported WorshipPlan 0.1 before applying it, and shows Service validation and the final order before downloading for Presenter. File selection remains explicit; the link does not transfer data between products or require an API.
+
 ## Verified path
 
 1. Service creates an editable cult with welcome, announcement, Scripture, sermon, and a manual closing song.
