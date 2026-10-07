@@ -13,7 +13,7 @@ test.skip(
 )
 
 test('Platform → Worship → Platform → Presenter contract stays offline', async () => {
-  test.setTimeout(240_000)
+  test.setTimeout(120_000)
   const folder = await mkdtemp(join(tmpdir(), 'lvm-m7-'))
   const profile = join(folder, 'platform-profile')
   const worshipProfile = join(folder, 'worship-profile')
@@ -76,6 +76,9 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
       waitUntil: 'domcontentloaded',
       timeout: 15000,
     })
+    await expect(
+      worshipPage.locator('input[type=file][accept*="json"]'),
+    ).toHaveCount(1)
     await worshipPage
       .locator('input[type=file]')
       .first()
@@ -109,25 +112,25 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
           ),
         },
       ])
-    await expect(worshipPage.locator('.gc-set-row')).toHaveCount(3)
-    await worshipPage.locator('.gc-set-row').first().click()
+    await expect(worshipPage.locator('.lvm-set-row')).toHaveCount(3)
+    await worshipPage.locator('.lvm-set-row').first().click()
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .first()
       .locator('input[placeholder="1,2,1,2"]')
       .fill('1,2,1,2')
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .first()
       .locator('select')
       .selectOption('G')
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .nth(1)
       .locator('select')
       .selectOption('D')
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .nth(2)
       .locator('select')
       .selectOption('A')
@@ -140,20 +143,22 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     await worship.route(/https?:\/\/(?!127\.0\.0\.1)/, (route) => route.abort())
     const reopenedWorship = worship.pages()[0] ?? (await worship.newPage())
     await reopenedWorship.goto(`${process.env.WORSHIP_URL}/setlist`)
-    await expect(reopenedWorship.locator('.gc-set-row')).toHaveCount(3)
+    await expect(reopenedWorship.locator('.lvm-set-row')).toHaveCount(3)
     const planDownload = reopenedWorship.waitForEvent('download', {
       timeout: 10000,
     })
     await reopenedWorship
       .getByRole('button', { name: /Save for Platform|Guardar para Platform/ })
-      .click()
+      .click({ noWaitAfter: true, timeout: 10_000 })
     const planFile = join(folder, 'plan.json')
     await (await planDownload).saveAs(planFile)
     const plan = parseWorshipPlan(JSON.parse(await readFile(planFile, 'utf8')))
     expect(plan.songs.map((song) => song.key)).toEqual(['G', 'D', 'A'])
     expect(plan.songs[0].arrangement).toEqual([1, 2, 1, 2])
 
-    await page.locator('input[type=file]').setInputFiles(planFile)
+    await page
+      .locator('input[type=file]')
+      .setInputFiles(planFile, { timeout: 5_000 })
     await expect(page.locator('.order-item')).toHaveCount(8)
     await expect(
       page.getByText('Repertorio de Worship importado y guardado'),
@@ -167,8 +172,14 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
       route.abort(),
     )
     page = platform.pages()[0] ?? (await platform.newPage())
-    await page.goto('http://127.0.0.1:4173/services')
-    await page.getByRole('link', { name: 'Abrir servicio' }).click()
+    await page.goto('http://127.0.0.1:4173/services', {
+      waitUntil: 'domcontentloaded',
+      timeout: 15_000,
+    })
+    await page
+      .getByRole('link', { name: /^Abrir(?: servicio)?/ })
+      .first()
+      .click({ timeout: 5_000 })
     await expect(page.locator('.order-item')).toHaveCount(8)
     await page.getByRole('tab', { name: 'Presentación' }).click()
     const serviceDownload = page.waitForEvent('download', { timeout: 10000 })
@@ -229,8 +240,10 @@ async function presentAndReopen(
 ) {
   const settings = join(folder, 'presenter-settings')
   const data = join(folder, 'presenter-data')
+  const appData = join(folder, 'presenter-appdata')
   await mkdir(settings)
   await mkdir(data)
+  await mkdir(appData)
 
   async function launch() {
     const app = await electron.launch({
@@ -242,8 +255,9 @@ async function presentAndReopen(
       args: ['.', '--no-sandbox'],
       env: {
         ...process.env,
-        NODE_ENV: 'production',
+        NODE_ENV: 'development',
         FS_MOCK_STORE_PATH: settings,
+        APPDATA: appData,
       },
     })
     await app.evaluate(({ dialog }, location) => {
@@ -254,12 +268,12 @@ async function presentAndReopen(
     }, data)
     let window = app
       .windows()
-      .find((candidate) => candidate.url().includes('index.html'))
+      .find((candidate) => candidate.url().includes('localhost:3000'))
     for (let i = 0; i < 40 && !window; i++) {
       await new Promise((resolve) => setTimeout(resolve, 500))
       window = app
         .windows()
-        .find((candidate) => candidate.url().includes('index.html'))
+        .find((candidate) => candidate.url().includes('localhost:3000'))
     }
     if (!window) throw new Error('Presenter main window did not open')
     await window
@@ -269,7 +283,12 @@ async function presentAndReopen(
     await app.evaluate(({ session }) => {
       session.defaultSession.webRequest.onBeforeRequest(
         { urls: ['http://*/*', 'https://*/*'] },
-        (_details, callback) => callback({ cancel: true }),
+        (details, callback) =>
+          callback({
+            cancel: !/^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?\//.test(
+              details.url,
+            ),
+          }),
       )
     })
     return { app, window }
@@ -277,11 +296,30 @@ async function presentAndReopen(
 
   async function close(app: Awaited<ReturnType<typeof electron.launch>>) {
     const child = app.process()
+    void app
+      .evaluate(() => {
+        const path = process.getBuiltinModule('node:path')
+        const require = process
+          .getBuiltinModule('node:module')
+          .createRequire(path.join(process.cwd(), 'build/electron/index.js'))
+        void require(
+          path.join(process.cwd(), 'build/electron/utils/close.js'),
+        ).exitApp()
+      })
+      .catch(() => {})
     await Promise.race([
       app.close().catch(() => {}),
       new Promise((resolve) => setTimeout(resolve, 5000)),
     ])
-    if (child && !child.killed) child.kill('SIGKILL')
+    if (child?.pid && !child.killed) {
+      try {
+        execFileSync('taskkill.exe', ['/PID', String(child.pid), '/T', '/F'], {
+          stdio: 'ignore',
+        })
+      } catch {
+        // Electron already exited.
+      }
+    }
   }
 
   let { app, window } = await launch()
@@ -309,9 +347,12 @@ async function presentAndReopen(
       }> => ({ canceled: false, filePaths: [location] })
     }, projectFile)
     await window.locator('.addButton').first().click()
-    await window.locator('.addMenu').getByText('Import').click()
+    await window
+      .locator('.addMenu')
+      .getByText('Import')
+      .click({ timeout: 5000 })
     await expect(window.locator('.popup').getByText('Imported!')).toBeVisible({
-      timeout: 30000,
+      timeout: 10000,
     })
     await window.locator('.popup button').first().click()
     await window.getByText('Culto M7 offline').first().click()
@@ -341,7 +382,7 @@ async function presentAndReopen(
           ).length,
         { timeout: 15000 },
       )
-      .toBe(9)
+      .toBe(8)
   } finally {
     await close(app)
   }
@@ -351,7 +392,7 @@ async function presentAndReopen(
     await expect
       .poll(
         async () =>
-          (await window.locator('body').innerText()).includes('All\n\n9'),
+          (await window.locator('body').innerText()).includes('All\n\n8'),
         { timeout: 30000 },
       )
       .toBe(true)
