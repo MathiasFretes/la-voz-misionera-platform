@@ -79,7 +79,7 @@ Cerrar Presenter normalmente al terminar, detener Vite con `Ctrl+C` y comprobar 
 | Capturas | Service antes/después, Worship, Presenter, Service/PublicContent, Web Pública escritorio/móvil |
 | Consistencia | Títulos, orden y sede iguales al fixture en los cuatro productos |
 
-La demo está lista para considerarse cerrada solo cuando la corrida automatizada **y** el recorrido manual estén verificados. Las capturas automáticas se guardan como evidencia de la primera mitad del gate.
+La demo se considera cerrada funcionalmente con la corrida automatizada y la revisión manual del usuario registradas abajo. Las capturas automáticas complementan esa revisión.
 
 ### Verificación de 2026-10-08
 
@@ -98,4 +98,10 @@ La repetición automatizada abrió Presenter sin DevTools, importó los ocho ele
 
 Con el backend de demo inactivo, la inspección visual adicional registró los estados recuperables de [`/songs`](screenshots/m79d/worship-songs-fallback.png), [`/setlist`](screenshots/m79d/worship-setlist-fallback.png) y [`/reading`](screenshots/m79d/worship-reading-fallback.png). La biblioteca no ofrece datos remotos en este entorno; el borrador local y la importación de archivos ChordPro siguen disponibles. Ninguna de estas pantallas muestra ya un error de parser al usuario.
 
-Gate manual pendiente: recorrer Service, Worship y Web Pública otra vez, y comprobar Presenter desde la interfaz con una persona. Hasta entonces **M7.9D permanece abierto**; M7.9E y M8 no avanzan.
+### Cierre funcional de M7.9D — 2026-10-08
+
+En su segunda revisión de las capturas y del recorrido, el usuario confirmó Service, Web Pública y Presenter. En Presenter observó **Culto Domingo 19:00**, ocho elementos, cuatro diapositivas de **Canción A** y la salida con **«Cantamos con fe»**. El E2E automatizado también pasó. Con esa evidencia se cierra **M7.9D funcionalmente** y comienza M7.9E.
+
+Worship conserva una limitación de la demo sin backend: el repertorio guardado independiente de un WorshipContext puede mostrar un error de carga. El flujo principal Service → Worship → Service funciona con archivos locales; el estado del repertorio independiente se registra para pulido en M7.9E. La lectura bíblica ya muestra un error comprensible y el cancionero vacío tiene estado explícito. Esto no implica que las pantallas dependientes de Supabase hayan sido verificadas con datos remotos.
+
+Pendientes visuales para M7.9E: textos en inglés y doble menú en Presenter, coherencia de estados en Worship y ocultación de herramientas de desarrollo en la versión de producción. La ocultación de Contract Inspector ya está implementada en la rama QA de Service; debe conservarse al integrar el trabajo visual. M8 sigue fuera de alcance hasta el gate final de M7.x.
