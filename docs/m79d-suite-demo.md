@@ -82,4 +82,6 @@ Las correcciones de Service y Worship se trabajan en ramas de QA de M7.9D. En Wo
 
 La repetición automatizada abrió Presenter sin DevTools, importó los ocho elementos, seleccionó Canción A y mostró “Cantamos con fe” en la salida física; la captura es [`05b-presenter-physical-output.png`](screenshots/m79d/05b-presenter-physical-output.png). Esto cubre el gate automático de proyección, pero no se presenta como QA humano.
 
+Con el backend de demo inactivo, la inspección visual adicional registró los estados recuperables de [`/songs`](screenshots/m79d/worship-songs-fallback.png), [`/setlist`](screenshots/m79d/worship-setlist-fallback.png) y [`/reading`](screenshots/m79d/worship-reading-fallback.png). La biblioteca no ofrece datos remotos en este entorno; el borrador local y la importación de archivos ChordPro siguen disponibles. Ninguna de estas pantallas muestra ya un error de parser al usuario.
+
 Gate manual pendiente: recorrer Service, Worship y Web Pública otra vez, y comprobar Presenter desde la interfaz con una persona. Hasta entonces **M7.9D permanece abierto**; M7.9E y M8 no avanzan.
