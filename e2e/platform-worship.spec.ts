@@ -384,9 +384,30 @@ async function presentAndReopen(
     await expect(
       window.locator('.previewOutput').getByText('Cantamos con fe').first(),
     ).toBeVisible({ timeout: 30000 })
+    // Exercise a physical Presenter output with the same selected slide. The
+    // demo profile has no configured display, so create one through Presenter's
+    // own output helper and turn it on with the normal toolbar control.
+    await window.evaluate(async () => {
+      const modulePath = '/src/frontend/components/helpers/output.ts'
+      const { addOutput } = await import(/* @vite-ignore */ modulePath)
+      addOutput(false, '', true, 'LVM Demo Output')
+    })
+    await window.locator('#output_window_button').click()
+    await expect
+      .poll(async () => app.windows().filter((candidate) => candidate !== window).length, {
+        timeout: 15000,
+      })
+      .toBeGreaterThan(0)
+    const physicalOutput = app.windows().find((candidate) => candidate !== window)!
+    await expect(physicalOutput.getByText('Cantamos con fe').first()).toBeVisible({
+      timeout: 15000,
+    })
     if (process.env.LVM_DEMO_CAPTURE === '1') {
       const location = join(process.cwd(), 'docs', 'screenshots', 'm79d', '05-presenter-slide.png')
       await window.screenshot({ path: location })
+      await physicalOutput.screenshot({
+        path: join(process.cwd(), 'docs', 'screenshots', 'm79d', '05b-presenter-physical-output.png'),
+      })
     }
     await window.keyboard.press('Control+s')
     await expect

@@ -14,9 +14,11 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/public-preview" onClick={close}>
         Contenido público
       </Link>
-      <Link to="/development/contract" onClick={close}>
-        Contract Inspector
-      </Link>
+      {import.meta.env.DEV && (
+        <Link to="/development/contract" onClick={close}>
+          Contract Inspector
+        </Link>
+      )}
     </nav>
   )
 }

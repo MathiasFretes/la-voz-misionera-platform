@@ -51,6 +51,16 @@ La demo está lista para considerarse cerrada solo cuando la corrida automatizad
 ### Verificación de 2026-10-08
 
 - `npm run test:demo`: pasó Service → Worship → Service → Presenter y Service → Web Pública. Se bloquearon las solicitudes no locales; el proceso terminó con código 0.
-- Capturas automáticas: `docs/screenshots/m79d/` incluye los cinco hitos del culto y seis vistas de Service/Web Pública.
+- Capturas automáticas: `docs/screenshots/m79d/` incluye los cinco hitos del culto, la ventana de salida física de Presenter y seis vistas de Service/Web Pública.
 - Inspección visual de capturas: los ocho elementos llegaron a Presenter, la canción A se ve en la preview de salida y Web Pública muestra el evento importado. La captura de Worship aún tiene etiquetas heredadas en inglés que dicen “Platform”; se registra para M7.9E.
 - Recorrido manual de los cuatro productos: **pendiente de confirmación**. La herramienta de control del navegador interno no logró iniciar en esta sesión; no se infiere el resultado manual del test automatizado.
+
+### QA manual de 2026-10-08 y correcciones en curso
+
+La revisión visual del usuario no aprobó aún el recorrido completo. Service se ve coherente, pero mostraba `LVM Platform` en Servicios y exponía Contract Inspector en la navegación normal. Web Pública se ve bien para la preview; `Cargar preview` es una herramienta de esta fase y deberá ocultarse en la publicación final. Worship mostró una carga de canciones sin fin, un error de repertorios guardados y un error técnico de JSON en Lectura. Presenter no apareció en las capturas manuales entregadas: la captura automatizada `05-presenter-slide.png` prueba importación, ocho elementos, cuatro diapositivas de Canción A y preview, pero no sustituye la comprobación manual de la ventana de salida.
+
+Las correcciones de Service y Worship se trabajan en ramas de QA de M7.9D. En Worship, **Lectura bíblica diaria** se considera una utilidad de lectura y plan bíblico del producto musical; los devocionales editables, publicaciones y CMS pertenecen a LVM Service. No se traslada contenido entre dominios en esta corrección. La denominación de navegación `Palabra del día` queda pendiente de revisión lingüística porque los archivos de traducción revisados por humanos no deben modificarse sin autorización explícita.
+
+La repetición automatizada abrió Presenter sin DevTools, importó los ocho elementos, seleccionó Canción A y mostró “Cantamos con fe” en la salida física; la captura es [`05b-presenter-physical-output.png`](screenshots/m79d/05b-presenter-physical-output.png). Esto cubre el gate automático de proyección, pero no se presenta como QA humano.
+
+Gate manual pendiente: recorrer Service, Worship y Web Pública otra vez, y comprobar Presenter desde la interfaz con una persona. Hasta entonces **M7.9D permanece abierto**; M7.9E y M8 no avanzan.

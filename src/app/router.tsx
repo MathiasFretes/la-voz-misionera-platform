@@ -49,7 +49,7 @@ export const router = createRouter({
     servicesRoute,
     newServiceRoute,
     serviceEditorRoute,
-    contractRoute,
+    ...(import.meta.env.DEV ? [contractRoute] : []),
     publicPreviewRoute,
   ]),
 })

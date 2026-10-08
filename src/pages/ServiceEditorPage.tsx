@@ -508,9 +508,11 @@ export function ServiceEditorPage() {
             >
               Descargar para Presenter
             </button>
-            <Link className="button secondary" to="/development/contract">
-              Revisar contrato
-            </Link>
+            {import.meta.env.DEV && (
+              <Link className="button secondary" to="/development/contract">
+                Revisar contrato
+              </Link>
+            )}
           </div>
         </div>
       )}
