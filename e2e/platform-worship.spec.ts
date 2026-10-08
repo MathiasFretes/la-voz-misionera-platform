@@ -511,9 +511,19 @@ async function presentAndReopen(
         await window.evaluate(() => document.documentElement.scrollWidth),
       ).toBeLessThanOrEqual(1025)
       await window.screenshot({
-        path: join(process.cwd(), 'docs', 'screenshots', 'm79e-v0', 'presenter-imported-1024.png'),
+        path: join(
+          process.cwd(),
+          'docs',
+          'screenshots',
+          'm79e-v0',
+          'presenter-imported-1024.png',
+        ),
       })
-      await window.locator('.top button').filter({ hasText: 'Edit' }).first().click()
+      await window
+        .locator('.top button')
+        .filter({ hasText: 'Edit' })
+        .first()
+        .click()
       await window.locator('.grid').getByText('Verso 1').first().click()
       await expect(window.locator('.editArea .parent')).toBeVisible()
       await expect(window.getByText('Cantamos con fe').first()).toBeVisible()
@@ -521,7 +531,13 @@ async function presentAndReopen(
         await window.evaluate(() => document.documentElement.scrollWidth),
       ).toBeLessThanOrEqual(1025)
       await window.screenshot({
-        path: join(process.cwd(), 'docs', 'screenshots', 'm79e-v0', 'presenter-editor-1024.png'),
+        path: join(
+          process.cwd(),
+          'docs',
+          'screenshots',
+          'm79e-v0',
+          'presenter-editor-1024.png',
+        ),
       })
     }
   } finally {
