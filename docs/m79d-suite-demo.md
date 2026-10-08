@@ -28,6 +28,25 @@ El runner ejecuta secuencialmente `test:suite` y `test:public-preview`, captura 
 
 ## Recorrido manual
 
+Iniciar tres terminales, cada una desde su repositorio. En esta demo local se usa una URL de Supabase deliberadamente inactiva para comprobar los estados de error sin una cuenta QA; las canciones del culto se importan desde los tres archivos ChordPro del fixture.
+
+```powershell
+# LVM Service (este checkout)
+$env:VITE_WORSHIP_URL='http://127.0.0.1:4174'
+$env:VITE_WEB_PUBLICA_URL='http://127.0.0.1:4175'
+node .\node_modules\vite\bin\vite.js --host 127.0.0.1 --port 4173 --strictPort
+
+# LVM Worship (C:\la-voz-misionera\LVM Worship\apps\web)
+$env:VITE_SUPABASE_URL='http://127.0.0.1:54321'
+$env:VITE_SUPABASE_ANON_KEY='demo-anon-key'
+node ..\..\node_modules\vite\bin\vite.js --host 127.0.0.1 --port 4174 --strictPort
+
+# LVM Web Pública (C:\la-voz-misionera\LVM Web Publica)
+node .\node_modules\vite\bin\vite.js --host 127.0.0.1 --port 4175 --strictPort
+```
+
+Presenter se ejecuta desde su checkout baseline con el perfil temporal del E2E o desde la aplicación de desarrollo, sin `LVM_OPEN_DEVTOOLS=1`. La revisión automática captura su ventana principal y la salida física, y comprueba que los procesos Electron del arnés terminan.
+
 1. Abrir Service en `http://127.0.0.1:4173` con `VITE_WORSHIP_URL=http://127.0.0.1:4174` y `VITE_WEB_PUBLICA_URL=http://127.0.0.1:4175`. Abrir Worship en `4174`, Web Pública en `4175` y Presenter desde el checkout baseline. Los cuatro servidores/aplicación deben ejecutarse localmente. Mantener una carpeta vacía para los JSON descargados.
 2. En **Service → Servicios**, crear **Culto Domingo 19:00** con fecha `2026-10-11 19:00`. Agregar Bienvenida, Adoración, la prédica **Viviendo por fe**, Ofrenda y Cierre en ese orden; en Información poner **Templo Central** como sede. Seleccionar **Adoración** como ancla musical. Capturar el orden antes de la importación.
 3. Descargar `WorshipContext 0.1` y abrir **LVM Worship → Repertorio**. Seleccionar ese JSON. Comprobar que Worship muestra el nombre del culto y un enlace para volver a Service. Importar [`m79d-cancion-a.cho`](../fixtures/m79d-cancion-a.cho), [`m79d-cancion-b.cho`](../fixtures/m79d-cancion-b.cho) y [`m79d-cancion-c.cho`](../fixtures/m79d-cancion-c.cho). Ordenar A/B/C, guardar y exportar `WorshipPlan 0.1`. Capturar el repertorio.
