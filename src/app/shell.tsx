@@ -11,6 +11,9 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/services" onClick={close}>
         Servicios
       </Link>
+      <Link to="/public-preview" onClick={close}>
+        Contenido público
+      </Link>
       <Link to="/development/contract" onClick={close}>
         Contract Inspector
       </Link>
@@ -26,7 +29,7 @@ function Brand({ close }: { close?: () => void }) {
       </span>
       <span>
         <strong>La Voz Misionera</strong>
-        <small>Platform</small>
+        <small>Service</small>
       </span>
     </Link>
   )
@@ -48,9 +51,11 @@ export function AppShell() {
   const { pathname } = useLocation()
   const section = pathname.startsWith('/services')
     ? 'Servicios'
-    : pathname.startsWith('/development')
-      ? 'Desarrollo'
-      : 'Inicio'
+    : pathname.startsWith('/public-preview')
+      ? 'Contenido público'
+      : pathname.startsWith('/development')
+        ? 'Desarrollo'
+        : 'Inicio'
 
   useEffect(() => {
     if (menuOpen) menuDrawer.current?.querySelector('a')?.focus()

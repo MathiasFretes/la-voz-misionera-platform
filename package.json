@@ -16,7 +16,8 @@
     "test": "vitest run",
     "fixture": "tsx scripts/generate-service-fixture.ts",
     "test:e2e": "playwright test --config playwright.config.ts",
-    "test:suite": "node scripts/m79-suite-e2e.mjs"
+    "test:suite": "node scripts/m79-suite-e2e.mjs",
+    "test:public-preview": "node scripts/m79-public-e2e.mjs"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.170.40",
