@@ -1,6 +1,6 @@
 # M7.x — Gate técnico de la suite
 
-Estado: **aprobado en ramas de revisión; integración a `main` pendiente**. Fecha: 2026-10-08. Este gate no publica software ni habilita M8 automáticamente en producción.
+Estado: **gate técnico aprobado en ramas de revisión; aprobación visual del usuario e integración a `main` pendientes**. Fecha: 2026-10-08. Este gate no publica software ni habilita M8 automáticamente en producción.
 
 | Área | Evidencia | Resultado |
 | --- | --- | --- |
@@ -9,7 +9,7 @@ Estado: **aprobado en ramas de revisión; integración a `main` pendiente**. Fec
 | LVM Presenter | Importación Service, diapositiva y salida física; cabina ES regional, menú único; build Electron/frontend | Aprobado para la demo local |
 | LVM Web Pública | PublicContent 0.1 importado, Inicio/Eventos/Prédicas/Sedes, 4 tests, build | Aprobado como preview |
 | Suite | `npm run test:demo` posterior al pulido, red externa bloqueada; QA manual del usuario registrada en M7.9D | Aprobado funcionalmente |
-| Lenguaje visual | `npm run test:design-language`, capturas desktop/390 px de cuatro productos, Service producción sin Contract Inspector | M7.9E 0.1 aprobado para las superficies de demo |
+| Lenguaje visual | `npm run test:design-language`, capturas desktop/390 px de cuatro productos, Service producción sin Contract Inspector | Candidato técnico M7.9E 0.1; falta aprobación visual del usuario |
 
 Las capturas y la reproducción se encuentran en [`m79d-suite-demo.md`](m79d-suite-demo.md) y [`m79e-visual-audit.md`](m79e-visual-audit.md). Los resultados se obtuvieron sobre ramas de revisión; no se infiere que `main` contenga esta integración. Worship Web conserva una dependencia de backend para repertorios de cuenta. Web Pública sigue siendo preview con datos de archivo/fixture. Presenter M7.8F mantiene separado su defecto de desinstalación NSIS; no bloquea la demo local ni se declara apto para release Windows.
 

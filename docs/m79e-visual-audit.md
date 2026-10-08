@@ -1,6 +1,6 @@
 # M7.9E — Auditoría visual de la familia LVM
 
-Estado: **M7.9E 0.1 completado para las superficies de la demo**. La comparación usa las capturas de `docs/screenshots/m79d/`, la revisión manual del usuario del 2026-10-08 y las fuentes CSS actuales. Este cierre no pretende rediseñar todas las pantallas heredadas.
+Estado: **M7.9E 0.1 candidato técnico para las superficies de la demo; revisión visual del usuario pendiente**. La comparación usa las capturas de `docs/screenshots/m79d/`, la revisión manual del usuario del 2026-10-08 y las fuentes CSS actuales. Esta revisión no pretende rediseñar todas las pantallas heredadas.
 
 | Dimensión | Service | Worship | Presenter | Web Pública | Decisión de familia |
 | --- | --- | --- | --- | --- | --- |
