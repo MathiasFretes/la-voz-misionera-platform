@@ -6,6 +6,7 @@ const publicPreview = process.env.LVM_PUBLIC_E2E === '1'
 const worshipRepo = process.env.WORSHIP_REPO
 const presenterRepo = process.env.PRESENTER_REPO
 const publicWebRepo = process.env.PUBLIC_WEB_REPO
+const reuseExistingServer = process.env.LVM_REUSE_SERVERS === '1'
 
 if (suite && (!worshipRepo || !presenterRepo)) {
   throw new Error('LVM_SUITE_E2E requires WORSHIP_REPO and PRESENTER_REPO')
@@ -22,7 +23,7 @@ export default defineConfig({
     {
       command: 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',
       url: 'http://127.0.0.1:4173',
-      reuseExistingServer: false,
+      reuseExistingServer,
       timeout: 30_000,
     },
     ...(suite
@@ -32,7 +33,7 @@ export default defineConfig({
               'node ../../node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4174 --strictPort',
             cwd: join(worshipRepo!, 'apps/web'),
             url: 'http://127.0.0.1:4174',
-            reuseExistingServer: false,
+            reuseExistingServer,
             timeout: 30_000,
           },
           {
@@ -41,7 +42,7 @@ export default defineConfig({
             cwd: presenterRepo!,
             env: { NODE_ENV: 'development' },
             url: 'http://127.0.0.1:3000',
-            reuseExistingServer: false,
+            reuseExistingServer,
             timeout: 45_000,
           },
         ]
@@ -53,7 +54,7 @@ export default defineConfig({
               'node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4175 --strictPort',
             cwd: publicWebRepo!,
             url: 'http://127.0.0.1:4175',
-            reuseExistingServer: false,
+            reuseExistingServer,
             timeout: 30_000,
           },
         ]

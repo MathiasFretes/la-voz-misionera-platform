@@ -1,6 +1,6 @@
 # M7.9E — Auditoría visual de la familia LVM
 
-Estado: **auditoría y correcciones en curso**. La comparación usa las capturas de `docs/screenshots/m79d/`, la revisión manual del usuario del 2026-10-08 y las fuentes CSS actuales. M7.9D está cerrado funcionalmente; esta auditoría aún no congela el lenguaje visual.
+Estado: **M7.9E 0.1 completado para las superficies de la demo**. La comparación usa las capturas de `docs/screenshots/m79d/`, la revisión manual del usuario del 2026-10-08 y las fuentes CSS actuales. Este cierre no pretende rediseñar todas las pantallas heredadas.
 
 | Dimensión | Service | Worship | Presenter | Web Pública | Decisión de familia |
 | --- | --- | --- | --- | --- | --- |
@@ -42,4 +42,15 @@ Estas capturas son evidencia de la demo automatizada. La revisión manual poster
 - La captura nueva de Presenter, `LVM Presenter/docs/screenshots/m79e-presenter-desktop.png`, muestra el shell en español, un solo menú y el monograma visible. El control aislado confirmó `navigator.language=es-419`, menú nativo oculto y cierre sin proceso de prueba.
 - Las capturas `docs/screenshots/m79e/` muestran Service, Worship y Web Pública a 1440/390 px sin overflow. `service-production-desktop.png` y `service-production-mobile.png` comprueban que Contract Inspector no aparece en el shell de producción.
 - Los estados de error del cancionero/repertorio/lectura de Worship están registrados en `docs/screenshots/m79d/`. La vista de repertorios guardados necesita backend o sesión; en la demo local el borrador sigue accesible. El término `Palabra del día` es la etiqueta revisada del locale español para una utilidad de lectura bíblica; no es el CMS de Service.
-- Falta revisar de forma conjunta los estados loading/vacío/error/éxito/offline de todas las vistas relevantes y repetir el recorrido de integración después del pulido visual. Por ello M7.9E permanece abierto.
+- La repetición de `npm run test:demo` pasó después del pulido: Service → Worship → Service → Presenter y Service → Web Pública, con red externa bloqueada por Playwright. Los servidores locales existentes se reutilizaron con `LVM_REUSE_SERVERS=1` y Service se inició con `VITE_WORSHIP_URL=http://127.0.0.1:4174/setlist`.
+
+## Estados de las superficies demostradas
+
+| Producto | Loading | Vacío | Error | Éxito/local | Límite de esta fase |
+| --- | --- | --- | --- | --- | --- |
+| Service | No hay carga remota en el editor local | Servicios sin registros y culto sin elementos | Validación de formulario/contrato junto al campo o sección | Guardado local, WorshipPlan aplicado, Service 0.1 válido | Persistencia/API queda para M8 |
+| Worship | Catálogo, búsqueda y repertorios guardados anuncian carga | Repertorio borrador y resultados sin canciones | Biblioteca/lectura/repertorios guardados dan mensaje comprensible y reintento | Borrador local y descarga WorshipPlan | Repertorios de cuenta requieren backend; no se simula sincronización |
+| Presenter | Inicialización y apertura de proyecto | Cabina sin proyecto y salida inactiva | Importación y salida informan fallos | Proyecto Service abierto y slide en salida física | La captura de E usa cabina vacía; la de D muestra el culto real |
+| Web Pública | La preview local no hace carga remota | Eventos/sedes sin datos tienen estado explícito | Importación inválida mantiene el contenido anterior y muestra error | PublicContent importado y marcado como vista local | `Cargar preview` es una herramienta de esta fase, no navegación pública final |
+
+Los nombres de Worship se toman del locale activo. `Palabra del día` conserva su traducción humana revisada y abre la lectura bíblica diaria; no implica ownership de CMS. Las cuatro paletas conservan sus roles: Service claro/navy, Worship oscuro/cyan, Presenter oscuro/magenta y Web Pública editorial/navy/dorado. Comparten el monograma, tipografía base, espaciado, radios, foco y reglas de estado documentadas en `lvm-design-language-0.1.md`.
