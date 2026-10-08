@@ -16,13 +16,24 @@ test('LVM web products keep their layout at 768 and 1024 px', async ({
   for (const width of [768, 1024]) {
     const page = await browser.newPage({ viewport: { width, height: 900 } })
     for (const product of [
-      { name: 'service', url: 'http://127.0.0.1:4173/', menu: '.menu-trigger' },
+      {
+        name: 'service',
+        url: 'http://127.0.0.1:4173/',
+        menu: '.menu-trigger',
+        motion: '.button',
+      },
       {
         name: 'worship',
         url: 'http://127.0.0.1:4174/',
         menu: '.lvm-worship-nav__menu-button',
+        motion: 'body',
       },
-      { name: 'web', url: 'http://127.0.0.1:4175/', menu: '.menu-toggle' },
+      {
+        name: 'web',
+        url: 'http://127.0.0.1:4175/',
+        menu: '.menu-toggle',
+        motion: '.button',
+      },
     ]) {
       await page.goto(product.url, { waitUntil: 'domcontentloaded' })
       await expect(page.locator('body')).toBeVisible()
@@ -47,6 +58,17 @@ test('LVM web products keep their layout at 768 and 1024 px', async ({
         expect(focus?.visible).toBe(true)
         expect(focus?.style).not.toBe('none')
         expect(focus?.width).toBeGreaterThanOrEqual(2)
+        await page.emulateMedia({ reducedMotion: 'reduce' })
+        const duration = await page
+          .locator(product.motion)
+          .first()
+          .evaluate((element) =>
+            getComputedStyle(element)
+              .transitionDuration.split(',')
+              .map((value) => Number.parseFloat(value)),
+          )
+        expect(duration.every((seconds) => seconds <= 0.001)).toBe(true)
+        await page.emulateMedia({ reducedMotion: 'no-preference' })
       }
       await page.screenshot({
         path: join(captureDir, `${product.name}-${width}.png`),
