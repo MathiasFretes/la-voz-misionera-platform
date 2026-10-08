@@ -21,11 +21,13 @@ La [captura del servicio importado en Presenter](screenshots/m79d/05-presenter-s
 
 La cabina de Presenter también se abrió a 1024 px: el documento no desborda horizontalmente, la guía de inicio se omitió antes de capturar y el título inicial cabe en el panel central. El arnés cerró Electron y eliminó su perfil temporal. Esto verifica la pantalla inicial a ese ancho; no equivale a una revisión de todos los paneles de edición de Presenter.
 
+En Worship, la [biblioteca sin backend a 390 px](screenshots/m79e-v0/worship-songs-error-390.png) pasó del estado de carga a un aviso recuperable con botón de reintento. No aparece la excepción técnica y no hay overflow. La vista está en inglés porque ese es el locale del perfil de prueba; las cadenas vienen de i18n. Los tests de `SongsPage` cubren también carga, vacío y lista con canciones mediante datos controlados. No se afirma que la biblioteca remota funcione sin un entorno QA.
+
 La revisión intermedia a [768 px](screenshots/m79e-v0/service-768.png) y [1024 px](screenshots/m79e-v0/service-1024.png) de Service, [768 px](screenshots/m79e-v0/worship-768.png) y [1024 px](screenshots/m79e-v0/worship-1024.png) de Worship, y [768 px](screenshots/m79e-v0/web-768.png) y [1024 px](screenshots/m79e-v0/web-1024.png) de Web Pública no encontró overflow horizontal. El control automatizado verifica foco visible por teclado, un área táctil de 44 × 44 px para los tres botones de menú y duración reducida de transiciones al solicitar menos movimiento. El acento de texto sobre blanco ahora usa `--lvm-gold-text-on-light`, que alcanza 6,01:1; sobre navy se conserva `brand.gold` con 6,01:1. En Presenter el movimiento reducido se limita al shell de operación para no alterar el tiempo de la proyección.
 
 ## Lo que falta antes del gate
 
-- Completar la revisión de estados loading, vacío, error y éxito con datos reales de Service/Worship; las capturas actuales cubren ejemplos parciales y el backend de demostración está inactivo.
+- Completar la revisión de estados loading, vacío, error y éxito con datos reales de Service/Worship; el error de Songs ya está capturado, pero el backend de demostración está inactivo.
 - Revisar foco y estados de contraste adicionales en los flujos completos y los paneles de edición de Presenter a 1024 px. El control de 768/1024, foco, targets táctiles y movimiento reducido de las tres interfaces web ya pasó.
 - Repetir una sola vez la demo integral desde las ramas actualizadas y revisar los diffs y CI de los PR borrador.
 
