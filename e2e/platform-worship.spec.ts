@@ -7,14 +7,25 @@ import { join } from 'node:path'
 import { parseService } from '../src/contracts/service'
 import { parseWorshipPlan } from '../src/contracts/worshipPlan'
 
+const demo = JSON.parse(
+  await readFile(new URL('../fixtures/m79d-demo.json', import.meta.url), 'utf8'),
+) as {
+  venue: string
+  service: Record<string, string>
+  songs: Array<{ title: string; key: string; lyrics: string }>
+}
+
 test.skip(
   !process.env.WORSHIP_URL,
   'Set WORSHIP_URL to the local Worship preview URL',
 )
 
-test('Platform → Worship → Platform → Presenter contract stays offline', async () => {
-  test.setTimeout(120_000)
+test('LVM Service → Worship → Service → Presenter demo stays offline', async () => {
+  test.setTimeout(180_000)
   const folder = await mkdtemp(join(tmpdir(), 'lvm-m7-'))
+  const capture = process.env.LVM_DEMO_CAPTURE === '1'
+  const captureDir = join(process.cwd(), 'docs', 'screenshots', 'm79d')
+  if (capture) await mkdir(captureDir, { recursive: true })
   const profile = join(folder, 'platform-profile')
   const worshipProfile = join(folder, 'worship-profile')
   let platform = await chromium.launchPersistentContext(profile, {
@@ -33,9 +44,12 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     let page = platform.pages()[0] ?? (await platform.newPage())
     await page.goto('http://127.0.0.1:4173')
     await page.getByRole('link', { name: 'Crear servicio' }).click()
-    await page.getByLabel('Nombre').fill('Culto M7 offline')
-    await page.getByLabel('Fecha y hora').fill('2026-10-04T19:00')
+    await page.getByLabel('Nombre').fill(demo.service.title)
+    await page.getByLabel('Fecha y hora').fill(demo.service.startsAt)
     await page.getByRole('button', { name: 'Crear servicio' }).click()
+    await page.getByRole('tab', { name: 'Información' }).click()
+    await page.getByLabel('Sede').fill(demo.venue)
+    await page.getByRole('tab', { name: 'Orden' }).click()
 
     async function add(kind: string, values: Record<string, string>) {
       await page.getByRole('button', { name: /Agregar elemento/ }).click()
@@ -44,25 +58,19 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
         await page.getByLabel(label, { exact: true }).fill(value)
       await page.getByRole('button', { name: 'Guardar elemento' }).click()
     }
-    await add('ANNOUNCEMENT', { Título: 'Bienvenida', Texto: 'Bienvenidos.' })
+    await add('ANNOUNCEMENT', { Título: demo.service.welcome, Texto: 'Bienvenidos.' })
     await add('ANNOUNCEMENT', {
-      Título: 'Anuncio',
-      Texto: 'Reunión de jóvenes.',
-    })
-    await add('SCRIPTURE', {
-      Referencia: 'Juan 3:16',
-      Versión: 'RV1909',
-      'Texto local': 'Porque de tal manera amó Dios al mundo.',
+      Título: demo.service.worship,
+      Texto: 'Tiempo de adoración.',
     })
     await add('SERMON', {
-      Título: 'Predicación',
-      Texto: 'Esperanza para todos.',
+      Título: demo.service.sermon,
+      Texto: 'Una prédica sobre vivir por fe.',
     })
-    await add('SONG', {
-      'Título de la canción': 'Cierre',
-      Tonalidad: 'C',
-      'Secciones y letra': '# Coro\n[C]Amén',
-    })
+    await add('ANNOUNCEMENT', { Título: demo.service.offering, Texto: 'Ofrenda.' })
+    await add('ANNOUNCEMENT', { Título: demo.service.closing, Texto: 'Gracias por acompañarnos.' })
+    await page.getByLabel('Colocar el bloque musical después de').selectOption({ label: demo.service.worship })
+    if (capture) await page.screenshot({ path: join(captureDir, '01-service-plan.png'), fullPage: true })
 
     const contextDownload = page.waitForEvent('download', { timeout: 10000 })
     await page
@@ -88,7 +96,7 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
       .first()
       .setInputFiles(contextFile)
     await expect(
-      worshipPage.getByText('Culto M7 offline').first(),
+      worshipPage.getByText(demo.service.title).first(),
     ).toBeVisible()
     await expect(
       worshipPage.getByRole('link', { name: /Return to LVM Service|Volver a LVM Service/ }),
@@ -100,26 +108,21 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
         {
           name: 'uno.cho',
           mimeType: 'text/plain',
-          buffer: Buffer.from(
-            '{title: Señor fiel}\n{key: D}\n{start_of_verse: Verso}\n[D]Señor 😀 [A]estás aquí\n{end_of_verse}\n{start_of_chorus: Coro}\n[G]Cantaré\n{end_of_chorus}',
-          ),
+          buffer: Buffer.from(`{title: ${demo.songs[0].title}}\n{key: ${demo.songs[0].key}}\n{start_of_verse: Verso}\n${demo.songs[0].lyrics}\n{end_of_verse}\n{start_of_chorus: Coro}\n[G]Cantamos\n{end_of_chorus}`),
         },
         {
           name: 'dos.cho',
           mimeType: 'text/plain',
-          buffer: Buffer.from(
-            '{title: Gracia}\n{key: G}\n{start_of_verse}\n[G]Gracia\n{end_of_verse}',
-          ),
+          buffer: Buffer.from(`{title: ${demo.songs[1].title}}\n{key: ${demo.songs[1].key}}\n{start_of_verse}\n${demo.songs[1].lyrics}\n{end_of_verse}`),
         },
         {
           name: 'tres.cho',
           mimeType: 'text/plain',
-          buffer: Buffer.from(
-            '{title: Alabanza}\n{key: C}\n{start_of_chorus}\n[C]Alabanza\n{end_of_chorus}',
-          ),
+          buffer: Buffer.from(`{title: ${demo.songs[2].title}}\n{key: ${demo.songs[2].key}}\n{start_of_chorus}\n${demo.songs[2].lyrics}\n{end_of_chorus}`),
         },
       ])
     await expect(worshipPage.locator('.lvm-set-row')).toHaveCount(3)
+    if (capture) await worshipPage.screenshot({ path: join(captureDir, '02-worship-setlist.png'), fullPage: true })
     await worshipPage.locator('.lvm-set-row').first().click()
     await worshipPage
       .locator('.lvm-set-row')
@@ -160,7 +163,7 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     const planFile = join(folder, 'plan.json')
     await (await planDownload).saveAs(planFile)
     const plan = parseWorshipPlan(JSON.parse(await readFile(planFile, 'utf8')))
-    expect(plan.songs.map((song) => song.key)).toEqual(['G', 'D', 'A'])
+    expect(plan.songs.map((song) => song.key)).toEqual(demo.songs.map((song) => song.key))
     expect(plan.songs[0].arrangement).toEqual([1, 2, 1, 2])
 
     await page
@@ -177,6 +180,7 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     await expect(
       page.getByText('Repertorio de Worship importado y guardado'),
     ).toBeVisible()
+    if (capture) await page.screenshot({ path: join(captureDir, '03-service-import.png'), fullPage: true })
     await platform.close()
     platform = await chromium.launchPersistentContext(profile, {
       headless: true,
@@ -196,6 +200,7 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
       .click({ timeout: 5_000 })
     await expect(page.locator('.order-item')).toHaveCount(8)
     await page.getByRole('tab', { name: 'Presentación' }).click()
+    if (capture) await page.screenshot({ path: join(captureDir, '04-service-presenter-handoff.png'), fullPage: true })
     const serviceDownload = page.waitForEvent('download', { timeout: 10000 })
     await page.getByRole('button', { name: 'Descargar para Presenter' }).click()
     const serviceFile = join(folder, 'service.json')
@@ -206,21 +211,22 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     )
     expect(service.items.map((item) => item.kind)).toEqual([
       'ANNOUNCEMENT',
-      'SONG',
-      'SONG',
-      'SONG',
       'ANNOUNCEMENT',
-      'SCRIPTURE',
-      'SERMON',
       'SONG',
+      'SONG',
+      'SONG',
+      'SERMON',
+      'ANNOUNCEMENT',
+      'ANNOUNCEMENT',
     ])
     expect(service.items[1]).toMatchObject({
-      song: { title: 'Señor fiel', key: 'G' },
+      announcement: { title: demo.service.worship },
     })
-    expect(service.items[4]).toMatchObject({
-      announcement: { title: 'Anuncio' },
+    expect(service.items[2]).toMatchObject({
+      song: { title: demo.songs[0].title, key: 'G' },
     })
-    expect(service.items[7]).toMatchObject({ song: { title: 'Cierre' } })
+    expect(service.items[5]).toMatchObject({ sermon: { title: demo.service.sermon } })
+    expect(service.items[7]).toMatchObject({ announcement: { title: demo.service.closing } })
 
     if (process.env.PRESENTER_REPO) {
       const projectFile = join(folder, 'service.project')
@@ -369,21 +375,25 @@ async function presentAndReopen(
       timeout: 10000,
     })
     await window.locator('.popup button').first().click()
-    await window.getByText('Culto M7 offline').first().click()
-    await window.getByText('Señor fiel').first().click()
-    await expect(window.getByText('Señor 😀 estás aquí').first()).toBeVisible({
+    await window.getByText(demo.service.title).first().click()
+    await window.getByText(demo.songs[0].title).first().click()
+    await expect(window.getByText('Cantamos con fe').first()).toBeVisible({
       timeout: 30000,
     })
-    await window.getByText('Señor 😀 estás aquí').first().click()
+    await window.getByText('Cantamos con fe').first().click()
     await expect(
-      window.locator('.previewOutput').getByText('Señor 😀 estás aquí').first(),
+      window.locator('.previewOutput').getByText('Cantamos con fe').first(),
     ).toBeVisible({ timeout: 30000 })
+    if (process.env.LVM_DEMO_CAPTURE === '1') {
+      const location = join(process.cwd(), 'docs', 'screenshots', 'm79d', '05-presenter-slide.png')
+      await window.screenshot({ path: location })
+    }
     await window.keyboard.press('Control+s')
     await expect
       .poll(
         async () =>
           (await readFile(join(settings, 'projects.json'), 'utf8')).includes(
-            'Culto M7 offline',
+            demo.service.title,
           ),
         { timeout: 15000 },
       )
@@ -410,15 +420,15 @@ async function presentAndReopen(
         { timeout: 30000 },
       )
       .toBe(true)
-    await expect(window.getByText('Culto M7 offline').first()).toBeVisible({
+    await expect(window.getByText(demo.service.title).first()).toBeVisible({
       timeout: 30000,
     })
-    await window.getByText('Culto M7 offline').first().click()
-    await expect(window.getByText('Señor fiel').first()).toBeVisible({
+    await window.getByText(demo.service.title).first().click()
+    await expect(window.getByText(demo.songs[0].title).first()).toBeVisible({
       timeout: 30000,
     })
-    await window.getByText('Señor fiel').first().click()
-    await expect(window.getByText('Señor 😀 estás aquí').first()).toBeVisible({
+    await window.getByText(demo.songs[0].title).first().click()
+    await expect(window.getByText('Cantamos con fe').first()).toBeVisible({
       timeout: 30000,
     })
   } finally {
