@@ -209,8 +209,8 @@ p {
   text-decoration: none;
   text-align: center;
   transition:
-    background 160ms ease-out,
-    border-color 160ms ease-out;
+    background var(--lvm-motion-fast) ease-out,
+    border-color var(--lvm-motion-fast) ease-out;
 }
 .button:hover {
   text-decoration: none;
@@ -775,6 +775,7 @@ p {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .button,
   .mobile-drawer,
   .mobile-backdrop {
     transition: none;

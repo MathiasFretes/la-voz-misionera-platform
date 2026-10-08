@@ -35,6 +35,7 @@ Estas capturas son evidencia de la demo automatizada. La revisión manual poster
 ## Avance de corrección
 
 - Los cuatro repositorios ya declaran los mismos valores navy, navy elevado, dorado y anillo de foco. `npm run test:design-language` lee las cuatro fuentes CSS y falla si divergen.
+- Los botones de Service y Web Pública usan `--lvm-motion-fast`; Presenter usa `--lvm-motion-normal` para las transiciones de su shell. El indicador de guardado de Presenter y los botones/drawer de Service reducen el movimiento cuando el sistema lo solicita. En Service se comprobó `0.18s` normal y `0s` con `prefers-reduced-motion: reduce` en el botón principal. Las reglas no modifican la animación del contenido proyectado.
 - Service y Web Pública muestran el monograma textual `LVM` en círculo dorado; Worship adoptó el mismo tratamiento en su shell; Presenter lo incorporó a la cabecera de cabina.
 - Web Pública usa la misma pila tipográfica base que Service; Presenter también la declara, con fallback del sistema.
 - Las cuatro traducciones de Worship conservan las claves técnicas existentes, pero nombran **LVM Service** en la interfaz.
