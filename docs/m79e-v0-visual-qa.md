@@ -19,10 +19,12 @@ La segunda pasada incluyó [Servicios](screenshots/m79e-v0/service-list.png), [E
 
 La [captura del servicio importado en Presenter](screenshots/m79d/05-presenter-slide.png) confirma que los bordes de selección de la diapositiva y las salidas usan dorado LVM. El primer intento conservaba magenta en una salida predeterminada guardada; Presenter migra únicamente ese color heredado y conserva los colores personalizados. El E2E offline del recorrido Service → Worship → Service → Presenter volvió a pasar tras la corrección. El arnés elige inglés para el onboarding de Presenter; eso no representa una mezcla de idiomas dentro de un locale.
 
+La revisión intermedia a [768 px](screenshots/m79e-v0/service-768.png) y [1024 px](screenshots/m79e-v0/service-1024.png) de Service, [768 px](screenshots/m79e-v0/worship-768.png) y [1024 px](screenshots/m79e-v0/worship-1024.png) de Worship, y [768 px](screenshots/m79e-v0/web-768.png) y [1024 px](screenshots/m79e-v0/web-1024.png) de Web Pública no encontró overflow horizontal. El control automatizado verifica foco visible por teclado y un área táctil de 44 × 44 px para los tres botones de menú. El acento de texto sobre blanco ahora usa `--lvm-gold-text-on-light`, que alcanza 6,01:1; sobre navy se conserva `brand.gold` con 6,01:1.
+
 ## Lo que falta antes del gate
 
 - Completar la revisión de estados loading, vacío, error y éxito con datos reales de Service/Worship; las capturas actuales cubren ejemplos parciales y el backend de demostración está inactivo.
-- Revisar foco, contraste, movimiento reducido y anchos intermedios (768/1024) en los cuatro productos.
+- Revisar foco y movimiento reducido en los flujos completos, estados de contraste adicionales y la ventana de Presenter a 1024 px. El control de 768/1024 de las tres interfaces web ya pasó.
 - Repetir una sola vez la demo integral desde las ramas actualizadas y revisar los diffs y CI de los PR borrador.
 
 El verificador `scripts/verify-design-language.mjs` comprueba los valores de marca compartidos en los cuatro repositorios. M7.9F mapeará después estos tokens a los temas claro y oscuro; no se implementa un segundo diseño en este gate.
