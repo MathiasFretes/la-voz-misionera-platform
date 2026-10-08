@@ -24,7 +24,7 @@ La tipografía de interfaz y titulares será **Poppins** con respaldo del sistem
 
 Service, Worship, Presenter y Web Pública usarán **navy + dorado + blanco** como identidad común. El encabezado combinará la marca de La Voz Misionera con el nombre del producto. Se distinguirán por función, iconos, contenido y densidad, sin convertir cyan o magenta en marcas separadas. La Web Pública y las capturas V0 son la referencia visual; Service ya está más cerca y Presenter conservará la distribución de cabina al adoptar los nuevos tokens.
 
-La marca anterior de la demo —monograma textual `LVM` dentro de círculo dorado— sigue en las ramas de revisión y debe sustituirse por la marca inspirada en V0 durante E2–E5. Dibujaremos la cruz/wordmark con CSS o SVG propio; no copiaremos el componente React Native de V0. Las imágenes remotas del hero V0 no se trasladan sin verificar procedencia y derechos de uso. La UI de contenido proyectado, acordes y diapositivas no hereda automáticamente la fuente ni los colores del shell.
+La marca anterior de la demo —monograma textual `LVM` dentro de círculo dorado— se sustituye por la cruz y el nombre **La Voz Misionera** en las superficies migradas. La cruz se dibuja con CSS propio; no copiamos el componente React Native de V0. Las imágenes remotas del hero V0 no se trasladan sin verificar procedencia y derechos de uso. La UI de contenido proyectado, acordes y diapositivas no hereda automáticamente la fuente ni los colores del shell.
 
 ## Tokens semánticos y tema futuro
 

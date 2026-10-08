@@ -17,9 +17,9 @@ const sources = [
   ['Web Pública', join(web, 'src/styles.css')],
 ]
 const expected = {
-  '--lvm-brand-navy': '#0e1a2b',
+  '--lvm-brand-navy': '#1c2a39',
   '--lvm-brand-navy-raised': '#172033',
-  '--lvm-brand-gold': '#c89b3c',
+  '--lvm-brand-gold': '#c6a15b',
   '--lvm-focus-ring': '#b4872e',
   '--lvm-space-1': '4px',
   '--lvm-space-2': '8px',
