@@ -45,7 +45,21 @@ node ..\..\node_modules\vite\bin\vite.js --host 127.0.0.1 --port 4174 --strictPo
 node .\node_modules\vite\bin\vite.js --host 127.0.0.1 --port 4175 --strictPort
 ```
 
-Presenter se ejecuta desde su checkout baseline con el perfil temporal del E2E o desde la aplicación de desarrollo, sin `LVM_OPEN_DEVTOOLS=1`. La revisión automática captura su ventana principal y la salida física, y comprueba que los procesos Electron del arnés terminan.
+Para Presenter, usar dos terminales adicionales desde `C:\la-voz-misionera\.worktrees\M79 Presenter Baseline`, en la rama `codex/m79d-presenter-demo-qa`. La primera compila Electron y deja Vite activo; la segunda abre la aplicación con un perfil de demo separado. No establecer `LVM_OPEN_DEVTOOLS=1`.
+
+```powershell
+# Terminal de frontend; ejecutar antes una vez: npm run build:electron:dev
+npm run build:frontend:dev
+
+# Otra terminal, en el mismo checkout, cuando localhost:3000 responda
+$env:NODE_ENV='development'
+$env:FS_MOCK_STORE_PATH="$env:TEMP\lvm-m79d-presenter-settings"
+$env:APPDATA="$env:TEMP\lvm-m79d-presenter-appdata"
+New-Item -ItemType Directory -Force -Path $env:FS_MOCK_STORE_PATH,$env:APPDATA | Out-Null
+& '.\node_modules\.bin\electron.cmd' .
+```
+
+Cerrar Presenter normalmente al terminar, detener Vite con `Ctrl+C` y comprobar que no quedan procesos de esta prueba. La revisión automática captura su ventana principal y la salida física, y comprueba que los procesos Electron del arnés terminan.
 
 1. Abrir Service en `http://127.0.0.1:4173` con `VITE_WORSHIP_URL=http://127.0.0.1:4174` y `VITE_WEB_PUBLICA_URL=http://127.0.0.1:4175`. Abrir Worship en `4174`, Web Pública en `4175` y Presenter desde el checkout baseline. Los cuatro servidores/aplicación deben ejecutarse localmente. Mantener una carpeta vacía para los JSON descargados.
 2. En **Service → Servicios**, crear **Culto Domingo 19:00** con fecha `2026-10-11 19:00`. Agregar Bienvenida, Adoración, la prédica **Viviendo por fe**, Ofrenda y Cierre en ese orden; en Información poner **Templo Central** como sede. Seleccionar **Adoración** como ancla musical. Capturar el orden antes de la importación.
