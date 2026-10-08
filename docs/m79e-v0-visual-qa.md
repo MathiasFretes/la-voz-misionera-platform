@@ -13,9 +13,11 @@
 
 La Web usa el mismo recurso local `hero-comunidad.webp` en ambos anchos. Se comprobó que la imagen carga y tiene 1672 px de ancho intrínseco tanto a 1440 como a 390 px. El recorte distinto responde a `background-size: cover`, no a una imagen ni un hero alternativo. El build público normal muestra una pantalla de preparación mientras no haya contenido publicado por Service; las rutas de demostración solo aparecen en `build:preview` o desarrollo.
 
+La segunda pasada incluyó [Servicios](screenshots/m79e-v0/service-list.png), [Editor](screenshots/m79e-v0/service-editor.png), [Editor móvil](screenshots/m79e-v0/service-editor-mobile.png), [Canciones](screenshots/m79e-v0/worship-songs.png), [Canciones móvil](screenshots/m79e-v0/worship-songs-mobile.png), [Repertorio](screenshots/m79e-v0/worship-setlist.png) y [Lectura bíblica](screenshots/m79e-v0/worship-reading.png). Las siete vistas no presentan overflow en el ancho observado. Se corrigió el título `LVM Platform` de la pestaña Service, los metadatos de Songs/Reading según locale y el estado de error visual de Lectura. Las capturas de Canciones muestran la carga inicial con el backend de demostración inactivo; no prueban una biblioteca con datos remotos ni el estado de error posterior.
+
 ## Lo que falta antes del gate
 
-- Revisar las pantallas interiores de Service y Worship, además de sus estados loading, vacío, error y éxito.
+- Completar la revisión de estados loading, vacío, error y éxito con datos reales de Service/Worship; las capturas actuales cubren ejemplos parciales y el backend de demostración está inactivo.
 - Comprobar Presenter con un servicio importado y observar slides/output con el nuevo tema, sin alterar el contenido proyectado.
 - Revisar foco, contraste, movimiento reducido y anchos intermedios (768/1024) en los cuatro productos.
 - Repetir una sola vez la demo integral desde las ramas actualizadas y revisar los diffs y CI de los PR borrador.
