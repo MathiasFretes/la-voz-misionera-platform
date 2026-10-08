@@ -26,11 +26,11 @@ function Navigation({ close }: { close?: () => void }) {
 function Brand({ close }: { close?: () => void }) {
   return (
     <Link to="/" className="brand" onClick={close}>
-      <span className="brand-mark" aria-hidden="true">
-        LVM
-      </span>
+      <span className="brand-mark" aria-hidden="true" />
       <span>
-        <strong>La Voz Misionera</strong>
+        <strong>
+          La Voz <span className="brand-name-accent">Misionera</span>
+        </strong>
         <small>Service</small>
       </span>
     </Link>
@@ -100,6 +100,7 @@ export function AppShell() {
           >
             <span aria-hidden="true">☰</span>
           </Button>
+          <Brand />
           <span className="mobile-section">{section}</span>
         </header>
         {menuOpen && (

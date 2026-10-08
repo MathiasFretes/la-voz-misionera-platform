@@ -1,6 +1,10 @@
 # M7.9E — Auditoría visual de la familia LVM
 
-Estado: **M7.9E 0.1 candidato técnico para las superficies de la demo; revisión visual del usuario pendiente**. La comparación usa las capturas de `docs/screenshots/m79d/`, la revisión manual del usuario del 2026-10-08 y las fuentes CSS actuales. Esta revisión no pretende rediseñar todas las pantallas heredadas.
+Estado: **auditoría de la propuesta anterior; M7.9E reabierto por la decisión de identidad única basada en V0 del 2026-10-08**. Las capturas de `docs/screenshots/m79d/` y `docs/screenshots/m79e/` prueban la demo y el estado anterior, pero no aprueban la nueva dirección visual. La especificación objetivo está en [`lvm-design-language-0.1.md`](lvm-design-language-0.1.md).
+
+> La tabla siguiente conserva la comparación histórica que motivó el cambio. Sus paletas separadas y el monograma `LVM` **no son el diseño final aprobado**. Worship conserva sus idiomas; la corrección visual no exige traducir toda su interfaz al español.
+
+Primer slice E2: Service ya usa Poppins local, los valores navy/dorado/fondo de V0, la marca con cruz y un Inicio editorial en escritorio/móvil. Las capturas nuevas están en `docs/screenshots/m79e-v0/`. Dashboard, Editor y los otros tres productos aún requieren revisión visual con la identidad unificada; este slice no cierra E2.
 
 | Dimensión        | Service                                  | Worship                                                                                                       | Presenter                                                                                                     | Web Pública                          | Decisión de familia                                                                                                      |
 | ---------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |

@@ -1,15 +1,15 @@
 # M7.x — Gate técnico de la suite
 
-Estado: **gate técnico aprobado en ramas de revisión; aprobación visual del usuario e integración a `main` pendientes**. Fecha: 2026-10-08. Este gate no publica software ni habilita M8 automáticamente en producción.
+Estado: **M7.9D aprobado; M7.9E reabierto para adoptar la identidad de V0 en toda la suite; integración a `main` pendiente**. Fecha: 2026-10-08. Este documento no publica software ni habilita M8 automáticamente.
 
-| Área            | Evidencia                                                                                                              | Resultado                                                        |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| LVM Service     | Editor local, contratos versionados, `npm run lint`, `npm run build`, `docs/m79d-suite-demo.md`                        | Aprobado para la demo                                            |
-| LVM Worship     | Web de repertorios, i18n ES/EN, `i18n:check`, 484 tests, build de preview                                              | Aprobado para el flujo offline de archivos                       |
-| LVM Presenter   | Importación Service, diapositiva y salida física; cabina ES regional, menú único; build Electron/frontend              | Aprobado para la demo local                                      |
-| LVM Web Pública | PublicContent 0.1 importado, Inicio/Eventos/Prédicas/Sedes, 4 tests, build                                             | Aprobado como preview                                            |
-| Suite           | `npm run test:demo` posterior al pulido, red externa bloqueada; QA manual del usuario registrada en M7.9D              | Aprobado funcionalmente                                          |
-| Lenguaje visual | `npm run test:design-language`, capturas desktop/390 px de cuatro productos, Service producción sin Contract Inspector | Candidato técnico M7.9E 0.1; falta aprobación visual del usuario |
+| Área            | Evidencia                                                                                                              | Resultado                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| LVM Service     | Editor local, contratos versionados, `npm run lint`, `npm run build`, `docs/m79d-suite-demo.md`                        | Aprobado para la demo                                                |
+| LVM Worship     | Web de repertorios, i18n ES/EN, `i18n:check`, 484 tests, build de preview                                              | Aprobado para el flujo offline de archivos                           |
+| LVM Presenter   | Importación Service, diapositiva y salida física; cabina ES regional, menú único; build Electron/frontend              | Aprobado para la demo local                                          |
+| LVM Web Pública | PublicContent 0.1 importado, Inicio/Eventos/Prédicas/Sedes, 4 tests, build                                             | Aprobado como preview                                                |
+| Suite           | `npm run test:demo` posterior al pulido, red externa bloqueada; QA manual del usuario registrada en M7.9D              | Aprobado funcionalmente                                              |
+| Lenguaje visual | `npm run test:design-language`, capturas desktop/390 px de cuatro productos, Service producción sin Contract Inspector | Evidencia de la propuesta anterior; E1–E7 de identidad V0 pendientes |
 
 Las capturas y la reproducción se encuentran en [`m79d-suite-demo.md`](m79d-suite-demo.md) y [`m79e-visual-audit.md`](m79e-visual-audit.md). Los resultados se obtuvieron sobre ramas de revisión; no se infiere que `main` contenga esta integración. Worship Web conserva una dependencia de backend para repertorios de cuenta. Web Pública sigue siendo preview con datos de archivo/fixture. Presenter M7.8F mantiene separado su defecto de desinstalación NSIS; no bloquea la demo local ni se declara apto para release Windows.
 
