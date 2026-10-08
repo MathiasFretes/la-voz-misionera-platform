@@ -4,14 +4,16 @@
 
 ## Evidencia inicial
 
-| Producto | Desktop | Móvil | Comprobación de esta pasada |
-| --- | --- | --- | --- |
-| Service | [1440 px](screenshots/m79e-v0/service-desktop.png) | [390 px](screenshots/m79e-v0/service-mobile.png) | Inicio con tokens V0 y marca; tests, lint y build |
-| Worship | [1440 px](screenshots/m79e-v0/worship-desktop.png) | [390 px ES](screenshots/m79e-v0/worship-mobile.png), [390 px EN](screenshots/m79e-v0/worship-mobile-en.png) | 484 tests, lint, i18n y build; sin overflow a 390 px |
-| Presenter | [Windows desktop](screenshots/m79e-v0/presenter-desktop.png) | No aplica al programa de cabina | Cabecera real sin DevTools ni menú duplicado; cierre del proceso; build frontend y tests del contrato |
-| Web Pública | [1440 px](screenshots/m79e-v0/web-desktop.png) | [390 px](screenshots/m79e-v0/web-mobile.png) | 4 tests, 3 E2E, build; sin overflow |
+| Producto    | Desktop                                                      | Móvil                                                                                                       | Comprobación de esta pasada                                                                           |
+| ----------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Service     | [1440 px](screenshots/m79e-v0/service-desktop.png)           | [390 px](screenshots/m79e-v0/service-mobile.png)                                                            | Inicio con tokens V0 y marca; tests, lint y build                                                     |
+| Worship     | [1440 px](screenshots/m79e-v0/worship-desktop.png)           | [390 px ES](screenshots/m79e-v0/worship-mobile.png), [390 px EN](screenshots/m79e-v0/worship-mobile-en.png) | 484 tests, lint, i18n y build; sin overflow a 390 px                                                  |
+| Presenter   | [Windows desktop](screenshots/m79e-v0/presenter-desktop.png) | No aplica al programa de cabina                                                                             | Cabecera real sin DevTools ni menú duplicado; cierre del proceso; build frontend y tests del contrato |
+| Web Pública | [1440 px](screenshots/m79e-v0/web-desktop.png)               | [390 px](screenshots/m79e-v0/web-mobile.png)                                                                | 4 tests, 3 E2E, build; sin overflow                                                                   |
 
 La Web usa el mismo recurso local `hero-comunidad.webp` en ambos anchos. Se comprobó que la imagen carga y tiene 1672 px de ancho intrínseco tanto a 1440 como a 390 px. El recorte distinto responde a `background-size: cover`, no a una imagen ni un hero alternativo. El build público normal muestra una pantalla de preparación mientras no haya contenido publicado por Service; las rutas de demostración solo aparecen en `build:preview` o desarrollo.
+
+La repetición integral posterior a los cambios V0 pasó el 2026-10-08: `npm run test:demo` validó Service → Worship → Service → Presenter y Service → Web Pública sin red externa. El runner usa `build:preview` de Web Pública para verificar el intercambio; el build público normal permanece sin fixtures. La primera invocación se detuvo porque había servidores manuales ocupando los puertos de Playwright; se cerraron y la corrida en el entorno previsto terminó con código 0.
 
 La segunda pasada incluyó [Servicios](screenshots/m79e-v0/service-list.png), [Editor](screenshots/m79e-v0/service-editor.png), [Editor móvil](screenshots/m79e-v0/service-editor-mobile.png), [Canciones](screenshots/m79e-v0/worship-songs.png), [Canciones móvil](screenshots/m79e-v0/worship-songs-mobile.png), [Repertorio](screenshots/m79e-v0/worship-setlist.png) y [Lectura bíblica](screenshots/m79e-v0/worship-reading.png). Las siete vistas no presentan overflow en el ancho observado. Se corrigió el título `LVM Platform` de la pestaña Service, los metadatos de Songs/Reading según locale y el estado de error visual de Lectura. Las capturas de Canciones muestran la carga inicial con el backend de demostración inactivo; no prueban una biblioteca con datos remotos ni el estado de error posterior.
 

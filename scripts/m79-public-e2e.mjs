@@ -37,7 +37,9 @@ function run(command, args, cwd, env = process.env) {
     throw new Error(`${command} ${args.join(' ')} failed in ${cwd}`)
 }
 
-run('npm', ['run', 'build'], webRepo)
+// The production build intentionally withholds fixture content. This gate
+// exercises the explicit local preview used for Service ↔ Web exchange.
+run('npm', ['run', 'build:preview'], webRepo)
 run('npm', ['run', 'build'], serviceRepo, {
   ...process.env,
   VITE_WEB_PUBLICA_URL: 'http://127.0.0.1:4175',
