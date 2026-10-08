@@ -38,9 +38,14 @@ const expected = {
 for (const [name, path] of sources) {
   const css = readFileSync(path, 'utf8')
   for (const [token, value] of Object.entries(expected)) {
-    const declaration = css.match(new RegExp(`${token}:\\s*([^;]+);`))?.[1]?.trim().toLowerCase()
+    const declaration = css
+      .match(new RegExp(`${token}:\\s*([^;]+);`))?.[1]
+      ?.trim()
+      .toLowerCase()
     if (declaration !== value) {
-      throw new Error(`${name}: ${token} is ${declaration ?? 'missing'}; expected ${value}`)
+      throw new Error(
+        `${name}: ${token} is ${declaration ?? 'missing'}; expected ${value}`,
+      )
     }
   }
   process.stdout.write(`${name}: shared brand tokens match\n`)

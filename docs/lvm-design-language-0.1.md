@@ -10,18 +10,18 @@ Este contrato visual acompaña los cuatro productos sin exigir el mismo framewor
 
 ## Primitivas comunes
 
-| Área | Regla 0.1 |
-| --- | --- |
-| Tipografía UI | `Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; el contenido proyectado y los acordes usan sus propias fuentes |
-| Grid/espaciado | Base de 4 px: 4, 8, 12, 16, 24, 32, 48; columnas y densidad varían según producto |
-| Radio | 8 px controles, 12 px tarjetas, 16 px paneles; círculo para monograma/avatar |
-| Botones | Acción primaria única por bloque, texto verbal concreto, estado disabled perceptible, objetivo táctil de al menos 44 px en móvil |
-| Inputs | Etiqueta visible, error cerca del campo, foco de 3 px `#b4872e` con offset de 3 px |
-| Iconos | Decorativos con `aria-hidden`; las acciones de icono tienen nombre accesible; no depender del icono como única señal |
-| Estados | Loading indica qué se espera; vacío propone siguiente acción; éxito y error describen el hecho; offline distingue datos locales de publicación/sincronización |
-| Modales | Título y acción principal claros, Escape cuando sea seguro, foco retenido y devuelto al disparador |
-| Motion | 180–220 ms para cambios de UI; respetar `prefers-reduced-motion`; nunca animar el contenido proyectado por una regla global de shell |
-| Lenguaje | Nombres de producto actuales: LVM Service, LVM Worship, LVM Presenter, LVM Web Pública. Los nombres de contratos 0.1 permanecen técnicos y versionados |
+| Área           | Regla 0.1                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tipografía UI  | `Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`; el contenido proyectado y los acordes usan sus propias fuentes                 |
+| Grid/espaciado | Base de 4 px: 4, 8, 12, 16, 24, 32, 48; columnas y densidad varían según producto                                                                             |
+| Radio          | 8 px controles, 12 px tarjetas, 16 px paneles; círculo para monograma/avatar                                                                                  |
+| Botones        | Acción primaria única por bloque, texto verbal concreto, estado disabled perceptible, objetivo táctil de al menos 44 px en móvil                              |
+| Inputs         | Etiqueta visible, error cerca del campo, foco de 3 px `#b4872e` con offset de 3 px                                                                            |
+| Iconos         | Decorativos con `aria-hidden`; las acciones de icono tienen nombre accesible; no depender del icono como única señal                                          |
+| Estados        | Loading indica qué se espera; vacío propone siguiente acción; éxito y error describen el hecho; offline distingue datos locales de publicación/sincronización |
+| Modales        | Título y acción principal claros, Escape cuando sea seguro, foco retenido y devuelto al disparador                                                            |
+| Motion         | 180–220 ms para cambios de UI; respetar `prefers-reduced-motion`; nunca animar el contenido proyectado por una regla global de shell                          |
+| Lenguaje       | Nombres de producto actuales: LVM Service, LVM Worship, LVM Presenter, LVM Web Pública. Los nombres de contratos 0.1 permanecen técnicos y versionados        |
 
 ## Límites
 

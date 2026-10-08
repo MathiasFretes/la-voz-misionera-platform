@@ -8,11 +8,17 @@ Service exporta un archivo JSON que la Web Pública importa explícitamente. El 
 {
   "schemaVersion": "0.1",
   "generatedAt": "2026-10-07T15:00:00.000Z",
-  "events": [{
-    "id": "encuentro-juvenil", "title": "Encuentro Juvenil", "date": "2026-10-17",
-    "time": "19:00", "venue": "Sede Central", "kind": "encuentro",
-    "description": "Descripción para la vista previa"
-  }],
+  "events": [
+    {
+      "id": "encuentro-juvenil",
+      "title": "Encuentro Juvenil",
+      "date": "2026-10-17",
+      "time": "19:00",
+      "venue": "Sede Central",
+      "kind": "encuentro",
+      "description": "Descripción para la vista previa"
+    }
+  ],
   "sermons": [],
   "venues": []
 }

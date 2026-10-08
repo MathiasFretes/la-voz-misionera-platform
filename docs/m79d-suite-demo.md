@@ -4,12 +4,12 @@
 
 La fuente de los datos de esta demo es [`fixtures/m79d-demo.json`](../fixtures/m79d-demo.json). Iglesia: **La Voz Misionera**; sede: **Templo Central**; culto: **Culto Domingo 19:00**. El orden tiene Bienvenida, Adoración (Canción A, B y C), prédica **Viviendo por fe**, Ofrenda y Cierre. El contenido público usa la misma prédica y sede, más el evento **Encuentro Juvenil**. Los textos y dirección son de demostración; no representan contenido publicado por la iglesia.
 
-| Producto | Responsabilidad en la demo | Archivo de intercambio |
-| --- | --- | --- |
-| LVM Service | Crear el culto y consolidar el orden | WorshipContext 0.1; Service 0.1; PublicContent 0.1 |
-| LVM Worship | Preparar tres canciones y su orden | WorshipPlan 0.1 |
-| LVM Presenter | Importar y presentar el proyecto derivado de Service | `.project` generado por el adaptador |
-| LVM Web Pública | Revisar el contenido antes de mostrarlo localmente | PublicContent 0.1 |
+| Producto        | Responsabilidad en la demo                           | Archivo de intercambio                             |
+| --------------- | ---------------------------------------------------- | -------------------------------------------------- |
+| LVM Service     | Crear el culto y consolidar el orden                 | WorshipContext 0.1; Service 0.1; PublicContent 0.1 |
+| LVM Worship     | Preparar tres canciones y su orden                   | WorshipPlan 0.1                                    |
+| LVM Presenter   | Importar y presentar el proyecto derivado de Service | `.project` generado por el adaptador               |
+| LVM Web Pública | Revisar el contenido antes de mostrarlo localmente   | PublicContent 0.1                                  |
 
 Los cuatro checkouts usados para esta demo son ramas de revisión. Presenter `main` no incluye todavía el trabajo de la rama baseline; M7.8F continúa pausado. Ningún paso requiere Supabase, API, PostgreSQL, NDI o conexión a Internet.
 
@@ -71,13 +71,13 @@ Cerrar Presenter normalmente al terminar, detener Vite con `Ctrl+C` y comprobar 
 
 ## Gate y evidencia
 
-| Criterio | Evidencia requerida |
-| --- | --- |
-| Recorrido automatizado | `npm run test:demo` verde; JSON y `.project` validados |
-| Recorrido manual | Registro fechado de los siete pasos, sin errores ni crash |
-| Offline | Solicitudes remotas bloqueadas en E2E; intercambio manual con red externa desconectada |
-| Capturas | Service antes/después, Worship, Presenter, Service/PublicContent, Web Pública escritorio/móvil |
-| Consistencia | Títulos, orden y sede iguales al fixture en los cuatro productos |
+| Criterio               | Evidencia requerida                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| Recorrido automatizado | `npm run test:demo` verde; JSON y `.project` validados                                         |
+| Recorrido manual       | Registro fechado de los siete pasos, sin errores ni crash                                      |
+| Offline                | Solicitudes remotas bloqueadas en E2E; intercambio manual con red externa desconectada         |
+| Capturas               | Service antes/después, Worship, Presenter, Service/PublicContent, Web Pública escritorio/móvil |
+| Consistencia           | Títulos, orden y sede iguales al fixture en los cuatro productos                               |
 
 La demo se considera cerrada funcionalmente con la corrida automatizada y la revisión manual del usuario registradas abajo. Las capturas automáticas complementan esa revisión.
 
