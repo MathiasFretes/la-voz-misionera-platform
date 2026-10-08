@@ -1,6 +1,6 @@
 # M7.9E — revisión de identidad V0
 
-**Estado:** en curso. Las ramas de revisión usan la identidad única de La Voz Misionera; todavía no se autorizó su integración a `main` ni el cierre de E6/E7.
+**Estado:** revisión visual completa en las ramas M7.9E; pendiente de integración y gate final desde `main`.
 
 ## Evidencia inicial
 
@@ -19,7 +19,7 @@ La segunda pasada incluyó [Servicios](screenshots/m79e-v0/service-list.png), [E
 
 La [captura del servicio importado en Presenter](screenshots/m79d/05-presenter-slide.png) confirma que los bordes de selección de la diapositiva y las salidas usan dorado LVM. El primer intento conservaba magenta en una salida predeterminada guardada; Presenter migra únicamente ese color heredado y conserva los colores personalizados. El E2E offline del recorrido Service → Worship → Service → Presenter volvió a pasar tras la corrección. El arnés elige inglés para el onboarding de Presenter; eso no representa una mezcla de idiomas dentro de un locale.
 
-La cabina de Presenter también se abrió a 1024 px: el documento no desborda horizontalmente, la guía de inicio se omitió antes de capturar y el título inicial cabe en el panel central. El arnés cerró Electron y eliminó su perfil temporal. Esto verifica la pantalla inicial a ese ancho; no equivale a una revisión de todos los paneles de edición de Presenter.
+La cabina de Presenter también se abrió a 1024 px: el documento no desborda horizontalmente, la guía de inicio se omitió antes de capturar y el título inicial cabe en el panel central. El arnés cerró Electron y eliminó su perfil temporal. El recorrido posterior verificó a ese ancho el [servicio importado](screenshots/m79e-v0/presenter-imported-1024.png) y el [editor de una diapositiva real](screenshots/m79e-v0/presenter-editor-1024.png), con lista, lienzo y propiedades visibles, sin overflow global.
 
 En Worship, la [biblioteca sin backend a 390 px](screenshots/m79e-v0/worship-songs-error-390.png) pasó del estado de carga a un aviso recuperable con botón de reintento. No aparece la excepción técnica y no hay overflow. La vista está en inglés porque ese es el locale del perfil de prueba; las cadenas vienen de i18n. Los tests de `SongsPage` cubren también carga, vacío y lista con canciones mediante datos controlados. No se afirma que la biblioteca remota funcione sin un entorno QA.
 
@@ -27,8 +27,7 @@ La revisión intermedia a [768 px](screenshots/m79e-v0/service-768.png) y [1024 
 
 ## Lo que falta antes del gate
 
-- Completar la revisión de estados loading, vacío, error y éxito con datos reales de Service/Worship; el error de Songs ya está capturado, pero el backend de demostración está inactivo.
-- Revisar foco y estados de contraste adicionales en los flujos completos y los paneles de edición de Presenter a 1024 px. El control de 768/1024, foco, targets táctiles y movimiento reducido de las tres interfaces web ya pasó.
+- Completar con datos QA reales los estados de Worship que requieren backend. La prueba automatizada y las capturas verifican el flujo offline, la lista con fixture y el error recuperable. Los controles de 768/1024, foco, targets táctiles y movimiento reducido de las tres interfaces web pasaron.
 - Repetir una sola vez la demo integral desde las ramas actualizadas y revisar los diffs y CI de los PR borrador.
 
 El verificador `scripts/verify-design-language.mjs` comprueba los valores de marca compartidos en los cuatro repositorios. M7.9F mapeará después estos tokens a los temas claro y oscuro; no se implementa un segundo diseño en este gate.
