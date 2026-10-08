@@ -29,7 +29,7 @@ a:hover {
   text-decoration: underline;
 }
 :where(a, button, input, select, textarea):focus-visible {
-  outline: 2px solid var(--lvm-brand-gold);
+  outline: 3px solid var(--lvm-focus-ring);
   outline-offset: 3px;
 }
 .app-shell {
@@ -772,5 +772,12 @@ p {
   }
   .dashboard-empty {
     padding: var(--lvm-space-8) var(--lvm-space-4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-drawer,
+  .mobile-backdrop {
+    transition: none;
+    animation: none;
   }
 }

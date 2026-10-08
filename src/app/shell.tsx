@@ -25,7 +25,7 @@ function Brand({ close }: { close?: () => void }) {
   return (
     <Link to="/" className="brand" onClick={close}>
       <span className="brand-mark" aria-hidden="true">
-        LV
+        LVM
       </span>
       <span>
         <strong>La Voz Misionera</strong>

@@ -158,7 +158,7 @@ test('LVM Service → Worship → Service → Presenter demo stays offline', asy
       timeout: 10000,
     })
     await reopenedWorship
-      .getByRole('button', { name: /Save for Platform|Guardar para Platform/ })
+      .getByRole('button', { name: /Download for LVM Service|Descargar para LVM Service/ })
       .click({ noWaitAfter: true, timeout: 10_000 })
     const planFile = join(folder, 'plan.json')
     await (await planDownload).saveAs(planFile)

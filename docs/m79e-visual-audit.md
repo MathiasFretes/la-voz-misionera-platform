@@ -31,3 +31,11 @@ Estado: **auditoría inicial**. La comparación usa las capturas de `docs/screen
 - Web Pública: `web-desktop.png`, `web-mobile.png`, `web-import-desktop.png`, `web-import-mobile.png`.
 
 Estas capturas son evidencia de la demo automatizada, no sustituyen una prueba manual de los cuatro productos ni prueban todos los estados de UI.
+
+## Avance de corrección
+
+- Los cuatro repositorios ya declaran los mismos valores navy, navy elevado, dorado y anillo de foco. `npm run test:design-language` lee las cuatro fuentes CSS y falla si divergen.
+- Service y Web Pública muestran el monograma textual `LVM` en círculo dorado; Worship adoptó el mismo tratamiento en su shell; Presenter lo incorporó a la cabecera de cabina.
+- Web Pública usa la misma pila tipográfica base que Service; Presenter también la declara, con fallback del sistema.
+- Las cuatro traducciones de Worship conservan las claves técnicas existentes, pero nombran **LVM Service** en la interfaz.
+- Aún faltan capturas comparativas posteriores a estos cambios, revisión manual y cobertura de todos los estados loading/vacío/error/éxito/offline. Por ello M7.9E permanece abierto.
