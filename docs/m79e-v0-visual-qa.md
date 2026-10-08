@@ -17,10 +17,11 @@ La repetición integral posterior a los cambios V0 pasó el 2026-10-08: `npm run
 
 La segunda pasada incluyó [Servicios](screenshots/m79e-v0/service-list.png), [Editor](screenshots/m79e-v0/service-editor.png), [Editor móvil](screenshots/m79e-v0/service-editor-mobile.png), [Canciones](screenshots/m79e-v0/worship-songs.png), [Canciones móvil](screenshots/m79e-v0/worship-songs-mobile.png), [Repertorio](screenshots/m79e-v0/worship-setlist.png) y [Lectura bíblica](screenshots/m79e-v0/worship-reading.png). Las siete vistas no presentan overflow en el ancho observado. Se corrigió el título `LVM Platform` de la pestaña Service, los metadatos de Songs/Reading según locale y el estado de error visual de Lectura. Las capturas de Canciones muestran la carga inicial con el backend de demostración inactivo; no prueban una biblioteca con datos remotos ni el estado de error posterior.
 
+La [captura del servicio importado en Presenter](screenshots/m79d/05-presenter-slide.png) confirma que los bordes de selección de la diapositiva y las salidas usan dorado LVM. El primer intento conservaba magenta en una salida predeterminada guardada; Presenter migra únicamente ese color heredado y conserva los colores personalizados. El E2E offline del recorrido Service → Worship → Service → Presenter volvió a pasar tras la corrección. El arnés elige inglés para el onboarding de Presenter; eso no representa una mezcla de idiomas dentro de un locale.
+
 ## Lo que falta antes del gate
 
 - Completar la revisión de estados loading, vacío, error y éxito con datos reales de Service/Worship; las capturas actuales cubren ejemplos parciales y el backend de demostración está inactivo.
-- Comprobar Presenter con un servicio importado y observar slides/output con el nuevo tema, sin alterar el contenido proyectado.
 - Revisar foco, contraste, movimiento reducido y anchos intermedios (768/1024) en los cuatro productos.
 - Repetir una sola vez la demo integral desde las ramas actualizadas y revisar los diffs y CI de los PR borrador.
 

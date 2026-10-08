@@ -430,6 +430,16 @@ async function presentAndReopen(
     await expect(
       window.locator('.previewOutput').getByText('Cantamos con fe').first(),
     ).toBeVisible({ timeout: 30000 })
+    await expect
+      .poll(() =>
+        window.evaluate(() =>
+          getComputedStyle(document.documentElement)
+            .getPropertyValue('--secondary')
+            .trim()
+            .toLowerCase(),
+        ),
+      )
+      .toBe('#c6a15b')
     // Exercise a physical Presenter output with the same selected slide. The
     // demo profile has no configured display, so create one through Presenter's
     // own output helper and turn it on with the normal toolbar control.
