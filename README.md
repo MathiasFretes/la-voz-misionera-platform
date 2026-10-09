@@ -1,5 +1,7 @@
 # LVM Platform
 
+The first PostgreSQL/API layer is documented in [M8A backend foundation](docs/m8a-backend-foundation.md). The editor continues to use `localStorage` until the M8B repository cutover.
+
 The documentary M7.6 audit of the read-only legacy site lives in [the V0 migration map](docs/v0-migration-map.md). It inventories public/admin screens, data fields and migration gates; it does not add legacy runtime dependencies to Platform.
 
 M7 connects Platform, Worship, and Presenter by local files. Platform exports a [Worship context](contracts/worship-plan-0.1.md) for the service; Worship returns a music-only WorshipPlan 0.1; Platform merges the selected musical block and exports the existing Service 0.1 to Presenter. The three-product workflow requires no account, API, or Internet connection. Worship's offline draft accepts local ChordPro songs.
