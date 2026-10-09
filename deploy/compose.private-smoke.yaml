@@ -1,0 +1,48 @@
+# CI/local packaging proof only. No host ports, DNS, TLS or production secrets.
+name: lvm-service-private-smoke
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: lvm
+      POSTGRES_PASSWORD: lvm_smoke_only
+      POSTGRES_DB: lvm_service
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks: [private]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U lvm -d lvm_service']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migrate:
+    image: lvm-service-api:private-smoke
+    environment:
+      DATABASE_URL: postgres://lvm:lvm_smoke_only@db:5432/lvm_service
+    networks: [private]
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ['node', 'dist/backend/migrate-cli.js']
+
+  api:
+    image: lvm-service-api:private-smoke
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgres://lvm:lvm_smoke_only@db:5432/lvm_service
+      LVM_API_HOST: 0.0.0.0
+      LVM_API_PORT: 4318
+    networks: [private]
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:
+
+networks:
+  private:
+    internal: true
