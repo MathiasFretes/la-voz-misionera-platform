@@ -27,6 +27,7 @@
     "db:restore": "node --env-file-if-exists=.env scripts/db-restore.mjs",
     "test:db-ops": "node --env-file-if-exists=.env scripts/db-operations-smoke.mjs",
     "build:backend": "tsc --project tsconfig.backend.json",
+    "build:backend:runtime": "npm run build:backend && node scripts/build-backend-runtime.mjs",
     "test:backend": "vitest run --config backend/vitest.config.ts",
     "test:db-e2e": "playwright test --config playwright.db.config.ts"
   },
@@ -48,6 +49,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "esbuild": "^0.28.2",
     "eslint": "^10.11.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "jsdom": "^30.1.1",

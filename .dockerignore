@@ -1,0 +1,15 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+.backups
+node_modules
+dist
+coverage
+playwright-report
+test-results
+design-lab
+docs
+e2e
+fixtures

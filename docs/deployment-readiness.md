@@ -6,6 +6,7 @@
 
 - La API de Service y PostgreSQL 17 pasan migraciones, pruebas de persistencia, conflictos y backup/restore en CI desde `main`.
 - El servidor de Service escucha en `127.0.0.1:4318`. El Compose actual expone PostgreSQL solo en `127.0.0.1:5433` y usa credenciales de desarrollo. Ninguno es configuración de producción.
+- `backend/Dockerfile` empaqueta la API y sus migraciones. `deploy/compose.private-smoke.yaml` las ejecuta con PostgreSQL en una red interna, sin publicar puertos del host. El bind `0.0.0.0` solo se configura dentro de ese contenedor; el valor por defecto fuera de él continúa siendo loopback.
 - El build normal de Web Pública muestra una página de preparación. La vista con eventos, prédicas y sedes usa fixtures de preview, no contenido aprobado.
 
 ## Topología objetivo, todavía sin aplicar
@@ -31,3 +32,19 @@ Antes de crear un Compose de producción o apuntar DNS, se necesitan: VPS y domi
 6. Probar backup, borrado controlado y restore en el VPS antes de aceptar datos reales.
 
 La documentación de referencia para una futura implementación es [Docker Compose en producción](https://docs.docker.com/compose/how-tos/production/), [secretos de Compose](https://docs.docker.com/reference/compose-file/secrets/) y [Caddy reverse proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy). Este archivo no sustituye una prueba de despliegue en la infraestructura final.
+
+## Prueba privada de empaquetado
+
+El job `private-container` de CI construye la imagen con `npm ci`, ejecuta las migraciones sobre una base nueva y consulta `/health` desde otro contenedor de la misma red. Comprueba también que se aplicaron las dos migraciones y destruye sus volúmenes al terminar. Las credenciales del Compose son exclusivamente de prueba.
+
+Para reproducirlo en un equipo con Docker:
+
+```bash
+docker compose -f deploy/compose.private-smoke.yaml build api
+docker compose -f deploy/compose.private-smoke.yaml up -d db
+docker compose -f deploy/compose.private-smoke.yaml run --rm migrate
+docker compose -f deploy/compose.private-smoke.yaml up -d api
+docker compose -f deploy/compose.private-smoke.yaml down -v
+```
+
+Este Compose no debe utilizarse para datos reales: no configura secretos, backups persistentes, proxy, HTTPS ni Auth.
