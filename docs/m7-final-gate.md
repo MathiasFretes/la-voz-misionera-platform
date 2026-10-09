@@ -26,7 +26,7 @@
 | Responsive web 768/1024 px                             | Pasó en Service, Worship y Web: sin overflow, foco visible, botón de menú táctil y movimiento reducido.                                                                            |
 | Identidad V0 compartida                                | Pasó el verificador de marca para Service, Worship Web/Mobile/Studio, Presenter y Web Pública. Las referencias desktop/390 px están en [la revisión visual](m79e-v0-visual-qa.md). |
 
-La primera ejecución de la demo completa desde el checkout principal de Presenter falló al localizar `#output_window_button` después de importar un servicio. El mismo flujo pasó en una segunda ejecución usando otro checkout limpio del **mismo commit `5c08855`**. No se identificó la causa del fallo inicial; el resultado se conserva como señal para el siguiente QA interactivo de Presenter. No se repitieron benchmarks NDI.
+El 2026-10-09, `npm run test:demo` terminó con código 0 desde los cuatro commits integrados: primero pasó Service → Worship → Service → Presenter y después Service → Web Pública. El arnés cerró Presenter sin procesos activos. La primera ejecución anterior desde el checkout principal de Presenter había fallado al localizar `#output_window_button`; el recorrido completo pasó después usando otro checkout limpio del **mismo commit `5c08855`**. No se identificó la causa de aquel fallo aislado y queda registrada para el próximo QA interactivo. No se repitieron benchmarks NDI.
 
 ## Contratos congelados como baseline de M8A
 
