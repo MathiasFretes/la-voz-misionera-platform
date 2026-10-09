@@ -7,6 +7,18 @@ test('creates a real service, survives an empty browser cache and exports Servic
 }) => {
   const title = `Culto PostgreSQL ${Date.now()}`
   let id = ''
+  const writes: string[] = []
+  page.on('response', (response) => {
+    if (
+      response.url().includes('/api/services/') &&
+      response.request().method() === 'PUT'
+    ) {
+      void response
+        .text()
+        .then((body) => writes.push(`${response.status()} ${body}`))
+        .catch(() => {})
+    }
+  })
   try {
     expect((await request.get('/api/services')).status()).toBe(200)
     await page.goto('/services/new')
@@ -15,9 +27,15 @@ test('creates a real service, survives an empty browser cache and exports Servic
     await expect(page.getByRole('heading', { name: title })).toBeVisible()
     id = new URL(page.url()).pathname.split('/').at(-1) ?? ''
     expect(id).toBeTruthy()
-    await expect(
-      page.getByText('Servicios sincronizados con PostgreSQL.'),
-    ).toBeVisible({ timeout: 10_000 })
+    try {
+      await expect(
+        page.getByText('Servicios sincronizados con PostgreSQL.'),
+      ).toBeVisible({ timeout: 10_000 })
+    } catch (error) {
+      throw new Error(`Service API writes: ${writes.join(' | ') || 'none'}`, {
+        cause: error,
+      })
+    }
     expect((await request.get(`/api/services/${id}`)).status()).toBe(200)
 
     await page.getByRole('button', { name: /Agregar elemento/ }).click()
