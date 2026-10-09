@@ -1,5 +1,5 @@
 import type { ServiceRecord } from '../../domain/service/service'
-import type { ServiceRepository } from '../ServiceRepository'
+import type { PersistenceStatus, ServiceRepository } from '../ServiceRepository'
 
 const STORAGE_KEY = 'lvm.platform.services.v1'
 
@@ -66,6 +66,18 @@ export class LocalServiceRepository implements ServiceRepository {
     return () => {
       this.listeners.delete(listener)
     }
+  }
+
+  async ready(): Promise<void> {}
+
+  async retry(): Promise<void> {}
+
+  status(): PersistenceStatus {
+    return { mode: 'local', phase: 'synced', conflicts: 0 }
+  }
+
+  migrationConflicts(): ServiceRecord[] {
+    return []
   }
 
   private notify(): void {

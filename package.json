@@ -24,7 +24,8 @@
     "api:dev": "node --env-file-if-exists=.env --import tsx backend/src/server.ts",
     "db:migrate": "node --env-file-if-exists=.env --import tsx backend/src/migrate-cli.ts",
     "build:backend": "tsc --project tsconfig.backend.json",
-    "test:backend": "vitest run --config backend/vitest.config.ts"
+    "test:backend": "vitest run --config backend/vitest.config.ts",
+    "test:db-e2e": "playwright test --config playwright.db.config.ts"
   },
   "dependencies": {
     "@fontsource/poppins": "^5.3.0",

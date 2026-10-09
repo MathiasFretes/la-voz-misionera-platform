@@ -1,6 +1,6 @@
 # LVM Platform
 
-The first PostgreSQL/API layer is documented in [M8A backend foundation](docs/m8a-backend-foundation.md). The editor continues to use `localStorage` until the M8B repository cutover.
+The PostgreSQL/API layer is documented in [M8A backend foundation](docs/m8a-backend-foundation.md). The optional Editor cutover and safe migration of browser drafts are documented in [M8B Service persistence](docs/m8b-service-persistence.md).
 
 The documentary M7.6 audit of the read-only legacy site lives in [the V0 migration map](docs/v0-migration-map.md). It inventories public/admin screens, data fields and migration gates; it does not add legacy runtime dependencies to Platform.
 
