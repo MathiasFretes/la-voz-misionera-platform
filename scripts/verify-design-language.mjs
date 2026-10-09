@@ -51,3 +51,21 @@ for (const [name, path] of sources) {
   }
   process.stdout.write(`${name}: shared brand tokens match\n`)
 }
+
+const native = readFileSync(join(worship, 'packages/tokens/native.ts'), 'utf8')
+const nativeLight = native
+  .split('export const lightColors: ThemeColors = {')[1]
+  ?.split('\n}')[0]
+const nativeDark = native
+  .split('export const darkColors: ThemeColors = {')[1]
+  ?.split('\n}')[0]
+if (
+  !nativeLight?.includes("bg: '#F6F7F9'") ||
+  !nativeLight.includes("ink: '#1C2A39'") ||
+  !nativeLight.includes("star: '#C6A15B'") ||
+  !nativeDark?.includes("surface: '#1C2A39'") ||
+  !nativeDark.includes("accent: '#E2C58A'")
+) {
+  throw new Error('Worship Mobile/Studio: V0 navy/gold brand roles differ')
+}
+process.stdout.write('Worship Mobile/Studio: native brand roles match\n')
