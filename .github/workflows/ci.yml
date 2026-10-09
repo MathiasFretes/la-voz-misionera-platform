@@ -57,6 +57,16 @@ jobs:
         env:
           DATABASE_URL: postgres://lvm:lvm_dev_only@127.0.0.1:5433/lvm_service
           LVM_PG_CONTAINER: ${{ job.services.postgres.id }}
+      - uses: actions/checkout@v4
+        with:
+          repository: MathiasFretes/lvm-web-publica
+          ref: 007b8961dcc7740217dea0ace8788aab4362bacc
+          path: public-contract
+      - run: npm ci
+        working-directory: public-contract
+      - run: npm run test:public-preview
+        env:
+          PUBLIC_WEB_REPO: public-contract
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
