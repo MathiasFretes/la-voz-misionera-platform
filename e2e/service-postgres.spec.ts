@@ -8,12 +8,17 @@ test('creates a real service, survives an empty browser cache and exports Servic
   const title = `Culto PostgreSQL ${Date.now()}`
   let id = ''
   try {
+    expect((await request.get('/api/services')).status()).toBe(200)
     await page.goto('/services/new')
     await page.getByLabel('Nombre').fill(title)
     await page.getByRole('button', { name: 'Crear servicio' }).click()
     await expect(page.getByRole('heading', { name: title })).toBeVisible()
     id = new URL(page.url()).pathname.split('/').at(-1) ?? ''
     expect(id).toBeTruthy()
+    await expect(
+      page.getByText('Servicios sincronizados con PostgreSQL.'),
+    ).toBeVisible({ timeout: 10_000 })
+    expect((await request.get(`/api/services/${id}`)).status()).toBe(200)
 
     await page.getByRole('button', { name: /Agregar elemento/ }).click()
     await page.getByLabel('Tipo').selectOption('ANNOUNCEMENT')
