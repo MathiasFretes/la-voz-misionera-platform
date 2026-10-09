@@ -1,0 +1,28 @@
+{
+  "church": "La Voz Misionera",
+  "venue": "Templo Central",
+  "service": {
+    "title": "Culto Domingo 19:00",
+    "startsAt": "2026-10-11T19:00",
+    "welcome": "Bienvenida",
+    "worship": "Adoración",
+    "sermon": "Viviendo por fe",
+    "offering": "Ofrenda",
+    "closing": "Cierre"
+  },
+  "songs": [
+    { "title": "Canción A", "key": "G", "lyrics": "[G]Cantamos con fe" },
+    { "title": "Canción B", "key": "D", "lyrics": "[D]Juntos en adoración" },
+    { "title": "Canción C", "key": "A", "lyrics": "[A]Nuestra esperanza" }
+  ],
+  "public": {
+    "event": "Encuentro Juvenil",
+    "eventDate": "2026-10-17",
+    "eventTime": "19:00",
+    "eventDescription": "Encuentro para jóvenes de La Voz Misionera.",
+    "sermonSummary": "Una prédica sobre vivir por fe.",
+    "venueZone": "Sede Central",
+    "venueAddress": "Dirección de demostración",
+    "venueHours": "Domingo · 19:00"
+  }
+}

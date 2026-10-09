@@ -11,9 +11,14 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/services" onClick={close}>
         Servicios
       </Link>
-      <Link to="/development/contract" onClick={close}>
-        Contract Inspector
+      <Link to="/public-preview" onClick={close}>
+        Contenido público
       </Link>
+      {import.meta.env.DEV && (
+        <Link to="/development/contract" onClick={close}>
+          Contract Inspector
+        </Link>
+      )}
     </nav>
   )
 }
@@ -21,12 +26,12 @@ function Navigation({ close }: { close?: () => void }) {
 function Brand({ close }: { close?: () => void }) {
   return (
     <Link to="/" className="brand" onClick={close}>
-      <span className="brand-mark" aria-hidden="true">
-        LV
-      </span>
+      <span className="brand-mark" aria-hidden="true" />
       <span>
-        <strong>La Voz Misionera</strong>
-        <small>Platform</small>
+        <strong>
+          La Voz <span className="brand-name-accent">Misionera</span>
+        </strong>
+        <small>Service</small>
       </span>
     </Link>
   )
@@ -48,9 +53,11 @@ export function AppShell() {
   const { pathname } = useLocation()
   const section = pathname.startsWith('/services')
     ? 'Servicios'
-    : pathname.startsWith('/development')
-      ? 'Desarrollo'
-      : 'Inicio'
+    : pathname.startsWith('/public-preview')
+      ? 'Contenido público'
+      : pathname.startsWith('/development')
+        ? 'Desarrollo'
+        : 'Inicio'
 
   useEffect(() => {
     if (menuOpen) menuDrawer.current?.querySelector('a')?.focus()
@@ -93,6 +100,7 @@ export function AppShell() {
           >
             <span aria-hidden="true">☰</span>
           </Button>
+          <Brand />
           <span className="mobile-section">{section}</span>
         </header>
         {menuOpen && (

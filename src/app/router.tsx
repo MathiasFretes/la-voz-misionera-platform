@@ -9,6 +9,7 @@ import { ServicesPage } from '../pages/ServicesPage'
 import { NewServicePage } from '../pages/NewServicePage'
 import { ServiceEditorPage } from '../pages/ServiceEditorPage'
 import { ContractInspectorPage } from '../pages/ContractInspectorPage'
+import { PublicPreviewPage } from '../pages/PublicPreviewPage'
 
 const rootRoute = createRootRoute({ component: AppShell })
 const homeRoute = createRoute({
@@ -36,6 +37,11 @@ const contractRoute = createRoute({
   path: '/development/contract',
   component: ContractInspectorPage,
 })
+const publicPreviewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/public-preview',
+  component: PublicPreviewPage,
+})
 
 export const router = createRouter({
   routeTree: rootRoute.addChildren([
@@ -43,7 +49,8 @@ export const router = createRouter({
     servicesRoute,
     newServiceRoute,
     serviceEditorRoute,
-    contractRoute,
+    ...(import.meta.env.DEV ? [contractRoute] : []),
+    publicPreviewRoute,
   ]),
 })
 

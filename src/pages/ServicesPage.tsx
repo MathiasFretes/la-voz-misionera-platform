@@ -65,7 +65,7 @@ export function ServicesPage() {
     <>
       <PageHeader
         title="Servicios"
-        eyebrow="LVM Platform"
+        eyebrow="LVM Service"
         description="El orden del culto vive en este navegador."
         actions={
           <Link className={buttonClass('primary')} to="/services/new">

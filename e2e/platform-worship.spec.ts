@@ -7,14 +7,28 @@ import { join } from 'node:path'
 import { parseService } from '../src/contracts/service'
 import { parseWorshipPlan } from '../src/contracts/worshipPlan'
 
+const demo = JSON.parse(
+  await readFile(
+    new URL('../fixtures/m79d-demo.json', import.meta.url),
+    'utf8',
+  ),
+) as {
+  venue: string
+  service: Record<string, string>
+  songs: Array<{ title: string; key: string; lyrics: string }>
+}
+
 test.skip(
   !process.env.WORSHIP_URL,
   'Set WORSHIP_URL to the local Worship preview URL',
 )
 
-test('Platform → Worship → Platform → Presenter contract stays offline', async () => {
-  test.setTimeout(240_000)
+test('LVM Service → Worship → Service → Presenter demo stays offline', async () => {
+  test.setTimeout(180_000)
   const folder = await mkdtemp(join(tmpdir(), 'lvm-m7-'))
+  const capture = process.env.LVM_DEMO_CAPTURE === '1'
+  const captureDir = join(process.cwd(), 'docs', 'screenshots', 'm79d')
+  if (capture) await mkdir(captureDir, { recursive: true })
   const profile = join(folder, 'platform-profile')
   const worshipProfile = join(folder, 'worship-profile')
   let platform = await chromium.launchPersistentContext(profile, {
@@ -33,9 +47,12 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     let page = platform.pages()[0] ?? (await platform.newPage())
     await page.goto('http://127.0.0.1:4173')
     await page.getByRole('link', { name: 'Crear servicio' }).click()
-    await page.getByLabel('Nombre').fill('Culto M7 offline')
-    await page.getByLabel('Fecha y hora').fill('2026-10-04T19:00')
+    await page.getByLabel('Nombre').fill(demo.service.title)
+    await page.getByLabel('Fecha y hora').fill(demo.service.startsAt)
     await page.getByRole('button', { name: 'Crear servicio' }).click()
+    await page.getByRole('tab', { name: 'Información' }).click()
+    await page.getByLabel('Sede').fill(demo.venue)
+    await page.getByRole('tab', { name: 'Orden' }).click()
 
     async function add(kind: string, values: Record<string, string>) {
       await page.getByRole('button', { name: /Agregar elemento/ }).click()
@@ -44,45 +61,66 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
         await page.getByLabel(label, { exact: true }).fill(value)
       await page.getByRole('button', { name: 'Guardar elemento' }).click()
     }
-    await add('ANNOUNCEMENT', { Título: 'Bienvenida', Texto: 'Bienvenidos.' })
     await add('ANNOUNCEMENT', {
-      Título: 'Anuncio',
-      Texto: 'Reunión de jóvenes.',
+      Título: demo.service.welcome,
+      Texto: 'Bienvenidos.',
     })
-    await add('SCRIPTURE', {
-      Referencia: 'Juan 3:16',
-      Versión: 'RV1909',
-      'Texto local': 'Porque de tal manera amó Dios al mundo.',
+    await add('ANNOUNCEMENT', {
+      Título: demo.service.worship,
+      Texto: 'Tiempo de adoración.',
     })
     await add('SERMON', {
-      Título: 'Predicación',
-      Texto: 'Esperanza para todos.',
+      Título: demo.service.sermon,
+      Texto: 'Una prédica sobre vivir por fe.',
     })
-    await add('SONG', {
-      'Título de la canción': 'Cierre',
-      Tonalidad: 'C',
-      'Secciones y letra': '# Coro\n[C]Amén',
+    await add('ANNOUNCEMENT', {
+      Título: demo.service.offering,
+      Texto: 'Ofrenda.',
     })
+    await add('ANNOUNCEMENT', {
+      Título: demo.service.closing,
+      Texto: 'Gracias por acompañarnos.',
+    })
+    await page
+      .getByLabel('Colocar el bloque musical después de')
+      .selectOption({ label: demo.service.worship })
+    if (capture)
+      await page.screenshot({
+        path: join(captureDir, '01-service-plan.png'),
+        fullPage: true,
+      })
 
     const contextDownload = page.waitForEvent('download', { timeout: 10000 })
     await page
-      .getByRole('button', { name: 'Exportar contexto para Worship' })
+      .getByRole('button', { name: '1. Descargar contexto para Worship' })
       .click()
     const contextFile = join(folder, 'context.json')
     await (await contextDownload).saveAs(contextFile)
 
+    const worshipHandoffUrl = await page
+      .getByRole('link', { name: 'Abrir LVM Worship' })
+      .getAttribute('href')
+    expect(worshipHandoffUrl).toContain(`${process.env.WORSHIP_URL}/setlist`)
     const worshipPage = worship.pages()[0] ?? (await worship.newPage())
-    await worshipPage.goto(`${process.env.WORSHIP_URL}/setlist`, {
+    await worshipPage.goto(worshipHandoffUrl!, {
       waitUntil: 'domcontentloaded',
       timeout: 15000,
     })
+    await expect(
+      worshipPage.locator('input[type=file][accept*="json"]'),
+    ).toHaveCount(1)
     await worshipPage
       .locator('input[type=file]')
       .first()
       .setInputFiles(contextFile)
     await expect(
-      worshipPage.getByText('Culto M7 offline').first(),
+      worshipPage.getByText(demo.service.title).first(),
     ).toBeVisible()
+    await expect(
+      worshipPage.getByRole('link', {
+        name: /Return to LVM Service|Volver a LVM Service/,
+      }),
+    ).toHaveAttribute('href', page.url())
     await worshipPage
       .locator('input[type=file]')
       .last()
@@ -91,43 +129,48 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
           name: 'uno.cho',
           mimeType: 'text/plain',
           buffer: Buffer.from(
-            '{title: Señor fiel}\n{key: D}\n{start_of_verse: Verso}\n[D]Señor 😀 [A]estás aquí\n{end_of_verse}\n{start_of_chorus: Coro}\n[G]Cantaré\n{end_of_chorus}',
+            `{title: ${demo.songs[0].title}}\n{key: ${demo.songs[0].key}}\n{start_of_verse: Verso}\n${demo.songs[0].lyrics}\n{end_of_verse}\n{start_of_chorus: Coro}\n[G]Cantamos\n{end_of_chorus}`,
           ),
         },
         {
           name: 'dos.cho',
           mimeType: 'text/plain',
           buffer: Buffer.from(
-            '{title: Gracia}\n{key: G}\n{start_of_verse}\n[G]Gracia\n{end_of_verse}',
+            `{title: ${demo.songs[1].title}}\n{key: ${demo.songs[1].key}}\n{start_of_verse}\n${demo.songs[1].lyrics}\n{end_of_verse}`,
           ),
         },
         {
           name: 'tres.cho',
           mimeType: 'text/plain',
           buffer: Buffer.from(
-            '{title: Alabanza}\n{key: C}\n{start_of_chorus}\n[C]Alabanza\n{end_of_chorus}',
+            `{title: ${demo.songs[2].title}}\n{key: ${demo.songs[2].key}}\n{start_of_chorus}\n${demo.songs[2].lyrics}\n{end_of_chorus}`,
           ),
         },
       ])
-    await expect(worshipPage.locator('.gc-set-row')).toHaveCount(3)
-    await worshipPage.locator('.gc-set-row').first().click()
+    await expect(worshipPage.locator('.lvm-set-row')).toHaveCount(3)
+    if (capture)
+      await worshipPage.screenshot({
+        path: join(captureDir, '02-worship-setlist.png'),
+        fullPage: true,
+      })
+    await worshipPage.locator('.lvm-set-row').first().click()
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .first()
       .locator('input[placeholder="1,2,1,2"]')
       .fill('1,2,1,2')
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .first()
       .locator('select')
       .selectOption('G')
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .nth(1)
       .locator('select')
       .selectOption('D')
     await worshipPage
-      .locator('.gc-set-row')
+      .locator('.lvm-set-row')
       .nth(2)
       .locator('select')
       .selectOption('A')
@@ -140,24 +183,42 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     await worship.route(/https?:\/\/(?!127\.0\.0\.1)/, (route) => route.abort())
     const reopenedWorship = worship.pages()[0] ?? (await worship.newPage())
     await reopenedWorship.goto(`${process.env.WORSHIP_URL}/setlist`)
-    await expect(reopenedWorship.locator('.gc-set-row')).toHaveCount(3)
+    await expect(reopenedWorship.locator('.lvm-set-row')).toHaveCount(3)
     const planDownload = reopenedWorship.waitForEvent('download', {
       timeout: 10000,
     })
     await reopenedWorship
-      .getByRole('button', { name: /Save for Platform|Guardar para Platform/ })
-      .click()
+      .getByRole('button', {
+        name: /Download for LVM Service|Descargar para LVM Service/,
+      })
+      .click({ noWaitAfter: true, timeout: 10_000 })
     const planFile = join(folder, 'plan.json')
     await (await planDownload).saveAs(planFile)
     const plan = parseWorshipPlan(JSON.parse(await readFile(planFile, 'utf8')))
-    expect(plan.songs.map((song) => song.key)).toEqual(['G', 'D', 'A'])
+    expect(plan.songs.map((song) => song.key)).toEqual(
+      demo.songs.map((song) => song.key),
+    )
     expect(plan.songs[0].arrangement).toEqual([1, 2, 1, 2])
 
-    await page.locator('input[type=file]').setInputFiles(planFile)
+    await page
+      .locator('input[type=file]')
+      .setInputFiles(planFile, { timeout: 5_000 })
+    await expect(
+      page.getByRole('region', {
+        name: 'Vista previa del repertorio de Worship',
+      }),
+    ).toContainText('3 canciones')
+    await expect(page.locator('.order-item')).toHaveCount(5)
+    await page.getByRole('button', { name: 'Confirmar importación' }).click()
     await expect(page.locator('.order-item')).toHaveCount(8)
     await expect(
       page.getByText('Repertorio de Worship importado y guardado'),
     ).toBeVisible()
+    if (capture)
+      await page.screenshot({
+        path: join(captureDir, '03-service-import.png'),
+        fullPage: true,
+      })
     await platform.close()
     platform = await chromium.launchPersistentContext(profile, {
       headless: true,
@@ -167,12 +228,23 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
       route.abort(),
     )
     page = platform.pages()[0] ?? (await platform.newPage())
-    await page.goto('http://127.0.0.1:4173/services')
-    await page.getByRole('link', { name: 'Abrir servicio' }).click()
+    await page.goto('http://127.0.0.1:4173/services', {
+      waitUntil: 'domcontentloaded',
+      timeout: 15_000,
+    })
+    await page
+      .getByRole('link', { name: /^Abrir(?: servicio)?/ })
+      .first()
+      .click({ timeout: 5_000 })
     await expect(page.locator('.order-item')).toHaveCount(8)
     await page.getByRole('tab', { name: 'Presentación' }).click()
+    if (capture)
+      await page.screenshot({
+        path: join(captureDir, '04-service-presenter-handoff.png'),
+        fullPage: true,
+      })
     const serviceDownload = page.waitForEvent('download', { timeout: 10000 })
-    await page.getByRole('button', { name: 'Exportar Service 0.1' }).click()
+    await page.getByRole('button', { name: 'Descargar para Presenter' }).click()
     const serviceFile = join(folder, 'service.json')
     const finalDownload = await serviceDownload
     await finalDownload.saveAs(serviceFile)
@@ -181,21 +253,26 @@ test('Platform → Worship → Platform → Presenter contract stays offline', a
     )
     expect(service.items.map((item) => item.kind)).toEqual([
       'ANNOUNCEMENT',
-      'SONG',
-      'SONG',
-      'SONG',
       'ANNOUNCEMENT',
-      'SCRIPTURE',
-      'SERMON',
       'SONG',
+      'SONG',
+      'SONG',
+      'SERMON',
+      'ANNOUNCEMENT',
+      'ANNOUNCEMENT',
     ])
     expect(service.items[1]).toMatchObject({
-      song: { title: 'Señor fiel', key: 'G' },
+      announcement: { title: demo.service.worship },
     })
-    expect(service.items[4]).toMatchObject({
-      announcement: { title: 'Anuncio' },
+    expect(service.items[2]).toMatchObject({
+      song: { title: demo.songs[0].title, key: 'G' },
     })
-    expect(service.items[7]).toMatchObject({ song: { title: 'Cierre' } })
+    expect(service.items[5]).toMatchObject({
+      sermon: { title: demo.service.sermon },
+    })
+    expect(service.items[7]).toMatchObject({
+      announcement: { title: demo.service.closing },
+    })
 
     if (process.env.PRESENTER_REPO) {
       const projectFile = join(folder, 'service.project')
@@ -229,8 +306,10 @@ async function presentAndReopen(
 ) {
   const settings = join(folder, 'presenter-settings')
   const data = join(folder, 'presenter-data')
+  const appData = join(folder, 'presenter-appdata')
   await mkdir(settings)
   await mkdir(data)
+  await mkdir(appData)
 
   async function launch() {
     const app = await electron.launch({
@@ -242,8 +321,9 @@ async function presentAndReopen(
       args: ['.', '--no-sandbox'],
       env: {
         ...process.env,
-        NODE_ENV: 'production',
+        NODE_ENV: 'development',
         FS_MOCK_STORE_PATH: settings,
+        APPDATA: appData,
       },
     })
     await app.evaluate(({ dialog }, location) => {
@@ -254,12 +334,12 @@ async function presentAndReopen(
     }, data)
     let window = app
       .windows()
-      .find((candidate) => candidate.url().includes('index.html'))
+      .find((candidate) => candidate.url().includes('localhost:3000'))
     for (let i = 0; i < 40 && !window; i++) {
       await new Promise((resolve) => setTimeout(resolve, 500))
       window = app
         .windows()
-        .find((candidate) => candidate.url().includes('index.html'))
+        .find((candidate) => candidate.url().includes('localhost:3000'))
     }
     if (!window) throw new Error('Presenter main window did not open')
     await window
@@ -269,7 +349,12 @@ async function presentAndReopen(
     await app.evaluate(({ session }) => {
       session.defaultSession.webRequest.onBeforeRequest(
         { urls: ['http://*/*', 'https://*/*'] },
-        (_details, callback) => callback({ cancel: true }),
+        (details, callback) =>
+          callback({
+            cancel: !/^http:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?\//.test(
+              details.url,
+            ),
+          }),
       )
     })
     return { app, window }
@@ -277,11 +362,30 @@ async function presentAndReopen(
 
   async function close(app: Awaited<ReturnType<typeof electron.launch>>) {
     const child = app.process()
+    void app
+      .evaluate(() => {
+        const path = process.getBuiltinModule('node:path')
+        const require = process
+          .getBuiltinModule('node:module')
+          .createRequire(path.join(process.cwd(), 'build/electron/index.js'))
+        void require(
+          path.join(process.cwd(), 'build/electron/utils/close.js'),
+        ).exitApp()
+      })
+      .catch(() => {})
     await Promise.race([
       app.close().catch(() => {}),
       new Promise((resolve) => setTimeout(resolve, 5000)),
     ])
-    if (child && !child.killed) child.kill('SIGKILL')
+    if (child?.pid && !child.killed) {
+      try {
+        execFileSync('taskkill.exe', ['/PID', String(child.pid), '/T', '/F'], {
+          stdio: 'ignore',
+        })
+      } catch {
+        // Electron already exited.
+      }
+    }
   }
 
   let { app, window } = await launch()
@@ -309,26 +413,84 @@ async function presentAndReopen(
       }> => ({ canceled: false, filePaths: [location] })
     }, projectFile)
     await window.locator('.addButton').first().click()
-    await window.locator('.addMenu').getByText('Import').click()
+    await window
+      .locator('.addMenu')
+      .getByText('Import')
+      .click({ timeout: 5000 })
     await expect(window.locator('.popup').getByText('Imported!')).toBeVisible({
-      timeout: 30000,
+      timeout: 10000,
     })
     await window.locator('.popup button').first().click()
-    await window.getByText('Culto M7 offline').first().click()
-    await window.getByText('Señor fiel').first().click()
-    await expect(window.getByText('Señor 😀 estás aquí').first()).toBeVisible({
+    await window.getByText(demo.service.title).first().click()
+    await window.getByText(demo.songs[0].title).first().click()
+    await expect(window.getByText('Cantamos con fe').first()).toBeVisible({
       timeout: 30000,
     })
-    await window.getByText('Señor 😀 estás aquí').first().click()
+    await window.getByText('Cantamos con fe').first().click()
     await expect(
-      window.locator('.previewOutput').getByText('Señor 😀 estás aquí').first(),
+      window.locator('.previewOutput').getByText('Cantamos con fe').first(),
     ).toBeVisible({ timeout: 30000 })
+    await expect
+      .poll(() =>
+        window.evaluate(() =>
+          getComputedStyle(document.documentElement)
+            .getPropertyValue('--secondary')
+            .trim()
+            .toLowerCase(),
+        ),
+      )
+      .toBe('#c6a15b')
+    // Exercise a physical Presenter output with the same selected slide. The
+    // demo profile has no configured display, so create one through Presenter's
+    // own output helper and turn it on with the normal toolbar control.
+    await window.evaluate(async () => {
+      const modulePath = '/src/frontend/components/helpers/output.ts'
+      const { addOutput } = await import(/* @vite-ignore */ modulePath)
+      addOutput(false, '', true, 'LVM Demo Output')
+    })
+    await window.locator('#output_window_button').click()
+    await expect
+      .poll(
+        async () =>
+          app.windows().filter((candidate) => candidate !== window).length,
+        {
+          timeout: 15000,
+        },
+      )
+      .toBeGreaterThan(0)
+    const physicalOutput = app
+      .windows()
+      .find((candidate) => candidate !== window)!
+    await expect(
+      physicalOutput.getByText('Cantamos con fe').first(),
+    ).toBeVisible({
+      timeout: 15000,
+    })
+    if (process.env.LVM_DEMO_CAPTURE === '1') {
+      const location = join(
+        process.cwd(),
+        'docs',
+        'screenshots',
+        'm79d',
+        '05-presenter-slide.png',
+      )
+      await window.screenshot({ path: location })
+      await physicalOutput.screenshot({
+        path: join(
+          process.cwd(),
+          'docs',
+          'screenshots',
+          'm79d',
+          '05b-presenter-physical-output.png',
+        ),
+      })
+    }
     await window.keyboard.press('Control+s')
     await expect
       .poll(
         async () =>
           (await readFile(join(settings, 'projects.json'), 'utf8')).includes(
-            'Culto M7 offline',
+            demo.service.title,
           ),
         { timeout: 15000 },
       )
@@ -341,7 +503,43 @@ async function presentAndReopen(
           ).length,
         { timeout: 15000 },
       )
-      .toBe(9)
+      .toBe(8)
+    if (process.env.LVM_DEMO_CAPTURE === '1') {
+      await window.setViewportSize({ width: 1024, height: 768 })
+      await expect(window.getByText('Cantamos con fe').first()).toBeVisible()
+      expect(
+        await window.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(1025)
+      await window.screenshot({
+        path: join(
+          process.cwd(),
+          'docs',
+          'screenshots',
+          'm79e-v0',
+          'presenter-imported-1024.png',
+        ),
+      })
+      await window
+        .locator('.top button')
+        .filter({ hasText: 'Edit' })
+        .first()
+        .click()
+      await window.locator('.grid').getByText('Verso 1').first().click()
+      await expect(window.locator('.editArea .parent')).toBeVisible()
+      await expect(window.getByText('Cantamos con fe').first()).toBeVisible()
+      expect(
+        await window.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(1025)
+      await window.screenshot({
+        path: join(
+          process.cwd(),
+          'docs',
+          'screenshots',
+          'm79e-v0',
+          'presenter-editor-1024.png',
+        ),
+      })
+    }
   } finally {
     await close(app)
   }
@@ -351,19 +549,19 @@ async function presentAndReopen(
     await expect
       .poll(
         async () =>
-          (await window.locator('body').innerText()).includes('All\n\n9'),
+          (await window.locator('body').innerText()).includes('All\n\n8'),
         { timeout: 30000 },
       )
       .toBe(true)
-    await expect(window.getByText('Culto M7 offline').first()).toBeVisible({
+    await expect(window.getByText(demo.service.title).first()).toBeVisible({
       timeout: 30000,
     })
-    await window.getByText('Culto M7 offline').first().click()
-    await expect(window.getByText('Señor fiel').first()).toBeVisible({
+    await window.getByText(demo.service.title).first().click()
+    await expect(window.getByText(demo.songs[0].title).first()).toBeVisible({
       timeout: 30000,
     })
-    await window.getByText('Señor fiel').first().click()
-    await expect(window.getByText('Señor 😀 estás aquí').first()).toBeVisible({
+    await window.getByText(demo.songs[0].title).first().click()
+    await expect(window.getByText('Cantamos con fe').first()).toBeVisible({
       timeout: 30000,
     })
   } finally {
