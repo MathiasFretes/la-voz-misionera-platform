@@ -5,6 +5,7 @@ RUN npm ci
 COPY backend ./backend
 COPY src/contracts ./src/contracts
 COPY src/domain ./src/domain
+COPY src/fixtures ./src/fixtures
 COPY tsconfig.backend.json ./
 COPY scripts/build-backend-runtime.mjs ./scripts/build-backend-runtime.mjs
 RUN npm run build:backend:runtime
