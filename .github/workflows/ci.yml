@@ -8,6 +8,20 @@ on:
 jobs:
   platform:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: lvm
+          POSTGRES_PASSWORD: lvm_dev_only
+          POSTGRES_DB: lvm_service
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U lvm -d lvm_service"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,5 +33,12 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+      - run: npm run build:backend
+      - run: npm run db:migrate
+        env:
+          DATABASE_URL: postgres://lvm:lvm_dev_only@127.0.0.1:5433/lvm_service
+      - run: npm run test:backend
+        env:
+          DATABASE_URL: postgres://lvm:lvm_dev_only@127.0.0.1:5433/lvm_service
       - run: npm run fixture
       - run: git diff --exit-code -- fixtures/platform-service.json
