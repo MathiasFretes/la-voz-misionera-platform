@@ -67,13 +67,15 @@ describe.skipIf(!databaseUrl)('PostgreSQL + API integration', () => {
       body: JSON.stringify(record),
     })
     expect(created.status).toBe(201)
+    expect(await created.json()).toEqual({ ...record, revision: 1 })
 
     const reopened = await fetch(`${base}/api/services/${id}`)
     expect(reopened.status).toBe(200)
-    expect(await reopened.json()).toEqual(record)
+    expect(await reopened.json()).toEqual({ ...record, revision: 1 })
 
     const revised = {
       ...record,
+      revision: 1,
       service: {
         ...record.service,
         items: [...record.service.items].reverse(),
@@ -85,9 +87,11 @@ describe.skipIf(!databaseUrl)('PostgreSQL + API integration', () => {
       body: JSON.stringify(revised),
     })
     expect(updated.status).toBe(200)
-    expect(await (await fetch(`${base}/api/services/${id}`)).json()).toEqual(
-      revised,
-    )
+    expect(await updated.json()).toEqual({ ...revised, revision: 2 })
+    expect(await (await fetch(`${base}/api/services/${id}`)).json()).toEqual({
+      ...revised,
+      revision: 2,
+    })
 
     const freshRepository = new PostgresServiceRepository(pool)
     expect(
@@ -99,8 +103,30 @@ describe.skipIf(!databaseUrl)('PostgreSQL + API integration', () => {
       ),
     ).toBe(true)
 
+    const stale = await fetch(`${base}/api/services/${id}`, {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ...revised, service: record.service }),
+    })
+    expect(stale.status).toBe(409)
+    expect(await (await fetch(`${base}/api/services/${id}`)).json()).toEqual({
+      ...revised,
+      revision: 2,
+    })
+
+    const staleDelete = await fetch(`${base}/api/services/${id}`, {
+      method: 'DELETE',
+      headers: { 'if-match': '1' },
+    })
+    expect(staleDelete.status).toBe(409)
+
     expect(
-      (await fetch(`${base}/api/services/${id}`, { method: 'DELETE' })).status,
+      (
+        await fetch(`${base}/api/services/${id}`, {
+          method: 'DELETE',
+          headers: { 'if-match': '2' },
+        })
+      ).status,
     ).toBe(200)
     expect((await fetch(`${base}/api/services/${id}`)).status).toBe(404)
   })

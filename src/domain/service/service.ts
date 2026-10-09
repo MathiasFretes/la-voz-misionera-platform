@@ -5,6 +5,8 @@ export type ServiceRecord = {
   venue: string
   service: Service
   worshipAfterItemId?: string
+  /** Internal API concurrency metadata; never part of Service 0.1 exports. */
+  revision?: number
 }
 
 export function newService(

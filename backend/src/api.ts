@@ -4,7 +4,10 @@ import {
   type ServerResponse,
 } from 'node:http'
 import type { Pool } from 'pg'
-import { PostgresServiceRepository } from './PostgresServiceRepository'
+import {
+  PostgresServiceRepository,
+  RevisionConflictError,
+} from './PostgresServiceRepository'
 import { validateServiceRecord } from './validateRecord'
 
 class HttpError extends Error {
@@ -65,9 +68,8 @@ export function createApiServer(
         }
         if (request.method === 'POST') {
           const body = validateServiceRecord(await readJson(request))
-          if (await repository.get(body.id)) {
-            throw new HttpError(409, 'Service already exists')
-          }
+          if (body.revision !== undefined)
+            throw new HttpError(400, 'New service must not have a revision')
           json(response, 201, await repository.save(body))
           return
         }
@@ -98,7 +100,19 @@ export function createApiServer(
           return
         }
         if (request.method === 'DELETE') {
-          const removed = await repository.remove(id)
+          const matchRevision = request.headers['if-match']
+          if (
+            matchRevision !== undefined &&
+            (typeof matchRevision !== 'string' ||
+              !/^[1-9]\d*$/.test(matchRevision) ||
+              !Number.isSafeInteger(Number(matchRevision)))
+          ) {
+            throw new HttpError(400, 'If-Match must be a positive revision')
+          }
+          const removed = await repository.remove(
+            id,
+            matchRevision === undefined ? undefined : Number(matchRevision),
+          )
           json(
             response,
             removed ? 200 : 404,
@@ -109,7 +123,9 @@ export function createApiServer(
       }
       json(response, 404, { error: 'Route not found' })
     } catch (error) {
-      if (error instanceof HttpError) {
+      if (error instanceof RevisionConflictError) {
+        json(response, 409, { error: error.message })
+      } else if (error instanceof HttpError) {
         json(response, error.status, { error: error.message })
       } else if (
         error instanceof Error &&
