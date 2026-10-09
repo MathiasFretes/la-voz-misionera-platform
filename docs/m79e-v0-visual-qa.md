@@ -1,6 +1,6 @@
 # M7.9E — revisión de identidad V0
 
-**Estado:** revisión visual completa en las ramas M7.9E; pendiente de integración y gate final desde `main`.
+**Estado:** identidad V0 integrada en los cuatro `main`; gate técnico final registrado en [M7.x](m7-final-gate.md).
 
 ## Evidencia inicial
 
@@ -27,9 +27,9 @@ Worship Mobile y Studio consumen ahora los roles navy/dorado de `packages/tokens
 
 La revisión intermedia a [768 px](screenshots/m79e-v0/service-768.png) y [1024 px](screenshots/m79e-v0/service-1024.png) de Service, [768 px](screenshots/m79e-v0/worship-768.png) y [1024 px](screenshots/m79e-v0/worship-1024.png) de Worship, y [768 px](screenshots/m79e-v0/web-768.png) y [1024 px](screenshots/m79e-v0/web-1024.png) de Web Pública no encontró overflow horizontal. El control automatizado verifica foco visible por teclado, un área táctil de 44 × 44 px para los tres botones de menú y duración reducida de transiciones al solicitar menos movimiento. El acento de texto sobre blanco ahora usa `--lvm-gold-text-on-light`, que alcanza 6,01:1; sobre navy se conserva `brand.gold` con 6,01:1. En Presenter el movimiento reducido se limita al shell de operación para no alterar el tiempo de la proyección.
 
-## Lo que falta antes del gate
+## Límites de QA posteriores
 
-- Completar con datos QA reales los estados de Worship que requieren backend. La prueba automatizada y las capturas verifican el flujo offline, la lista con fixture y el error recuperable. Los controles de 768/1024, foco, targets táctiles y movimiento reducido de las tres interfaces web pasaron.
-- Repetir una sola vez la demo integral desde las ramas actualizadas y revisar los diffs y CI de los PR borrador.
+- Completar con datos QA reales los estados de Worship que requieren backend. La prueba automatizada y las capturas verifican el flujo offline, la lista con fixture y el error recuperable. Los controles de 768/1024, foco, targets táctiles y movimiento reducido de las tres interfaces web pasaron desde `main`.
+- Revisar Studio visualmente en macOS y las pantallas autenticadas de Mobile con datos de QA; el gate actual cubre tokens, bundles y tests.
 
 El verificador `scripts/verify-design-language.mjs` comprueba los valores de marca compartidos en los cuatro repositorios. M7.9F mapeará después estos tokens a los temas claro y oscuro; no se implementa un segundo diseño en este gate.
