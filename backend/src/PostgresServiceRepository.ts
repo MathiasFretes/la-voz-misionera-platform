@@ -5,6 +5,7 @@ import { validateServiceRecord } from './validateRecord'
 
 type Row = {
   id: string
+  revision: number
   schema_version: '0.1'
   title: string
   starts_at_text: string
@@ -23,6 +24,7 @@ function recordsFromRows(rows: Row[]): ServiceRecord[] {
     if (!record) {
       record = {
         id: row.id,
+        revision: row.revision,
         venue: row.venue,
         service: {
           schemaVersion: row.schema_version,
@@ -44,11 +46,13 @@ function recordsFromRows(rows: Row[]): ServiceRecord[] {
 }
 
 const SELECT_RECORDS = `
-  SELECT s.id, s.schema_version, s.title, s.starts_at_text,
+  SELECT s.id, s.revision, s.schema_version, s.title, s.starts_at_text,
     s.setlist_id, s.setlist_name, s.venue, s.worship_after_item_id,
     i.item_id, i.payload
   FROM services s LEFT JOIN service_items i ON i.service_id = s.id
 `
+
+export class RevisionConflictError extends Error {}
 
 export class PostgresServiceRepository {
   private readonly pool: Pool
@@ -77,32 +81,36 @@ export class PostgresServiceRepository {
     const client = await this.pool.connect()
     try {
       await client.query('BEGIN')
-      await client.query(
-        `INSERT INTO services (id, schema_version, title, starts_at, starts_at_text,
-          setlist_id, setlist_name, venue, worship_after_item_id)
-         VALUES ($1, $2, $3, $4::timestamptz, $5::text, $6, $7, $8, $9)
-         ON CONFLICT (id) DO UPDATE SET
-           schema_version = EXCLUDED.schema_version,
-           title = EXCLUDED.title,
-           starts_at = EXCLUDED.starts_at,
-           starts_at_text = EXCLUDED.starts_at_text,
-           setlist_id = EXCLUDED.setlist_id,
-           setlist_name = EXCLUDED.setlist_name,
-           venue = EXCLUDED.venue,
-           worship_after_item_id = EXCLUDED.worship_after_item_id,
-           updated_at = now()`,
+      const values = [
+        record.id,
+        record.service.schemaVersion,
+        record.service.title,
+        record.service.startsAt,
+        record.service.startsAt,
+        record.service.setlist.id,
+        record.service.setlist.name,
+        record.venue,
+        record.worshipAfterItemId ?? null,
+      ]
+      const result = await client.query<{ revision: number }>(
+        record.revision === undefined
+          ? `INSERT INTO services (id, schema_version, title, starts_at, starts_at_text,
+               setlist_id, setlist_name, venue, worship_after_item_id)
+             VALUES ($1, $2, $3, $4::timestamptz, $5::text, $6, $7, $8, $9)
+             ON CONFLICT (id) DO NOTHING RETURNING revision`
+          : `UPDATE services SET schema_version = $2, title = $3,
+               starts_at = $4::timestamptz, starts_at_text = $5::text,
+               setlist_id = $6, setlist_name = $7, venue = $8,
+               worship_after_item_id = $9, updated_at = now(),
+               revision = revision + 1
+             WHERE id = $1 AND revision = $10 RETURNING revision`,
         [
-          record.id,
-          record.service.schemaVersion,
-          record.service.title,
-          record.service.startsAt,
-          record.service.startsAt,
-          record.service.setlist.id,
-          record.service.setlist.name,
-          record.venue,
-          record.worshipAfterItemId ?? null,
+          ...values,
+          ...(record.revision === undefined ? [] : [record.revision]),
         ],
       )
+      if (!result.rows[0])
+        throw new RevisionConflictError('Service changed in another session')
       await client.query('DELETE FROM service_items WHERE service_id = $1', [
         record.id,
       ])
@@ -114,7 +122,7 @@ export class PostgresServiceRepository {
         )
       }
       await client.query('COMMIT')
-      return record
+      return { ...record, revision: result.rows[0].revision }
     } catch (error) {
       await client.query('ROLLBACK')
       throw error
@@ -123,10 +131,19 @@ export class PostgresServiceRepository {
     }
   }
 
-  async remove(id: string): Promise<boolean> {
-    const result = await this.pool.query('DELETE FROM services WHERE id = $1', [
-      id,
-    ])
+  async remove(id: string, expectedRevision?: number): Promise<boolean> {
+    const result = await this.pool.query(
+      expectedRevision === undefined
+        ? 'DELETE FROM services WHERE id = $1'
+        : 'DELETE FROM services WHERE id = $1 AND revision = $2',
+      expectedRevision === undefined ? [id] : [id, expectedRevision],
+    )
+    if (
+      expectedRevision !== undefined &&
+      !result.rowCount &&
+      (await this.get(id))
+    )
+      throw new RevisionConflictError('Service changed in another session')
     return (result.rowCount ?? 0) > 0
   }
 }

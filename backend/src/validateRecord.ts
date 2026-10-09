@@ -16,7 +16,13 @@ function exactKeys(value: Record<string, unknown>, allowed: string[]): boolean {
 export function validateServiceRecord(value: unknown): ServiceRecord {
   if (
     !isObject(value) ||
-    !exactKeys(value, ['id', 'venue', 'service', 'worshipAfterItemId'])
+    !exactKeys(value, [
+      'id',
+      'venue',
+      'service',
+      'worshipAfterItemId',
+      'revision',
+    ])
   ) {
     throw new Error('record: expected a ServiceRecord object')
   }
@@ -28,6 +34,14 @@ export function validateServiceRecord(value: unknown): ServiceRecord {
     !nonEmpty(value.worshipAfterItemId)
   ) {
     throw new Error('record.worshipAfterItemId must be non-empty text')
+  }
+  if (
+    value.revision !== undefined &&
+    (typeof value.revision !== 'number' ||
+      !Number.isSafeInteger(value.revision) ||
+      value.revision < 1)
+  ) {
+    throw new Error('record.revision must be a positive integer')
   }
   if (!isObject(value.service)) throw new Error('record.service is required')
   const service = value.service

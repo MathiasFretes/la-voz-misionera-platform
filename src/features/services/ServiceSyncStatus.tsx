@@ -30,7 +30,8 @@ export function ServiceSyncStatus({
     pending: 'Cambios guardados en este navegador; sincronización pendiente.',
     synced: 'Servicios sincronizados con PostgreSQL.',
     error:
-      'No se pudo conectar con Service API. Los cambios siguen en este navegador.',
+      status.message ??
+      'No se pudo sincronizar con Service API. Los cambios siguen en este navegador.',
   }[status.phase]
 
   return (
@@ -44,8 +45,8 @@ export function ServiceSyncStatus({
       {status.conflicts > 0 && (
         <div>
           <p>
-            {status.conflicts} borrador(es) local(es) tienen el mismo ID que un
-            servicio del servidor. Se conservó una copia sin sobrescribir el
+            Hay {status.conflicts} copia(s) local(es) en conflicto. Puedes
+            descargarlas para revisarlas; no se sobrescribió la versión del
             servidor.
           </p>
           <button
