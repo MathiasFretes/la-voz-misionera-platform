@@ -44,9 +44,15 @@ jobs:
         env:
           VITE_SERVICE_BACKEND: postgres
       - run: npx playwright install --with-deps chromium
+      - uses: actions/checkout@v4
+        with:
+          repository: MathiasFretes/lvm-presenter
+          ref: ea9a886f4072986c435820a4638a2eaeaae9a92c
+          path: presenter-contract
       - run: npm run test:db-e2e
         env:
           DATABASE_URL: postgres://lvm:lvm_dev_only@127.0.0.1:5433/lvm_service
+          LVM_PRESENTER_REPO: presenter-contract
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
