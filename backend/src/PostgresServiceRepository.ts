@@ -80,7 +80,7 @@ export class PostgresServiceRepository {
       await client.query(
         `INSERT INTO services (id, schema_version, title, starts_at, starts_at_text,
           setlist_id, setlist_name, venue, worship_after_item_id)
-         VALUES ($1, $2, $3, $4::timestamptz, $4, $5, $6, $7, $8)
+         VALUES ($1, $2, $3, $4::timestamptz, $5::text, $6, $7, $8, $9)
          ON CONFLICT (id) DO UPDATE SET
            schema_version = EXCLUDED.schema_version,
            title = EXCLUDED.title,
@@ -95,6 +95,7 @@ export class PostgresServiceRepository {
           record.id,
           record.service.schemaVersion,
           record.service.title,
+          record.service.startsAt,
           record.service.startsAt,
           record.service.setlist.id,
           record.service.setlist.name,

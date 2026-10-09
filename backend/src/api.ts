@@ -5,6 +5,7 @@ import {
 } from 'node:http'
 import type { Pool } from 'pg'
 import { PostgresServiceRepository } from './PostgresServiceRepository'
+import { validateServiceRecord } from './validateRecord'
 
 class HttpError extends Error {
   readonly status: number
@@ -63,12 +64,8 @@ export function createApiServer(
           return
         }
         if (request.method === 'POST') {
-          const body = await readJson(request)
-          const id =
-            typeof body === 'object' && body !== null && 'id' in body
-              ? body.id
-              : null
-          if (typeof id === 'string' && (await repository.get(id))) {
+          const body = validateServiceRecord(await readJson(request))
+          if (await repository.get(body.id)) {
             throw new HttpError(409, 'Service already exists')
           }
           json(response, 201, await repository.save(body))
