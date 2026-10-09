@@ -1,6 +1,6 @@
 # M8 Final Gate — Backend / Persistencia
 
-**Estado:** candidato a cierre. La fuente de evidencia es el workflow `Platform` ejecutado desde `main`, no una captura de la interfaz ni una prueba con datos simulados.
+**Estado:** cerrado. El workflow `Platform` de `main` pasó en [run 37958651574](https://github.com/MathiasFretes/la-voz-misionera-platform/actions/runs/37958651574) después de integrar el gate. La fuente de evidencia es PostgreSQL real en CI, no una captura de la interfaz ni datos simulados.
 
 ## Matriz de verificación
 
