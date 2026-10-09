@@ -49,7 +49,10 @@ export class ApiServiceRepository implements ServiceRepository {
   private flushTimer: ReturnType<typeof setTimeout> | null = null
   private initialized = false
 
-  constructor(storage: Storage, fetcher: typeof fetch = fetch) {
+  constructor(
+    storage: Storage,
+    fetcher: typeof fetch = globalThis.fetch.bind(globalThis),
+  ) {
     this.storage = storage
     this.fetcher = fetcher
     this.cache = new LocalServiceRepository(storage)
