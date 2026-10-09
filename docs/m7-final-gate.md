@@ -4,27 +4,27 @@
 
 ## Revisiones integradas
 
-| Producto | PR | Commit de `main` comprobado |
-| --- | --- | --- |
-| LVM Service | [#7](https://github.com/MathiasFretes/la-voz-misionera-platform/pull/7) | `63f888f` |
-| LVM Worship | [#3](https://github.com/MathiasFretes/lvm-worship/pull/3) | `db8483605` |
-| LVM Presenter | [#2](https://github.com/MathiasFretes/lvm-presenter/pull/2) | `5c08855` |
-| LVM Web Pública | [#1](https://github.com/MathiasFretes/lvm-web-publica/pull/1) | `007b896` |
+| Producto        | PR                                                                      | Commit de `main` comprobado |
+| --------------- | ----------------------------------------------------------------------- | --------------------------- |
+| LVM Service     | [#7](https://github.com/MathiasFretes/la-voz-misionera-platform/pull/7) | `63f888f`                   |
+| LVM Worship     | [#3](https://github.com/MathiasFretes/lvm-worship/pull/3)               | `db8483605`                 |
+| LVM Presenter   | [#2](https://github.com/MathiasFretes/lvm-presenter/pull/2)             | `5c08855`                   |
+| LVM Web Pública | [#1](https://github.com/MathiasFretes/lvm-web-publica/pull/1)           | `007b896`                   |
 
 ## Evidencia funcional desde `main`
 
-| Gate | Resultado |
-| --- | --- |
-| Service: unitarios, lint y build | 20/20, lint y build correctos. |
-| Worship Web: unitarios, lint, i18n y build de preview | 484/484, lint, traducciones y build correctos. |
-| Worship Mobile: unitarios, TypeScript y bundle Android | 902/902, `tsc --noEmit` y `export:android` correctos. |
-| Worship Studio: tokens Swift | `tokens:swift:check` correcto; no equivale a ejecución nativa en macOS. |
-| Presenter: contrato Service y build global | 5/5 tests de `test:lvm`; frontend, servidores y Electron compilaron. |
-| Web Pública: unitarios y build normal | 4/4 y build correctos; el build normal no incluye el cargador de previews. |
-| Service → Worship → Service → Presenter | Pasó offline con el checkout de Presenter en `5c08855` (mismo commit de `main`). |
-| Service → Web Pública | Pasó con el build de preview y datos de archivo. |
-| Responsive web 768/1024 px | Pasó en Service, Worship y Web: sin overflow, foco visible, botón de menú táctil y movimiento reducido. |
-| Identidad V0 compartida | Pasó el verificador de marca para Service, Worship Web/Mobile/Studio, Presenter y Web Pública. Las referencias desktop/390 px están en [la revisión visual](m79e-v0-visual-qa.md). |
+| Gate                                                   | Resultado                                                                                                                                                                          |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Service: unitarios, lint y build                       | 20/20, lint y build correctos.                                                                                                                                                     |
+| Worship Web: unitarios, lint, i18n y build de preview  | 484/484, lint, traducciones y build correctos.                                                                                                                                     |
+| Worship Mobile: unitarios, TypeScript y bundle Android | 902/902, `tsc --noEmit` y `export:android` correctos.                                                                                                                              |
+| Worship Studio: tokens Swift                           | `tokens:swift:check` correcto; no equivale a ejecución nativa en macOS.                                                                                                            |
+| Presenter: contrato Service y build global             | 5/5 tests de `test:lvm`; frontend, servidores y Electron compilaron.                                                                                                               |
+| Web Pública: unitarios y build normal                  | 4/4 y build correctos; el build normal no incluye el cargador de previews.                                                                                                         |
+| Service → Worship → Service → Presenter                | Pasó offline con el checkout de Presenter en `5c08855` (mismo commit de `main`).                                                                                                   |
+| Service → Web Pública                                  | Pasó con el build de preview y datos de archivo.                                                                                                                                   |
+| Responsive web 768/1024 px                             | Pasó en Service, Worship y Web: sin overflow, foco visible, botón de menú táctil y movimiento reducido.                                                                            |
+| Identidad V0 compartida                                | Pasó el verificador de marca para Service, Worship Web/Mobile/Studio, Presenter y Web Pública. Las referencias desktop/390 px están en [la revisión visual](m79e-v0-visual-qa.md). |
 
 La primera ejecución de la demo completa desde el checkout principal de Presenter falló al localizar `#output_window_button` después de importar un servicio. El mismo flujo pasó en una segunda ejecución usando otro checkout limpio del **mismo commit `5c08855`**. No se identificó la causa del fallo inicial; el resultado se conserva como señal para el siguiente QA interactivo de Presenter. No se repitieron benchmarks NDI.
 
