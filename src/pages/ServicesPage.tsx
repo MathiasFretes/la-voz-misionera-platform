@@ -5,6 +5,8 @@ import {
   selectDashboardServices,
 } from '../features/services/dashboardSelectors'
 import { useServices } from '../features/services/useServices'
+import { ServiceSyncStatus } from '../features/services/ServiceSyncStatus'
+import type { PersistenceStatus } from '../repositories/ServiceRepository'
 import { Card } from '../ui/Card'
 import { PageHeader } from '../ui/PageHeader'
 import { StatusBadge } from '../ui/Badge'
@@ -27,7 +29,13 @@ function serviceMeta(record: ServiceRecord): string {
   return `${day.charAt(0).toUpperCase()}${day.slice(1)} · ${time} · ${venue}`
 }
 
-function ServiceStatuses({ record }: { record: ServiceRecord }) {
+function ServiceStatuses({
+  record,
+  persistence,
+}: {
+  record: ServiceRecord
+  persistence: PersistenceStatus
+}) {
   const status = dashboardStatus(record)
   return (
     <div
@@ -36,7 +44,11 @@ function ServiceStatuses({ record }: { record: ServiceRecord }) {
     >
       <StatusBadge
         dimension="Persistencia"
-        value="Guardado local"
+        value={
+          persistence.mode === 'postgres' && persistence.phase === 'synced'
+            ? 'Guardado en servidor'
+            : 'Guardado local'
+        }
         tone="success"
       />
       <StatusBadge
@@ -58,7 +70,7 @@ function ServiceStatuses({ record }: { record: ServiceRecord }) {
 }
 
 export function ServicesPage() {
-  const { records } = useServices()
+  const { records, persistence, retry, migrationConflicts } = useServices()
   const { upcoming, recent } = selectDashboardServices(records, new Date())
 
   return (
@@ -66,7 +78,11 @@ export function ServicesPage() {
       <PageHeader
         title="Servicios"
         eyebrow="LVM Service"
-        description="El orden del culto vive en este navegador."
+        description={
+          persistence.mode === 'postgres'
+            ? 'Planificá cultos con respaldo en PostgreSQL.'
+            : 'El orden del culto vive en este navegador.'
+        }
         actions={
           <Link className={buttonClass('primary')} to="/services/new">
             + Crear servicio
@@ -74,14 +90,24 @@ export function ServicesPage() {
         }
       />
 
-      {records.length === 0 ? (
+      <ServiceSyncStatus
+        status={persistence}
+        retry={retry}
+        conflicts={migrationConflicts}
+      />
+
+      {records.length === 0 && persistence.phase === 'loading' ? (
+        <Card as="section" className="dashboard-empty">
+          <p>Cargando servicios...</p>
+        </Card>
+      ) : records.length === 0 ? (
         <Card
           as="section"
           className="dashboard-empty"
           aria-labelledby="dashboard-empty-title"
         >
           <h2 id="dashboard-empty-title">Organizá tu primer servicio</h2>
-          <p>Prepará el orden del culto y guardalo en este navegador.</p>
+          <p>Prepará el orden del culto y guardalo para volver a abrirlo.</p>
           <Link className={buttonClass('primary')} to="/services/new">
             Crear servicio
           </Link>
@@ -100,7 +126,7 @@ export function ServicesPage() {
                   {upcoming.service.title || 'Sin título'}
                 </h2>
                 <p className="dashboard-meta">{serviceMeta(upcoming)}</p>
-                <ServiceStatuses record={upcoming} />
+                <ServiceStatuses record={upcoming} persistence={persistence} />
               </div>
               <Link
                 className={buttonClass('primary', 'dashboard-hero-action')}
@@ -115,7 +141,7 @@ export function ServicesPage() {
           <section aria-labelledby="dashboard-recent-title">
             <div className="dashboard-collection-heading">
               <div>
-                <p className="dashboard-kicker">Colección local</p>
+                <p className="dashboard-kicker">Colección de servicios</p>
                 <h2 id="dashboard-recent-title">Servicios recientes</h2>
               </div>
               <span>
@@ -133,7 +159,7 @@ export function ServicesPage() {
                     <h3>{record.service.title || 'Sin título'}</h3>
                     <p className="dashboard-meta">{serviceMeta(record)}</p>
                   </div>
-                  <ServiceStatuses record={record} />
+                  <ServiceStatuses record={record} persistence={persistence} />
                   <Link
                     className={buttonClass('secondary')}
                     to="/services/$serviceId"

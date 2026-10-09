@@ -118,4 +118,28 @@ describe.skipIf(!databaseUrl)('PostgreSQL + API integration', () => {
     expect(response.status).toBe(400)
     expect(await repository.get(id)).toBeNull()
   })
+
+  it('persists an empty editor draft before its first item exists', async () => {
+    const draftId = `m8b-draft-${randomUUID()}`
+    const draft = {
+      ...structuredClone(demoService),
+      id: draftId,
+      service: {
+        ...structuredClone(demoService.service),
+        id: draftId,
+        items: [],
+      },
+    }
+    try {
+      const created = await fetch(`${base}/api/services`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(draft),
+      })
+      expect(created.status).toBe(201)
+      expect((await repository.get(draftId))?.service.items).toEqual([])
+    } finally {
+      await repository.remove(draftId)
+    }
+  })
 })

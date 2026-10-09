@@ -5,6 +5,7 @@ import { parseService } from '../contracts/service'
 import { parseWorshipPlan } from '../contracts/worshipPlan'
 import { ItemEditor } from '../features/services/ItemEditor'
 import { useServices } from '../features/services/useServices'
+import { ServiceSyncStatus } from '../features/services/ServiceSyncStatus'
 import {
   downloadService,
   exportService,
@@ -43,7 +44,8 @@ const kindLabels: Record<ServiceItem['kind'], string> = {
 
 export function ServiceEditorPage() {
   const { serviceId } = useParams({ strict: false }) as { serviceId: string }
-  const { records, save } = useServices()
+  const { records, save, persistence, retry, migrationConflicts } =
+    useServices()
   const record = records.find((entry) => entry.id === serviceId)
   const [tab, setTab] = useState<'information' | 'order' | 'presentation'>(
     'order',
@@ -59,10 +61,22 @@ export function ServiceEditorPage() {
     replacing: number
   } | null>(null)
 
+  if (!record && persistence.phase === 'loading')
+    return (
+      <div className="empty-state">
+        <p>Cargando servicio...</p>
+      </div>
+    )
+
   if (!record)
     return (
       <div className="empty-state">
         <h1>Servicio no encontrado</h1>
+        <ServiceSyncStatus
+          status={persistence}
+          retry={retry}
+          conflicts={migrationConflicts}
+        />
         <Link to="/services">Volver a servicios</Link>
       </div>
     )
@@ -168,6 +182,11 @@ export function ServiceEditorPage() {
 
   return (
     <>
+      <ServiceSyncStatus
+        status={persistence}
+        retry={retry}
+        conflicts={migrationConflicts}
+      />
       <Link to="/services" className="back-link">
         ← Servicios
       </Link>

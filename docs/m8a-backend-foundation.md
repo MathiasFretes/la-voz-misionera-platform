@@ -39,4 +39,4 @@ npm run build
 
 With `DATABASE_URL` set and PostgreSQL running, `test:backend` exercises the real migration, HTTP API, ordered item persistence, reload through a new repository instance, invalid input rejection, and deletion. CI starts PostgreSQL 17 and runs these checks. Without `DATABASE_URL`, only the boundary tests run; the integration tests are skipped.
 
-M8B will connect `ServiceRepository` to this API, preserve the offline file handoffs, and explicitly handle local drafts already saved in browsers. M8A does not alter the source of truth used by the current editor or the other three products.
+The optional Editor connection, offline file handoffs and local-draft migration are described in [M8B Service persistence](m8b-service-persistence.md). M8A itself did not alter the source of truth used by the Editor or the other three products.

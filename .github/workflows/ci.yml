@@ -40,5 +40,17 @@ jobs:
       - run: npm run test:backend
         env:
           DATABASE_URL: postgres://lvm:lvm_dev_only@127.0.0.1:5433/lvm_service
+      - run: npm run build
+        env:
+          VITE_SERVICE_BACKEND: postgres
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:db-e2e
+        env:
+          DATABASE_URL: postgres://lvm:lvm_dev_only@127.0.0.1:5433/lvm_service
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: service-postgres-e2e
+          path: test-results/
       - run: npm run fixture
       - run: git diff --exit-code -- fixtures/platform-service.json
