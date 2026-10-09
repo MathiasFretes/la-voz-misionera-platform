@@ -57,8 +57,12 @@ export function createApiServer(
     try {
       const url = new URL(request.url ?? '/', 'http://127.0.0.1')
       if (request.method === 'GET' && url.pathname === '/health') {
-        await pool.query('SELECT 1')
-        json(response, 200, { status: 'ok' })
+        try {
+          await pool.query('SELECT 1')
+          json(response, 200, { status: 'ok' })
+        } catch {
+          json(response, 503, { status: 'unavailable' })
+        }
         return
       }
       if (url.pathname === '/api/services') {

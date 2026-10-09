@@ -23,6 +23,9 @@
     "capture:design-shells": "node scripts/capture-design-shells.mjs",
     "api:dev": "node --env-file-if-exists=.env --import tsx backend/src/server.ts",
     "db:migrate": "node --env-file-if-exists=.env --import tsx backend/src/migrate-cli.ts",
+    "db:backup": "node --env-file-if-exists=.env scripts/db-backup.mjs",
+    "db:restore": "node --env-file-if-exists=.env scripts/db-restore.mjs",
+    "test:db-ops": "node --env-file-if-exists=.env scripts/db-operations-smoke.mjs",
     "build:backend": "tsc --project tsconfig.backend.json",
     "test:backend": "vitest run --config backend/vitest.config.ts",
     "test:db-e2e": "playwright test --config playwright.db.config.ts"
