@@ -11,6 +11,20 @@ const folder = await mkdtemp(join(tmpdir(), 'lvm-db-ops-'))
 const archive = join(folder, 'service.dump')
 const id = `m8e-backup-${randomUUID()}`
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+
+async function snapshot() {
+  const [services, items, migrations] = await Promise.all([
+    pool.query('SELECT * FROM services ORDER BY id'),
+    pool.query('SELECT * FROM service_items ORDER BY service_id, position'),
+    pool.query('SELECT * FROM schema_migrations ORDER BY id'),
+  ])
+  return JSON.stringify({
+    services: services.rows,
+    items: items.rows,
+    migrations: migrations.rows,
+  })
+}
+
 try {
   await pool.query(
     `INSERT INTO services
@@ -19,6 +33,20 @@ try {
      VALUES ($1, '0.1', 'Backup check', now(), $2, $3, 'Backup check', '')`,
     [id, new Date().toISOString(), `setlist-${id}`],
   )
+  await pool.query(
+    `INSERT INTO service_items (service_id, item_id, position, kind, payload)
+     VALUES ($1, $2, 0, 'ANNOUNCEMENT', $3::jsonb)`,
+    [
+      id,
+      `${id}-welcome`,
+      JSON.stringify({
+        id: `${id}-welcome`,
+        kind: 'ANNOUNCEMENT',
+        announcement: { title: 'Bienvenida', body: 'Copia íntegra' },
+      }),
+    ],
+  )
+  const before = await snapshot()
   await backupDatabase(archive)
   await pool.query('DELETE FROM services WHERE id = $1', [id])
   if (
@@ -32,17 +60,11 @@ try {
     if (!/requires --confirm lvm_service/.test(error.message)) throw error
   }
   await restoreDatabase(archive, 'lvm_service')
-  const restored = await pool.query(
-    'SELECT title, revision FROM services WHERE id = $1',
-    [id],
+  if ((await snapshot()) !== before)
+    throw new Error('Restored database differs from the pre-backup snapshot')
+  console.log(
+    'PostgreSQL backup/restore preserved services, ordered items and migration ledger',
   )
-  if (
-    restored.rows[0]?.title !== 'Backup check' ||
-    restored.rows[0]?.revision !== 1
-  ) {
-    throw new Error('Control record was not restored correctly')
-  }
-  console.log('PostgreSQL backup/restore preserved the control record')
 } finally {
   try {
     await pool.query('DELETE FROM services WHERE id = $1', [id])
