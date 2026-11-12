@@ -1,4 +1,6 @@
-# LVM Platform
+# LVM Service
+
+El estado y el orden de trabajo de toda la suite están en el [roadmap de La Voz Misionera](docs/roadmap-suite.md).
 
 The PostgreSQL/API layer is documented in [M8A backend foundation](docs/m8a-backend-foundation.md). The optional Editor cutover and safe migration of browser drafts are documented in [M8B Service persistence](docs/m8b-service-persistence.md).
 
