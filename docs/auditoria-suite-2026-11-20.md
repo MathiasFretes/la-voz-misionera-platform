@@ -40,3 +40,5 @@ OAuth, recuperación por email, correo transaccional y pagos no están configura
 - Presenter: `node --test` sobre los cinco tests de `src/lvm/*.test.mjs`.
 
 Los verificadores crean y limpian registros propios de QA. No se publican fixtures institucionales permanentes ni se modifican cuentas reales para las pruebas.
+
+Resultado de esta revisión: 29 tests de Service, 40 de Web Pública, 5 de seguridad/validación de la API y 5 de contratos Presenter pasaron. Lint, formato y builds también pasaron. Las 18 páginas públicas se comprobaron a 390 y 1440 px; el ingreso compartido y la bandeja se volvieron a verificar en el VPS. La restauración de un dump nuevo confirmó la migración 007, el historial y la prohibición de leer borradores como visitante. La copia externa manual cifrada del dump `lvm_worship_20261120T190137Z` se verificó en esta PC; no es un backup externo automático.
