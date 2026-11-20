@@ -61,6 +61,9 @@ try {
   await page.reload({ waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Usuarios y roles' }).waitFor()
   await page.getByRole('heading', { name: 'Solicitudes de la web' }).waitFor()
+  await page.goto(`${origin}/admin`, { waitUntil: 'domcontentloaded' })
+  await page.waitForURL('**/service/admin')
+  await page.getByRole('heading', { name: 'Usuarios y roles' }).waitFor()
   await mkdir('test-results/vps', { recursive: true })
   await page.screenshot({
     path: 'test-results/vps/service-admin-desktop.png',
