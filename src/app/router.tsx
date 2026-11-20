@@ -10,8 +10,21 @@ import { NewServicePage } from '../pages/NewServicePage'
 import { ServiceEditorPage } from '../pages/ServiceEditorPage'
 import { ContractInspectorPage } from '../pages/ContractInspectorPage'
 import { PublicPreviewPage } from '../pages/PublicPreviewPage'
+import { AdministrationPage } from '../pages/AdministrationPage'
+import { SuiteAuth } from '../features/auth/SuiteAuth'
 
-const rootRoute = createRootRoute({ component: AppShell })
+const rootRoute = createRootRoute({
+  component: () => (
+    <SuiteAuth>
+      <AppShell />
+    </SuiteAuth>
+  ),
+})
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin',
+  component: AdministrationPage,
+})
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
@@ -44,6 +57,7 @@ const publicPreviewRoute = createRoute({
 })
 
 export const router = createRouter({
+  basepath: import.meta.env.VITE_SERVICE_BASEPATH || '/',
   routeTree: rootRoute.addChildren([
     homeRoute,
     servicesRoute,
@@ -51,6 +65,7 @@ export const router = createRouter({
     serviceEditorRoute,
     ...(import.meta.env.DEV ? [contractRoute] : []),
     publicPreviewRoute,
+    adminRoute,
   ]),
 })
 

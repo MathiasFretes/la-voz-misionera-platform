@@ -1,0 +1,11 @@
+# API compartida de LVM
+
+Autenticación y datos para LVM Web Pública, LVM Service y la web de LVM Worship. Se ejecuta en Docker junto con PostgreSQL y PostgREST, detrás de Caddy. **LVM Service es el panel administrativo**; Worship consume canciones, repertorios y sesiones de música. El API de planificación anterior en `backend/` sigue separado y no se expone sin autenticación por este despliegue.
+
+La infraestructura y configuración están documentadas en `LVM Worship/infra/vps/README.md`. Los secretos se generan solamente en el VPS; `server.mjs` los lee de `/run/secrets`. Las migraciones `schema/*.sql` son exclusivas de la base nueva. No ejecutar los scripts históricos de Supabase ni hacer una restauración encima de datos reales sin revisión. Un rollback de este cambio se hace restaurando un dump en otra base y validándolo, no borrando tablas en producción.
+
+Las tablas públicas tienen RLS. `lvm_api` autentica con SQL parametrizado y privilegios limitados; `lvm_rest` cambia a roles sin login con JWT internos de 60 segundos. Las contraseñas usan scrypt con sal, los tokens de sesión se guardan como hash y la cookie es HttpOnly/Secure. No se concede automáticamente el rol propietario al primer registro. `provision-owner.mjs` reserva explícitamente la cuenta indicada y genera un enlace de activación de un solo uso, válido 24 horas, en un archivo protegido del servidor.
+
+`node --test test/security.test.mjs` verifica hashing y expiración de credenciales internas. `test/integration.mjs`, ejecutado con el perfil Compose de administración sobre la base del VPS, crea y limpia cuentas propias y comprueba autenticación, CSRF, aislamiento entre usuarios, escalamiento de roles rechazado, canciones, repertorios anidados, favoritos, códigos de sesión, activación única y bandeja privada. Nunca usa ni borra cuentas reales.
+
+Los mensajes y solicitudes se almacenan, sin enviar correos automáticamente. OAuth y recuperación por email requieren configurar el proveedor. La API de datos incluye un adaptador de consultas en `LVM Worship/packages/core/src/backend/client.js`; el nombre de exportación web `supabase` permanece por compatibilidad de imports, sin conectar al servicio Supabase. Las sesiones musicales se actualizan mediante consultas periódicas de 1,2 segundos, con control de acceso por código.

@@ -1,5 +1,7 @@
 # LVM Service
 
+El panel administrativo de la suite se despliega en `/service/admin`, con la cuenta compartida de LVM. La autenticación y las tablas PostgreSQL de usuarios, Worship y contenido público están en [`suite-api/`](suite-api/README.md). La web pública reutiliza las pantallas V0; sus formularios guardan solicitudes en PostgreSQL y se consultan desde Service. La planificación Service 0.1 y los intercambios de archivos con Worship/Presenter conservan su funcionamiento existente. El backend de planificación anterior en `backend/` no se expone sin autenticación.
+
 El estado y el orden de trabajo de toda la suite están en el [roadmap de La Voz Misionera](docs/roadmap-suite.md).
 
 The PostgreSQL/API layer is documented in [M8A backend foundation](docs/m8a-backend-foundation.md). The optional Editor cutover and safe migration of browser drafts are documented in [M8B Service persistence](docs/m8b-service-persistence.md).

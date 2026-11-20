@@ -7,4 +7,25 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
+  {
+    files: ['scripts/verify-vps-admin.mjs'],
+    languageOptions: {
+      globals: { document: 'readonly', innerWidth: 'readonly' },
+    },
+  },
+  {
+    files: ['suite-api/**/*.mjs', 'scripts/verify-vps-admin.mjs'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        URL: 'readonly',
+        fetch: 'readonly',
+        AbortSignal: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+      },
+    },
+  },
 )

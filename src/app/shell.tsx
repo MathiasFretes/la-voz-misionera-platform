@@ -14,6 +14,11 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/public-preview" onClick={close}>
         Contenido público
       </Link>
+      {import.meta.env.VITE_SERVICE_AUTH === '1' && (
+        <Link to="/admin" onClick={close}>
+          Administración
+        </Link>
+      )}
       {import.meta.env.DEV && (
         <Link to="/development/contract" onClick={close}>
           Contract Inspector
@@ -51,13 +56,18 @@ export function AppShell() {
   const menuTrigger = useRef<HTMLButtonElement>(null)
   const menuDrawer = useRef<HTMLDivElement>(null)
   const { pathname } = useLocation()
-  const section = pathname.startsWith('/services')
-    ? 'Servicios'
-    : pathname.startsWith('/public-preview')
-      ? 'Contenido público'
-      : pathname.startsWith('/development')
-        ? 'Desarrollo'
-        : 'Inicio'
+  const localPath = import.meta.env.VITE_SERVICE_BASEPATH
+    ? pathname.replace(/^\/service(?=\/|$)/, '')
+    : pathname
+  const section = localPath.startsWith('/admin')
+    ? 'Administración'
+    : localPath.startsWith('/services')
+      ? 'Servicios'
+      : pathname.startsWith('/public-preview')
+        ? 'Contenido público'
+        : pathname.startsWith('/development')
+          ? 'Desarrollo'
+          : 'Inicio'
 
   useEffect(() => {
     if (menuOpen) menuDrawer.current?.querySelector('a')?.focus()
