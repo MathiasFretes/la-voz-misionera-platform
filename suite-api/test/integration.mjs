@@ -15,6 +15,7 @@ const admin = new pg.Pool({
 const created = []
 const songs = []
 const runId = randomUUID()
+const siteId = `qa-${runId}`
 const password = `test-${randomUUID()}`
 async function request(
   path,
@@ -248,6 +249,117 @@ try {
   await admin.query("UPDATE public.users SET role='admin' WHERE id=$1", [
     a.data.user.id,
   ])
+  const siteInput = {
+    p_collection: 'eventos',
+    p_id: siteId,
+    p_expected_revision: 0,
+    p_action: 'save',
+    p_data: { name: 'Private draft' },
+  }
+  const siteSave = (data, cookie = a.cookie) =>
+    request('data/rpc/save_site_document', { method: 'POST', cookie, data })
+  assert.equal((await siteSave(siteInput, b.cookie)).status, 403)
+  const draft = await siteSave(siteInput)
+  assert.equal(draft.status, 200, JSON.stringify(draft.data))
+  assert.equal(draft.data[0].revision, 1)
+  const publicRead = () =>
+    request(
+      `data/site_documents?select=collection,id,data&collection=eq.eventos&id=eq.${siteId}&published=eq.true`,
+    )
+  assert.deepEqual((await publicRead()).data, [])
+  const publishedData = {
+    name: 'Published event',
+    date: '2026-12-01',
+    time: '19:00',
+    day: 'QA only',
+  }
+  assert.equal(
+    (
+      await siteSave({
+        ...siteInput,
+        p_expected_revision: 1,
+        p_action: 'publish',
+        p_data: publishedData,
+      })
+    ).status,
+    200,
+  )
+  assert.deepEqual((await publicRead()).data[0].data, publishedData)
+  assert.equal(
+    (
+      await siteSave({
+        ...siteInput,
+        p_expected_revision: 2,
+        p_data: { name: 'New private draft' },
+      })
+    ).status,
+    200,
+  )
+  assert.deepEqual(
+    (await publicRead()).data[0].data,
+    publishedData,
+    'Saving a draft must not change the public version',
+  )
+  for (const cookie of [undefined, b.cookie]) {
+    assert.ok(
+      (
+        await request(`data/site_documents?select=draft_data&id=eq.${siteId}`, {
+          cookie,
+        })
+      ).status >= 400,
+      'Draft columns must not be readable even on a published row',
+    )
+    assert.ok(
+      (
+        await request('data/rpc/list_site_documents', {
+          method: 'POST',
+          cookie,
+          data: { p_collection: 'eventos' },
+        })
+      ).status >= 400,
+    )
+  }
+  assert.ok(
+    (
+      await request(`data/site_documents?id=eq.${siteId}`, {
+        method: 'PATCH',
+        cookie: a.cookie,
+        data: { data: { name: 'Bypass' } },
+      })
+    ).status >= 400,
+  )
+  const simultaneous = await Promise.all(
+    ['First editor', 'Second editor'].map((name) =>
+      siteSave({ ...siteInput, p_expected_revision: 3, p_data: { name } }),
+    ),
+  )
+  assert.deepEqual(
+    simultaneous.map((result) => result.status).sort(),
+    [200, 409],
+    'Concurrent editors must not silently overwrite each other',
+  )
+  const currentDraft = await request('data/rpc/list_site_documents', {
+    method: 'POST',
+    cookie: a.cookie,
+    data: { p_collection: 'eventos' },
+  })
+  assert.equal(currentDraft.data.find((row) => row.id === siteId).revision, 4)
+  assert.equal(
+    (
+      await siteSave({
+        ...siteInput,
+        p_expected_revision: 4,
+        p_action: 'unpublish',
+      })
+    ).status,
+    200,
+  )
+  assert.deepEqual((await publicRead()).data, [])
+  const audit = await admin.query(
+    'SELECT count(*)::int AS count FROM private.site_document_history WHERE collection=$1 AND document_id=$2',
+    ['eventos', siteId],
+  )
+  assert.equal(audit.rows[0].count, 5)
   const inbox = await request('data/rpc/list_site_inbox', {
     method: 'POST',
     cookie: a.cookie,
@@ -300,6 +412,14 @@ try {
     'PASS: auth, one-time activation and revocation, CSRF, role escalation rejection, private data isolation, catalog, nested setlists, stars, session codes and administrator-only public inbox',
   )
 } finally {
+  await admin.query(
+    'DELETE FROM private.site_document_history WHERE collection=$1 AND document_id=$2',
+    ['eventos', siteId],
+  )
+  await admin.query(
+    'DELETE FROM public.site_documents WHERE collection=$1 AND id=$2',
+    ['eventos', siteId],
+  )
   await admin.query(
     "DELETE FROM private.site_inbox WHERE payload->>'email'=$1",
     [`a-${runId}@example.com`],

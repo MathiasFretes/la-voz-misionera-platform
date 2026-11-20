@@ -1,6 +1,7 @@
 import { createServer } from 'node:http'
 import { readFile } from 'node:fs/promises'
 import pg from 'pg'
+import { validateSiteDocument } from './site-content.mjs'
 import {
   passwordHash,
   passwordMatches,
@@ -40,6 +41,8 @@ const functions = new Set([
   'admin_delete_user',
   'review_song_suggestion',
   'list_site_inbox',
+  'list_site_documents',
+  'save_site_document',
 ])
 
 function reply(res, status, body, headers = {}) {
@@ -361,10 +364,21 @@ const server = createServer(async (req, res) => {
         'range-unit',
       ])
         if (req.headers[header]) headers[header] = req.headers[header]
+      const payload = write ? await body(req) : undefined
+      if (path === 'rpc/save_site_document') {
+        if (req.method !== 'POST') throw fail(405, 'Method not allowed')
+        if (!user || !['admin', 'owner'].includes(user.role))
+          throw fail(403, 'No tenés permisos de publicación')
+        try {
+          validateSiteDocument(JSON.parse(payload.toString('utf8')))
+        } catch (error) {
+          throw fail(400, error.message)
+        }
+      }
       const upstream = await fetch(`http://rest:3000/${path}${url.search}`, {
         method: req.method,
         headers,
-        body: write ? await body(req) : undefined,
+        body: payload,
         signal: AbortSignal.timeout(15000),
       })
       const outgoing = { 'Cache-Control': 'no-store' }

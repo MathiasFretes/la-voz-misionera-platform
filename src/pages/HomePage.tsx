@@ -1,6 +1,57 @@
 import { Link } from '@tanstack/react-router'
 
 export function HomePage() {
+  if (import.meta.env.VITE_SERVICE_AUTH === '1')
+    return (
+      <section>
+        <p className="eyebrow">Administración de la suite</p>
+        <h1>LVM Service</h1>
+        <p>
+          Administrá La Voz Misionera desde un solo lugar: contenido de la web,
+          cuentas, solicitudes y preparación de servicios.
+        </p>
+        <div className="card-grid">
+          <article className="card">
+            <h2>Web pública</h2>
+            <p>
+              Guardá borradores y publicá eventos, prédicas, sedes, pastores,
+              ministerios y horarios.
+            </p>
+            <Link className="button primary" to="/content">
+              Administrar contenido
+            </Link>
+          </article>
+          <article className="card">
+            <h2>Cuentas y solicitudes</h2>
+            <p>
+              Gestioná roles y consultá los mensajes de contacto, oración,
+              visitas y boletín.
+            </p>
+            <Link className="button secondary" to="/admin">
+              Abrir administración
+            </Link>
+          </article>
+          <article className="card">
+            <h2>Servicios y presentación</h2>
+            <p>
+              Prepará el orden del culto en este navegador e intercambiá planes
+              con Worship y Presenter mediante los contratos 0.1.
+            </p>
+            <Link className="button secondary" to="/services">
+              Planificar servicios
+            </Link>
+          </article>
+        </div>
+        <div className="actions">
+          <a className="button secondary" href="/">
+            Ver web pública
+          </a>
+          <a className="button secondary" href="/app">
+            Abrir LVM Worship
+          </a>
+        </div>
+      </section>
+    )
   return (
     <section className="hero">
       <p className="eyebrow">Planificación del culto</p>

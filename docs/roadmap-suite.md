@@ -10,31 +10,39 @@ HTTPS, RLS, aislamiento de canciones/repertorios, activación de propietario, co
 
 Este documento es el índice canónico del avance de la suite. Los documentos de cada milestone conservan la evidencia técnica y los contratos versionados; este archivo fija el orden de producto y evita que los repositorios avancen con prioridades contradictorias.
 
+## Revisión integral y prioridad actual
+
+La [auditoría del 20 de noviembre](auditoria-suite-2026-11-20.md) contrasta los cinco repositorios con el VPS. Por indicación del usuario, la prioridad inmediata es **Web Pública + Service como administración central**. No se desplazan personas, contenido editorial ni permisos generales a Worship.
+
+El CMS conectado incorpora eventos, prédicas, sedes, pastores, ministerios y horarios. Se guardan borradores separados de la versión pública, se publica o retira explícitamente y cada escritura comprueba la revisión esperada. La API conserva un historial privado de revisiones. Esto es una primera vertical de M12, no su cierre: faltan las demás colecciones, edición de páginas, medios y un flujo editorial completo. La web lee sin cookies y filtra contenido publicado; incluso en registros publicados, las columnas de borrador no tienen permiso de lectura pública.
+
+M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus gates locales/CI no prueban que toda la suite esté conectada en producción. En especial, la API anterior de planificación sigue privada; el despliegue de Service conserva planificación local. Las afirmaciones de PR y CI en documentos históricos deben leerse con su fecha, no como una verificación remota actual.
+
 ## Estado actual
 
-| Bloque                                    | Estado                 | Evidencia y límite actual                                                                                                                                                                                                                                                                                                                                            |
-| ----------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M7 — Suite funcional e identidad V0       | ✅ Cerrado             | Flujo offline Service → Worship → Service → Presenter y Service → Web Pública; contratos 0.1 congelados; identidad navy/dorado/blanco integrada.                                                                                                                                                                                                                     |
-| M7.8A–E — LVM NDI                         | ✅ Funcional           | Sender propio, video E2E, integración y UI completados.                                                                                                                                                                                                                                                                                                              |
-| M7.8F — distribución NDI                  | 🟡 Pausado             | Funciona instalado; queda la limpieza de claves de registro NSIS, VM limpia y firma. No bloquea el producto.                                                                                                                                                                                                                                                         |
-| M8 — Backend y datos                      | ✅ Cerrado             | PostgreSQL, API, migraciones, repositorios, concurrencia, backup/restore y empaquetado privado verificados en CI.                                                                                                                                                                                                                                                    |
-| M14A.1 — Fundación Flutter                | ✅ Cerrado             | Cuatro apps Android y paquetes compartidos; todavía no reemplazan los clientes de producto existentes.                                                                                                                                                                                                                                                               |
-| M14E — Presenter Remote Core              | ✅ Cerrado             | QR, aprobación local, WebSocket LAN, navegación, Biblia, blackout, restore, reconexión y seguridad probados físicamente.                                                                                                                                                                                                                                             |
-| M14E.2 / M14E.3 / M14A.2                  | 🟡 En revisión         | Snapshot rico, orden real del culto y UX/identidad final están en los PR borrador [Presenter #13](https://github.com/MathiasFretes/lvm-presenter/pull/13) y [Mobile #17](https://github.com/MathiasFretes/lvm-mobile/pull/17), ambos mergeables y con CI verde. La auditoría visual [Mobile #11](https://github.com/MathiasFretes/lvm-mobile/pull/11) sigue abierta. |
-| M9 — Identidad, acceso y capacidades      | ⏳ Siguiente fundación | Definir identidad central, sesión, iglesia, membresía y capacidades. No duplicar usuarios en Worship.                                                                                                                                                                                                                                                                |
-| M10 — Iglesias, sedes, personas y equipos | 🔒 Después de M9       | Modelo organizacional y permisos por iglesia/sede.                                                                                                                                                                                                                                                                                                                   |
-| M11 — Ecosistema conectado                | 🔒 Después de M9/M10   | Conectar los productos a la API real preservando contratos y operación offline. La primera vertical será Worship.                                                                                                                                                                                                                                                    |
-| M12 — CMS                                 | 🔒 Posterior           | Service administra contenido; Web Pública consume contenido publicado.                                                                                                                                                                                                                                                                                               |
-| M13 — API pública y Web Pública 2         | 🔒 Posterior           | Publicación externa, contratos públicos y migración final desde V0.                                                                                                                                                                                                                                                                                                  |
+| Bloque                              | Estado                       | Evidencia y límite actual                                                                                 |
+| ----------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
+| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local  | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                  |
+| M7.8A–E — LVM NDI                   | Gate histórico funcional     | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                         |
+| M7.8F — distribución NDI            | Pendiente de release         | NSIS, VM limpia y firma; no bloquea el CMS.                                                               |
+| M8 — Backend y datos                | Cerrado en alcance local/CI  | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.      |
+| M9 — Identidad y capacidades        | En curso                     | Sesión web/roles globales desplegados; iglesia, membresías y capacidades pendientes.                      |
+| M10 — Organización                  | Pendiente                    | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.  |
+| M11 / W2 — Ecosistema conectado     | Pendiente de vertical remota | Intercambios locales disponibles; falta sincronización autenticada completa y conflictos entre productos. |
+| M12 — CMS                           | En curso                     | Seis colecciones conectadas a Service; faltan páginas/editoriales, medios y resto de colecciones.         |
+| M13 — API pública y Web 2           | Parcial                      | Web V0 publicada; faltan API pública versionada y migración funcional completa.                           |
+| M14A.1 — Fundación Flutter          | Gate histórico cerrado       | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                             |
+| M14E — Presenter Remote Core        | Gate físico histórico        | No se repitió QA de dispositivo en esta revisión.                                                         |
+| M14E.2/M14E.3/M14A.2                | Revisión pendiente           | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.        |
 
 ## Orden de ejecución
 
-1. Resolver la revisión de M14E.2/M14E.3 sin ampliar el alcance del control remoto.
-2. Cerrar la decisión de producto de LVM Worship descrita abajo.
-3. Implementar M9A: contrato de identidad y capacidades de la suite.
-4. Ejecutar la primera vertical conectada de M11 con Worship.
-5. Completar M10 y ampliar el ecosistema a equipos, sedes y personas.
-6. Abrir M12/M13 cuando identidad, permisos y datos estén estables.
+1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
+2. Implementar lo pendiente de M9: iglesia, membresía y capacidades sobre la identidad compartida ya desplegada.
+3. Conectar de forma autenticada la persistencia de planificación Service con PostgreSQL, conservando cola local y revisión esperada.
+4. Ejecutar W2 entre Service y Worship con reconexión y conflictos; migrar el cliente Expo sin duplicar usuarios.
+5. Completar M10 y las demás colecciones/editoriales de M12; después ampliar la API pública de M13.
+6. Retomar M14E.2/M14E.3 y gates de distribución con evidencia vigente. No reabrir NDI técnico ni sustituir Expo por la preview Flutter.
 
 M7.8F se retoma solo con evidencia nueva de electron-builder/NSIS, una actualización relevante de esas herramientas o una VM limpia. No se reabre NDI técnico.
 
@@ -125,7 +133,7 @@ El primer cambio de implementación debe ser pequeño y vertical:
 4. Mantener el adaptador local y probar modo offline.
 5. Guardar y devolver `WorshipPlan 0.1` con control de revisión, sin modificar el contrato.
 
-No entran en este slice: un nuevo editor Flutter, CMS, blog, auth propia de Worship, reescritura masiva de ChordPro, publicación de Service/Worship ni cambios a M7.8F.
+El slice musical no introduce un editor Flutter, CMS dentro de Worship, blog, identidad propia de Worship, reescritura de ChordPro ni cambios a M7.8F. La publicación autorizada de las aplicaciones web y el CMS de Service se gestionan en el bloque de despliegue y en la prioridad actual, fuera de ese slice musical.
 
 ## Gates transversales
 

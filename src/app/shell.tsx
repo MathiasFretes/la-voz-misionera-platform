@@ -11,7 +11,14 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/services" onClick={close}>
         Servicios
       </Link>
-      <Link to="/public-preview" onClick={close}>
+      <Link
+        to={
+          import.meta.env.VITE_SERVICE_AUTH === '1'
+            ? '/content'
+            : '/public-preview'
+        }
+        onClick={close}
+      >
         Contenido público
       </Link>
       {import.meta.env.VITE_SERVICE_AUTH === '1' && (
@@ -42,11 +49,15 @@ function Brand({ close }: { close?: () => void }) {
   )
 }
 
-function LocalStatus() {
+function LocalStatus({ local }: { local: boolean }) {
   return (
     <div className="local-status">
       <span className="local-status-dot" aria-hidden="true" />
-      <span>Flujo local · disponible sin conexión</span>
+      <span>
+        {local
+          ? 'Planificación local · disponible sin conexión'
+          : 'Administración central · requiere conexión'}
+      </span>
     </div>
   )
 }
@@ -63,9 +74,10 @@ export function AppShell() {
     ? 'Administración'
     : localPath.startsWith('/services')
       ? 'Servicios'
-      : pathname.startsWith('/public-preview')
+      : localPath.startsWith('/public-preview') ||
+          localPath.startsWith('/content')
         ? 'Contenido público'
-        : pathname.startsWith('/development')
+        : localPath.startsWith('/development')
           ? 'Desarrollo'
           : 'Inicio'
 
@@ -93,7 +105,9 @@ export function AppShell() {
         <Brand />
         <Navigation />
         <div className="sidebar-footer">
-          <LocalStatus />
+          <LocalStatus
+            local={section === 'Servicios' || section === 'Inicio'}
+          />
           <small>Service 0.1</small>
         </div>
       </aside>
@@ -147,7 +161,9 @@ export function AppShell() {
               <Brand close={closeMenu} />
               <Navigation close={closeMenu} />
               <div className="sidebar-footer">
-                <LocalStatus />
+                <LocalStatus
+                  local={section === 'Servicios' || section === 'Inicio'}
+                />
                 <small>Service 0.1</small>
               </div>
             </div>

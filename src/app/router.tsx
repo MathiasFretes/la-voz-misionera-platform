@@ -11,6 +11,7 @@ import { ServiceEditorPage } from '../pages/ServiceEditorPage'
 import { ContractInspectorPage } from '../pages/ContractInspectorPage'
 import { PublicPreviewPage } from '../pages/PublicPreviewPage'
 import { AdministrationPage } from '../pages/AdministrationPage'
+import { ContentPage } from '../pages/ContentPage'
 import { SuiteAuth } from '../features/auth/SuiteAuth'
 
 const rootRoute = createRootRoute({
@@ -24,6 +25,11 @@ const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
   component: AdministrationPage,
+})
+const contentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/content',
+  component: ContentPage,
 })
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -66,6 +72,7 @@ export const router = createRouter({
     ...(import.meta.env.DEV ? [contractRoute] : []),
     publicPreviewRoute,
     adminRoute,
+    contentRoute,
   ]),
 })
 
