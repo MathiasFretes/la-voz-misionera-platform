@@ -52,7 +52,11 @@ try {
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', (error) => errors.push(error.message))
-  await page.goto(`${origin}/service/content`, { waitUntil: 'networkidle' })
+  await page.goto(`${origin}/service/`, { waitUntil: 'networkidle' })
+  await page
+    .getByRole('link', { name: 'Administrar contenido', exact: true })
+    .click()
+  await page.waitForURL('**/service/content')
   await page.getByRole('heading', { name: 'Nuevo contenido' }).waitFor()
   await page.getByLabel('Nombre *', { exact: true }).fill(title)
   await page.getByLabel('Fecha *', { exact: true }).fill('2026-11-20')
