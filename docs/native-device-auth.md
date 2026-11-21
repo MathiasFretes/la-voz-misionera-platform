@@ -25,3 +25,11 @@ La planificación web volvió a pasar sus ocho escenarios de interfaz con la nue
 SecureStore, el adaptador de cliente y la recuperación offline ya están conectados en el layout cuando se define `EXPO_PUBLIC_LVM_API_URL`, documentada junto con su uso. Se ocultan los controles OAuth/recuperación por correo que esta API no admite y las solicitudes de exportación usan el transporte VPS para impedir que el token llegue al dominio anterior. Esto todavía no implementa los endpoints de exportación ni la planificación musical nativa conectada. Se comprobó mediante pruebas que cambiar la contraseña no descarta la nueva sesión después de revocar las anteriores.
 
 Antes de publicar: instalar un build nativo nuevo con SecureStore y ejecutar login/logout/cambio de cuenta, recuperación offline, repertorios y permisos contra esta API aislada. Los exports Android/iOS con modo VPS comprobaron resolución/compilación, sin probar Keystore ni ejecución de pantallas. Solo después publicar coordinadamente la API y activar un build nativo. No mezclar ni importar sesiones antiguas de Supabase ni guardar contraseñas en el dispositivo.
+
+## Evidencia Android de compilación
+
+Worship `7bd5330b9` completó el 21 de noviembre `:app:assembleDebug` para `arm64-v8a` con JDK 17/SDK 36: `BUILD SUCCESSFUL` (545 tareas, 11 min 2 s). El APK nuevo tiene 118.887.117 bytes y SHA-256 `363D5BFD34E7D7DAE490AF20CEF2B2DF47BC18DABA0F7A5A05491FDD451E5C69`. Se verificaron las clases DEX de SecureStore, su registro de autolinking y las exclusiones de respaldo/transferencia de sus preferencias en los XML empaquetados.
+
+Es un build debug dependiente de Metro, sin bundle JavaScript incrustado; no es una distribución autónoma ni evidencia de login o Keystore en ejecución. El SDK local no incluye emulador y quedó aproximadamente 1,2 GB libre después de compilar; no se descargó una imagen ni se retomó el teléfono excluido por el usuario. El gate de instalación y recorrido autenticado continúa abierto. Más detalle en Worship `apps/web/public/wiki/Native-VPS-Session.md`.
+
+La comprobación móvil posterior a ese build, también sobre `7bd5330b9`, terminó con 930 pruebas aprobadas en 85 archivos y `tsc --noEmit` aprobado. Ese resultado actualiza el conteo histórico del preflight inicial; no convierte las pruebas con almacenamiento inyectado en una prueba del Keystore.

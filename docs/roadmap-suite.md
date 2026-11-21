@@ -43,6 +43,8 @@ La [primera vertical de identidad por iglesia](identity-churches.md) agrega gest
 
 La [planificación por iglesia](planning-church-integration.md) está desplegada. El [gate de ocho escenarios](planning-acceptance.md) pasó en preproducción y contra el VPS publicado, con dos pestañas, reinicio del navegador, desconexión, respuestas atrasadas, conflicto 409 y revocación. Esto no completa W2 ni la adopción de identidad en clientes nativos.
 
+El [preflight de sesión nativa](native-device-auth.md) ya incluye transporte VPS, adaptación de sesión y SecureStore optativos en Expo, pruebas contra PostgreSQL aislado y un APK Android debug compilado con el módulo y sus reglas de respaldo verificados. Falta instalarlo y probar el recorrido autenticado/offline en ejecución; no se publicó la API nativa ni se activó una distribución. Este paso no cierra M9/W1 ni sustituye la planificación musical nativa conectada pendiente en W2.
+
 ## Orden de ejecución
 
 1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
