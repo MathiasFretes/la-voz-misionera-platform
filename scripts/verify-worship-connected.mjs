@@ -6,7 +6,9 @@ import { resolve, sep, extname } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { chromium } from '@playwright/test'
 const origin = 'https://srv2137598.hstgr.cloud'
-const backend = 'http://127.0.0.1:54319'
+const production = process.env.LVM_WORSHIP_TARGET === 'production'
+const backend = production ? origin : 'http://127.0.0.1:54319'
+const database = production ? 'lvm_worship' : 'lvm_planning_qa_20261121'
 const roots = {
   service: resolve('dist'),
   worship: resolve('../LVM Worship/apps/web/dist'),
@@ -25,7 +27,7 @@ function sql(statement) {
       '-o',
       'BatchMode=yes',
       'hostinger-vps',
-      `cd /srv/apps/la-voz-misionera && docker compose exec -T postgres psql -U lvm_owner -d lvm_planning_qa_20261121 -v ON_ERROR_STOP=1 -Atc "${statement}"`,
+      `cd /srv/apps/la-voz-misionera && docker compose exec -T postgres psql -U lvm_owner -d ${database} -v ON_ERROR_STOP=1 -Atc "${statement}"`,
     ],
     { encoding: 'utf8' },
   )
@@ -85,6 +87,7 @@ async function context(actor) {
         request.method() === 'PUT'
       )
         return route.abort('internetdisconnected')
+      if (production) return route.continue()
       const headers = Object.fromEntries(
         Object.entries(request.headers()).filter(([name]) =>
           [
@@ -109,6 +112,7 @@ async function context(actor) {
         body: await response.text(),
       })
     }
+    if (production) return route.continue()
     const service = url.pathname.startsWith('/service/')
     const root = service ? roots.service : roots.worship
     const relative = service
