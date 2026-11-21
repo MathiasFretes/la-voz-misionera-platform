@@ -31,7 +31,7 @@ Capturas de escritorio/móvil: `test-results/planning/church-selector-desktop.pn
 
 ## CI
 
-`.github/workflows/ci.yml` agrega el job `church-planning`: regeneración del validador, detección de diferencias en el artefacto, pruebas de API, migraciones y permisos en PostgreSQL fresco, Chromium y prueba del diario entre pestañas. No usa credenciales del VPS. Sus comandos equivalentes se ejecutaron durante el desarrollo; **no se afirma una ejecución remota de GitHub Actions para el commit nuevo mientras la rama no se publique**.
+`.github/workflows/ci.yml` incluye el job `church-planning`: regeneración del validador, detección de diferencias en el artefacto, pruebas de API, migraciones y permisos en PostgreSQL fresco, Chromium y prueba del diario entre pestañas. No usa credenciales del VPS. La rama está publicada y el PR #19 permanece en borrador, sin fusionar. GitHub Actions aprobó `6301397` en la ejecución `44906463520` y el código musical desplegado `0c5e73e` en `44910644424`; ambos incluyeron `church-planning`, `platform` y `private-container`. Estos resultados corresponden a esos SHA, no a cambios posteriores.
 
 ## Archivos principales de implementación
 
@@ -42,4 +42,4 @@ Capturas de escritorio/móvil: `test-results/planning/church-selector-desktop.pn
 | API y PostgreSQL        | `suite-api/planning.mjs`, `server.mjs`, `schema/010_church_planning.sql`; validador generado desde el contrato existente.                                                               |
 | Verificación            | Scripts `verify-planning-journal.mjs`, `verify-planning-ui.mjs`, `setup-planning-qa.sh`; tests de permisos, SQL y repositorio; workflow y scripts npm.                                  |
 
-Los cambios no cierran toda la suite: el flujo automático con Worship y Presenter, clientes nativos y otros gates siguen abiertos en el roadmap.
+La regresión de los ocho escenarios volvió a pasar por HTTPS después de publicar la migración musical 011. Los cambios no cierran toda la suite: el tramo Web Service–Worship está publicado, pero la entrega al proceso de Presenter, clientes nativos y otros gates siguen abiertos en el roadmap.
