@@ -1,6 +1,6 @@
 # Sesión nativa del VPS — preflight, sin publicar
 
-La app Expo conserva por ahora su cliente y autenticación anteriores. Esta entrega prepara y comprueba la frontera de sesión del dispositivo con los mismos usuarios de PostgreSQL, sin modificar ese cliente ni publicar la API nueva. No se afirma una migración nativa terminada.
+La app Expo conserva por defecto su autenticación anterior. Esta entrega prepara y comprueba la frontera de sesión del dispositivo con los mismos usuarios de PostgreSQL; el adaptador y SecureStore ya se integraron detrás de la variable optativa `EXPO_PUBLIC_LVM_API_URL`, sin publicar esta API ni distribuir un build activado. No se afirma una migración nativa terminada.
 
 ## API
 
@@ -22,4 +22,6 @@ La planificación web volvió a pasar sus ocho escenarios de interfaz con la nue
 
 ## Trabajo requerido antes de activar
 
-Integrar almacenamiento seguro del sistema, el adaptador de cliente y la recuperación de sesión offline en el layout; deshabilitar los controles OAuth que la API no admite y comprobar login/logout/cambio de cuenta. Documentar `EXPO_PUBLIC_LVM_API_URL` junto con su uso efectivo. Después ejecutar exports Android/iOS y un recorrido nativo real, con repertorios y permisos. Solo entonces publicar coordinadamente la API y activar el build nativo. No mezclar ni importar sesiones antiguas de Supabase, y no guardar contraseñas en el dispositivo.
+SecureStore, el adaptador de cliente y la recuperación offline ya están conectados en el layout cuando se define `EXPO_PUBLIC_LVM_API_URL`, documentada junto con su uso. Se ocultan los controles OAuth/recuperación por correo que esta API no admite y las solicitudes de exportación usan el transporte VPS para impedir que el token llegue al dominio anterior. Esto todavía no implementa los endpoints de exportación ni la planificación musical nativa conectada. Se comprobó mediante pruebas que cambiar la contraseña no descarta la nueva sesión después de revocar las anteriores.
+
+Antes de publicar: instalar un build nativo nuevo con SecureStore y ejecutar login/logout/cambio de cuenta, recuperación offline, repertorios y permisos contra esta API aislada. Los exports Android/iOS con modo VPS comprobaron resolución/compilación, sin probar Keystore ni ejecución de pantallas. Solo después publicar coordinadamente la API y activar un build nativo. No mezclar ni importar sesiones antiguas de Supabase ni guardar contraseñas en el dispositivo.
