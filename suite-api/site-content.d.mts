@@ -7,6 +7,7 @@ export type ContentField = {
 }
 export type ContentCollection = {
   id: string
+  documentId?: string
   label: string
   titleField: string
   publicPath: string

@@ -8,9 +8,18 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
   {
-    files: ['scripts/verify-vps-admin.mjs', 'scripts/verify-vps-content.mjs'],
+    files: [
+      'scripts/verify-vps-admin.mjs',
+      'scripts/verify-vps-content.mjs',
+      'scripts/verify-vps-editorial.mjs',
+    ],
     languageOptions: {
-      globals: { document: 'readonly', innerWidth: 'readonly' },
+      globals: {
+        document: 'readonly',
+        innerWidth: 'readonly',
+        window: 'readonly',
+        navigator: 'readonly',
+      },
     },
   },
   {
@@ -18,6 +27,7 @@ export default tseslint.config(
       'suite-api/**/*.mjs',
       'scripts/verify-vps-admin.mjs',
       'scripts/verify-vps-content.mjs',
+      'scripts/verify-vps-editorial.mjs',
     ],
     languageOptions: {
       globals: {

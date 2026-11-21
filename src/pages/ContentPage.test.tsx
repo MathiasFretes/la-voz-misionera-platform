@@ -37,6 +37,36 @@ beforeEach(() => {
   vi.mocked(listSiteDocuments).mockResolvedValue([document])
 })
 describe('public content editor', () => {
+  it('creates the devotional under its canonical page ID instead of a random document', async () => {
+    vi.mocked(listSiteDocuments).mockResolvedValue([])
+    vi.mocked(saveSiteDocument).mockImplementation(async (input) => ({
+      ...document,
+      collection: input.p_collection,
+      id: input.p_id,
+      draft_data: input.p_data,
+      revision: 1,
+      published: false,
+    }))
+    render(<ContentPage />)
+    await screen.findByRole('heading', { name: 'Nuevo contenido' })
+    fireEvent.change(screen.getByRole('combobox', { name: 'Sección' }), {
+      target: { value: 'contenido/general' },
+    })
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Título *' }), {
+      target: { value: 'Lectura publicada' },
+    })
+    expect(screen.queryByRole('button', { name: 'Nuevo contenido' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar borrador' }))
+    await waitFor(() =>
+      expect(saveSiteDocument).toHaveBeenCalledWith(
+        expect.objectContaining({
+          p_collection: 'contenido',
+          p_id: 'general',
+          p_expected_revision: 0,
+        }),
+      ),
+    )
+  })
   it('preserves entered changes after a concurrent-edit conflict', async () => {
     vi.mocked(saveSiteDocument).mockRejectedValue(
       new Error('El contenido cambió en otra sesión'),

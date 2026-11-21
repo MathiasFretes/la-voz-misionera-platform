@@ -18,6 +18,8 @@ function publicationState(document: SiteDocument | null) {
     ? 'Publicado'
     : 'Publicado · cambios sin publicar'
 }
+const schemaKey = (schema: ContentCollection) =>
+  `${schema.id}${schema.documentId ? `/${schema.documentId}` : ''}`
 
 function ContentEditor({
   schema,
@@ -43,7 +45,9 @@ function ContentEditor({
     )
   const [values, setValues] =
     useState<Record<string, string | boolean>>(initial)
-  const [id] = useState(() => document?.id || crypto.randomUUID())
+  const [id] = useState(
+    () => document?.id || schema.documentId || crypto.randomUUID(),
+  )
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [dirty, setDirty] = useState(false)
@@ -194,7 +198,7 @@ function ContentEditor({
 }
 
 export function ContentPage() {
-  const [collection, setCollection] = useState(contentCollections[0].id)
+  const [collection, setCollection] = useState('eventos')
   const [documents, setDocuments] = useState<SiteDocument[]>([])
   const [selection, setSelection] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -203,7 +207,9 @@ export function ContentPage() {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [revision, setRevision] = useState(0)
-  const schema = contentCollections.find((item) => item.id === collection)!
+  const schema = contentCollections.find(
+    (item) => schemaKey(item) === collection,
+  )!
   const selected =
     documents.find((document) => document.id === selection) || null
   const reload = useCallback(() => {
@@ -212,10 +218,15 @@ export function ContentPage() {
   }, [])
   useEffect(() => {
     let active = true
-    listSiteDocuments(collection)
+    listSiteDocuments(schema.id)
       .then((rows) => {
         if (active) {
-          setDocuments(rows)
+          setDocuments(
+            schema.documentId
+              ? rows.filter((row) => row.id === schema.documentId)
+              : rows,
+          )
+          if (schema.documentId) setSelection(schema.documentId)
           setError('')
         }
       })
@@ -228,7 +239,7 @@ export function ContentPage() {
     return () => {
       active = false
     }
-  }, [collection, revision])
+  }, [schema, revision])
   return (
     <section>
       <p className="eyebrow">Administración de la web</p>
@@ -242,6 +253,7 @@ export function ContentPage() {
         <label>
           Sección
           <select
+            aria-label="Sección"
             value={collection}
             disabled={dirty || saving}
             onChange={(event) => {
@@ -254,22 +266,24 @@ export function ContentPage() {
             }}
           >
             {contentCollections.map((item) => (
-              <option key={item.id} value={item.id}>
+              <option key={schemaKey(item)} value={schemaKey(item)}>
                 {item.label}
               </option>
             ))}
           </select>
         </label>
-        <Button
-          disabled={dirty || loading || saving}
-          onClick={() => {
-            setSelection(null)
-            setNotice('')
-            setRevision((value) => value + 1)
-          }}
-        >
-          Nuevo contenido
-        </Button>
+        {!schema.documentId && (
+          <Button
+            disabled={dirty || loading || saving}
+            onClick={() => {
+              setSelection(null)
+              setNotice('')
+              setRevision((value) => value + 1)
+            }}
+          >
+            Nuevo contenido
+          </Button>
+        )}
         <a
           className="button secondary"
           href={schema.publicPath}

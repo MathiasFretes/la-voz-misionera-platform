@@ -6,6 +6,8 @@ El estado y el orden de trabajo de toda la suite están en el [roadmap de La Voz
 
 `/service/content` es el editor conectado de eventos, prédicas, sedes, pastores, ministerios y horarios. Guardar un borrador conserva la versión pública; publicar o retirar es una acción explícita. La API exige administración y revisión esperada; los borradores no son legibles por visitantes, aunque el documento tenga una versión publicada. El [estado integral](docs/auditoria-suite-2026-11-20.md) distingue lo desplegado de los gates locales y las funciones pendientes.
 
+El mismo editor administra Inicio/transmisión, Nosotros y devocional mediante los registros editoriales únicos `home`, `nosotros` y `general`. No crea copias aleatorias de una página. `node scripts/verify-vps-editorial.mjs` comprueba el recorrido real y limpia sus registros temporales; se niega a sobrescribir páginas editoriales preexistentes durante QA.
+
 ## Baseline local y documentación histórica
 
 Las descripciones M6–M8 que siguen conservan su alcance local o de CI. El despliegue web actual usa `suite-api/` para identidad, permisos y CMS; la API de planificación en `backend/` continúa separada y privada.

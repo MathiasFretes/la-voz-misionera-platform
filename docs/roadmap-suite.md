@@ -14,26 +14,30 @@ Este documento es el índice canónico del avance de la suite. Los documentos de
 
 La [auditoría del 20 de noviembre](auditoria-suite-2026-11-20.md) contrasta los cinco repositorios con el VPS. Por indicación del usuario, la prioridad inmediata es **Web Pública + Service como administración central**. No se desplazan personas, contenido editorial ni permisos generales a Worship.
 
-El CMS conectado incorpora eventos, prédicas, sedes, pastores, ministerios y horarios. Se guardan borradores separados de la versión pública, se publica o retira explícitamente y cada escritura comprueba la revisión esperada. La API conserva un historial privado de revisiones. Esto es una primera vertical de M12, no su cierre: faltan las demás colecciones, edición de páginas, medios y un flujo editorial completo. La web lee sin cookies y filtra contenido publicado; incluso en registros publicados, las columnas de borrador no tienen permiso de lectura pública.
+El CMS conectado incorpora eventos, prédicas, sedes, pastores, ministerios y horarios. Se guardan borradores separados de la versión pública, se publica o retira explícitamente y cada escritura comprueba la revisión esperada. La API conserva un historial privado de revisiones. Esto es una primera vertical de M12, no su cierre: faltan las demás colecciones, edición de otras páginas, medios y un flujo editorial completo. La web lee sin cookies y filtra contenido publicado; incluso en registros publicados, las columnas de borrador no tienen permiso de lectura pública.
+
+La conexión editorial también está desplegada: Inicio y transmisión usan `contenido/home`, Nosotros usa `contenido/nosotros` y el devocional usa `contenido/general`. Service edita registros únicos, conserva borradores privados y publica con revisión esperada. Inicio refleja la misión y el devocional publicados. La transmisión valida y abre su enlace y permite desactivarla; el devocional ofrece impresión y compartir reales. El recorrido se verificó en el VPS a 1440/390 px, incluyendo carga fallida y reintento, y se corrigieron controles móviles recortados y el acceso flotante que tapaba contenido. Se conserva el resto de M12 pendiente.
+
+La trazabilidad del VPS está documentada con commits locales y `deployment.json`. Esto resuelve la incertidumbre sobre el código inspeccionado en el servidor, pero no equivale a integrar las ramas en GitHub/main ni a automatizar CI/CD. No se asigna un porcentaje global sin un inventario ponderado y criterios de aceptación aprobados.
 
 M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus gates locales/CI no prueban que toda la suite esté conectada en producción. En especial, la API anterior de planificación sigue privada; el despliegue de Service conserva planificación local. Las afirmaciones de PR y CI en documentos históricos deben leerse con su fecha, no como una verificación remota actual.
 
 ## Estado actual
 
-| Bloque                              | Estado                       | Evidencia y límite actual                                                                                 |
-| ----------------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------- |
-| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local  | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                  |
-| M7.8A–E — LVM NDI                   | Gate histórico funcional     | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                         |
-| M7.8F — distribución NDI            | Pendiente de release         | NSIS, VM limpia y firma; no bloquea el CMS.                                                               |
-| M8 — Backend y datos                | Cerrado en alcance local/CI  | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.      |
-| M9 — Identidad y capacidades        | En curso                     | Sesión web/roles globales desplegados; iglesia, membresías y capacidades pendientes.                      |
-| M10 — Organización                  | Pendiente                    | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.  |
-| M11 / W2 — Ecosistema conectado     | Pendiente de vertical remota | Intercambios locales disponibles; falta sincronización autenticada completa y conflictos entre productos. |
-| M12 — CMS                           | En curso                     | Seis colecciones conectadas a Service; faltan páginas/editoriales, medios y resto de colecciones.         |
-| M13 — API pública y Web 2           | Parcial                      | Web V0 publicada; faltan API pública versionada y migración funcional completa.                           |
-| M14A.1 — Fundación Flutter          | Gate histórico cerrado       | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                             |
-| M14E — Presenter Remote Core        | Gate físico histórico        | No se repitió QA de dispositivo en esta revisión.                                                         |
-| M14E.2/M14E.3/M14A.2                | Revisión pendiente           | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.        |
+| Bloque                              | Estado                       | Evidencia y límite actual                                                                                                        |
+| ----------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local  | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                         |
+| M7.8A–E — LVM NDI                   | Gate histórico funcional     | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                |
+| M7.8F — distribución NDI            | Pendiente de release         | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                      |
+| M8 — Backend y datos                | Cerrado en alcance local/CI  | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                             |
+| M9 — Identidad y capacidades        | En curso                     | Sesión web/roles globales desplegados; iglesia, membresías y capacidades pendientes.                                             |
+| M10 — Organización                  | Pendiente                    | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                         |
+| M11 / W2 — Ecosistema conectado     | Pendiente de vertical remota | Intercambios locales disponibles; falta sincronización autenticada completa y conflictos entre productos.                        |
+| M12 — CMS                           | En curso                     | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo. |
+| M13 — API pública y Web 2           | Parcial                      | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                  |
+| M14A.1 — Fundación Flutter          | Gate histórico cerrado       | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                    |
+| M14E — Presenter Remote Core        | Gate físico histórico        | No se repitió QA de dispositivo en esta revisión.                                                                                |
+| M14E.2/M14E.3/M14A.2                | Revisión pendiente           | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.                               |
 
 ## Orden de ejecución
 

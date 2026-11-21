@@ -50,7 +50,7 @@ test('content validation rejects unsafe links, bad dates and unsupported values'
   )
 })
 test('every editable collection has distinct fields and a public destination', () => {
-  assert.equal(contentCollections.length, 6)
+  assert.equal(contentCollections.length, 9)
   for (const collection of contentCollections) {
     assert.equal(
       new Set(collection.fields.map((field) => field.key)).size,
@@ -61,4 +61,41 @@ test('every editable collection has distinct fields and a public destination', (
     )
     assert.ok(collection.publicPath.startsWith('/'))
   }
+})
+test('editorial pages use stable IDs and cannot activate a live broadcast without a link', () => {
+  const editorial = { ...input(), p_collection: 'contenido', p_id: 'home' }
+  assert.doesNotThrow(() =>
+    validateSiteDocument({
+      ...editorial,
+      p_data: { heroTitle: 'Bienvenidos' },
+    }),
+  )
+  assert.throws(
+    () => validateSiteDocument({ ...editorial, p_id: 'random-copy' }),
+    /Contenido no reconocido/,
+  )
+  assert.throws(
+    () =>
+      validateSiteDocument({
+        ...editorial,
+        p_action: 'publish',
+        p_data: {
+          heroTitle: 'Bienvenidos',
+          heroSubtitle: 'Una comunidad',
+          isLive: true,
+          liveVideoUrl: '',
+        },
+      }),
+    /enlace/,
+  )
+  assert.throws(
+    () =>
+      validateSiteDocument({
+        ...editorial,
+        p_id: 'general',
+        p_action: 'publish',
+        p_data: { devocionalTitulo: 'Lectura' },
+      }),
+    /fecha/,
+  )
 })

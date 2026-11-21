@@ -7,6 +7,58 @@ const text = (key, label, required = false, type = 'text', value = '') => ({
 })
 export const contentCollections = [
   {
+    id: 'contenido',
+    documentId: 'home',
+    label: 'Página de inicio y transmisión',
+    titleField: 'heroTitle',
+    publicPath: '/',
+    fields: [
+      text('heroTitle', 'Título de bienvenida', true),
+      text('heroAccent', 'Texto destacado'),
+      text('heroSubtitle', 'Mensaje de bienvenida', true, 'textarea'),
+      text('liveTitle', 'Título de la transmisión'),
+      text('liveSubtitle', 'Descripción de la transmisión', false, 'textarea'),
+      text('isLive', 'Mostrar transmisión en vivo', false, 'boolean', false),
+      text('liveVideoUrl', 'Enlace de la transmisión', false, 'url'),
+    ],
+  },
+  {
+    id: 'contenido',
+    documentId: 'nosotros',
+    label: 'Página Nosotros',
+    titleField: 'heroTitle',
+    publicPath: '/nosotros',
+    fields: [
+      text('heroTitle', 'Título de la página', true),
+      text('heroSubtitle', 'Texto destacado'),
+      text('heroDescription', 'Presentación', false, 'textarea'),
+      text('visionTitle', 'Título de la visión', true),
+      text('visionText', 'Visión', true, 'textarea'),
+      text('missionTitle', 'Título de la misión', true),
+      text('missionText', 'Misión', true, 'textarea'),
+      text('statFoundation', 'Año de fundación'),
+      text('statMembers', 'Miembros'),
+      text('statVenues', 'Sedes'),
+      text('statGroups', 'Células'),
+    ],
+  },
+  {
+    id: 'contenido',
+    documentId: 'general',
+    label: 'Devocional',
+    titleField: 'devocionalTitulo',
+    publicPath: '/devocional',
+    fields: [
+      text('devocionalTitulo', 'Título', true),
+      text('devocionalFecha', 'Fecha', true, 'date'),
+      text('versiculoDia', 'Versículo', true, 'textarea'),
+      text('versiculoRef', 'Referencia bíblica', true),
+      text('devocionalTexto', 'Reflexión', true, 'textarea'),
+      text('devocionalAplicacion', 'Aplicación personal', false, 'textarea'),
+      text('devocionalOracion', 'Oración', false, 'textarea'),
+    ],
+  },
+  {
     id: 'eventos',
     label: 'Eventos',
     titleField: 'name',
@@ -94,7 +146,9 @@ export const contentCollections = [
 
 export function validateSiteDocument(input) {
   const schema = contentCollections.find(
-    (collection) => collection.id === input?.p_collection,
+    (collection) =>
+      collection.id === input?.p_collection &&
+      (!collection.documentId || collection.documentId === input?.p_id),
   )
   if (
     !schema ||
@@ -164,5 +218,12 @@ export function validateSiteDocument(input) {
           `Completá ${field.label.toLowerCase()} antes de publicar`,
         )
     }
+  if (
+    input.p_action === 'publish' &&
+    schema.documentId === 'home' &&
+    data.isLive === true &&
+    !data.liveVideoUrl?.trim()
+  )
+    throw new Error('Cargá el enlace antes de activar la transmisión')
   return input
 }
