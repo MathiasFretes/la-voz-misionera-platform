@@ -69,6 +69,32 @@ try {
   assert.equal(current.user.id, userId)
   assert.equal(current.access_token, session.access_token)
   assert.deepEqual(current.user.memberships, [])
+  const signedOut = await transport.fetch(
+    `${origin}/api/auth/logout`,
+    input({}),
+  )
+  assert.equal(signedOut.status, 200)
+  assert.equal(signedOut.headers.get('set-cookie'), null)
+  assert.equal(await transport.readStoredSession(), null)
+  const rejected = await globalThis.fetch(`${api}/data/users?id=eq.${userId}`, {
+    method: 'PATCH',
+    headers: {
+      'X-LVM-Client': 'native',
+      Authorization: `Bearer ${session.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ display_name: 'Revoked' }),
+  })
+  assert.equal(rejected.status, 403)
+  const relogin = await transport.fetch(
+    `${origin}/api/auth/login`,
+    input({ email, password }),
+  )
+  assert.equal(relogin.status, 200)
+  assert.notEqual(
+    (await relogin.json()).session.access_token,
+    session.access_token,
+  )
   const browser = await globalThis.fetch(`${api}/auth/login`, {
     ...input({ email, password }),
     headers: { Origin: origin, 'Content-Type': 'application/json' },

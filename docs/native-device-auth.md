@@ -16,7 +16,9 @@ Worship `apps/mobile/src/lib/deviceTransport.ts` es una frontera sin imports de 
 
 `node --experimental-strip-types scripts/verify-native-session.mjs` pasó contra la base aislada `lvm_planning_qa_20261121` y API interna mediante túnel SSH. El script fija ese destino y no permite ejecutarse sobre producción: alta nativa, token opaco sin cookie, restauración, lectura privada de datos, login web sobre la misma cuenta, protección CSRF web, rechazo de ruta nativa desde origen de navegador, rechazo de token nativo usado como cookie y revocación inmediata por cambio de contraseña web. Los fixtures propios se limpian al terminar. La sustitución de URL hacia loopback ocurre solamente en el fetch de prueba; no elimina la restricción de origen del transporte de aplicación.
 
-Los tests de frontera nativa y de API se incluyen en `npm run test:suite-api`. Los tests del transporte están en Worship `apps/mobile/src/lib/__tests__/deviceTransport.test.ts`; el typecheck móvil pasó. El almacenamiento del preflight es una implementación de memoria, no prueba del Keystore de Android.
+Los tests de frontera nativa y de API se incluyen en `npm run test:suite-api` (14 pruebas aprobadas). Los tests del transporte están en Worship `apps/mobile/src/lib/__tests__/deviceTransport.test.ts` (5 pruebas); el typecheck, la suite móvil completa de 925 pruebas y los exports Metro Android/iOS pasaron. El transporte no está activado en las pantallas, por lo que esos exports prueban compatibilidad del árbol, no un recorrido de login nativo. El almacenamiento del preflight es una implementación de memoria, no prueba del Keystore de Android.
+
+La planificación web volvió a pasar sus ocho escenarios de interfaz con la nueva API aislada: cookies, diario local, dos pestañas, reconexión, conflicto, aislamiento y revocación. La API productiva no se reemplazó. La preflight nativa también comprueba logout sin Set-Cookie, revocación del token anterior y que un token inválido no permite saltar el control Origin de una escritura.
 
 ## Trabajo requerido antes de activar
 

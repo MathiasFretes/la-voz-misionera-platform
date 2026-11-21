@@ -158,7 +158,7 @@ const server = createServer(async (req, res) => {
       write &&
       req.headers.origin !== origin &&
       !device &&
-      !nativeToken(req.headers)
+      !(nativeToken(req.headers) && (await currentUser(req)))
     )
       throw fail(403, 'Invalid request origin')
     if (write && !req.headers['content-type']?.startsWith('application/json'))
