@@ -45,6 +45,8 @@ La [planificación por iglesia](planning-church-integration.md) está desplegada
 
 El [preflight de sesión nativa](native-device-auth.md) ya incluye transporte VPS, adaptación de sesión y SecureStore optativos en Expo, pruebas contra PostgreSQL aislado y un APK Android debug compilado con el módulo y sus reglas de respaldo verificados. Falta instalarlo y probar el recorrido autenticado/offline en ejecución; no se publicó la API nativa ni se activó una distribución. Este paso no cierra M9/W1 ni sustituye la planificación musical nativa conectada pendiente en W2.
 
+Worship `5cd6845fb` incorpora además el editor Expo conectado por enlace de Service, con un diario duradero por cuenta/iglesia/culto/rama, cola idempotente, conflictos explícitos y recuperación de propuestas musicales existentes. Pasaron 950 pruebas móviles, los exports y el build web con catálogo del VPS. Falta verificar esta integración contra la API aislada e instalada, y completar selección de iglesia/culto, recuperación entre ramas y comparación visual; es avance de código en W2, no una publicación nativa ni el cierre del gate.
+
 ## Orden de ejecución
 
 1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
