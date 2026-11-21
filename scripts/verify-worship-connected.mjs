@@ -316,6 +316,21 @@ try {
     converted.shows[converted.project.shows[1].id].name,
     'Canto de prueba QA',
   )
+  await mkdir('test-results/worship-exchange', { recursive: true })
+  await planner.getByRole('tab', { name: 'Presentación', exact: true }).click()
+  const downloadEvent = planner.waitForEvent('download')
+  await planner
+    .getByRole('button', { name: 'Descargar para Presenter', exact: true })
+    .click()
+  const download = await downloadEvent
+  const serviceFile = resolve(
+    'test-results/worship-exchange/connected-service.json',
+  )
+  await download.saveAs(serviceFile)
+  assert.deepEqual(
+    JSON.parse(await readFile(serviceFile, 'utf8')),
+    merged.service,
+  )
   const freshDevice = await context(musician)
   await freshDevice.goto(
     `${origin}/setlist?churchId=${church}&serviceId=${serviceId}`,

@@ -2,7 +2,7 @@
 
 ## Estado y publicación
 
-La API y la migración 011 se comprobaron primero en una **base aislada** y se publicaron el 21 de noviembre de 2026 en `https://srv2137598.hstgr.cloud`. Service/API corresponden a `0c5e73e` y Worship Web a `52d4454bd`. La entrega al proceso de escritorio de Presenter todavía no se considera terminada; sí se verificó la conversión canónica del plan incorporado.
+La API y la migración 011 se comprobaron primero en una **base aislada** y se publicaron el 21 de noviembre de 2026 en `https://srv2137598.hstgr.cloud`. La API corresponde a `0c5e73e`; las interfaces actuales son Service `9d95d54` y Worship `cd2c87a92`. El JSON descargado desde el botón de Service se importó en la compilación Windows de Presenter `43e00b9` y sobrevivió al reinicio offline; la distribución instalable sigue pendiente.
 
 La revisión de propuestas en Service está habilitada con `VITE_SERVICE_WORSHIP=connected`. El editor conectado de Worship, su borrador privado por cuenta/iglesia/culto y la cola offline pasaron tanto QA como el flujo HTTPS publicado. No se modificaron locales con revisión humana.
 
@@ -49,3 +49,11 @@ Con `LVM_WORSHIP_TARGET=production`, el mismo verificador usa los recursos realm
 GitHub Actions aprobó los tres jobs de `0c5e73e`: [ejecución 44910644424](https://github.com/MathiasFretes/la-voz-misionera-platform/actions/runs/44910644424). Las pruebas locales suman 45 de Service, 12 de API y 546 de Worship; lint y builds aprobados. No se atribuye este resultado a commits posteriores de documentación o verificadores.
 
 El snapshot anterior está en `releases/worship-20261121T134628Z` (API, ambas interfaces, imagen anterior y manifiesto). El respaldo posterior `lvm_worship_20261121T135208Z.dump` se restauró en una base desechable: migración 011 presente, funciones autorizadas para `lvm_user`, tablas privadas inaccesibles para `lvm_user`/`lvm_anon` y un único propietario. También se comprobó la copia cifrada DPAPI fuera del VPS. La reversión conserva la migración aditiva y restaura interfaces/API previas; no debe borrar las propuestas productivas.
+
+## Retorno entre iglesias y entrega real a Presenter
+
+El enlace de retorno lleva `churchId`; Service lo contrasta con sus iglesias activas y autorizadas antes de abrir un repositorio. Tiene prioridad sobre la selección anterior. Un enlace ajeno, suspendido, vacío o `legacy` no vuelve silenciosamente a otro ámbito. Seis pruebas nuevas elevaron Service a 51 pruebas; CI `44911664234` aprobó los tres jobs de `9d95d54`. El verificador productivo pasó con una selección anterior distinta y un enlace a iglesia inexistente. Se publicaron las entradas HTML de `/setlist` y las demás rutas directas para que no siguieran cargando bundles anteriores. Snapshot de interfaces: `releases/church-link-20261121T140217Z`.
+
+El verificador ahora usa «Presentación → Descargar para Presenter», guarda `test-results/worship-exchange/connected-service.json` y compara todo el archivo con el plan incorporado. La entrega comprobada tiene SHA-256 `A26CE9C7C673EBFAE478EDB19D9A7D5E9E5FDC6E111B853E217C012368ACE270` (fixture propio de QA, eliminado de PostgreSQL al terminar).
+
+Presenter `config/testing/lvmService.test.ts`, con `LVM_SERVICE_JSON` apuntando a ese archivo, pasó en Electron real: importación directa sin CLI, guardado, reinicio sin red y letra visible. También pasaron los dos recorridos de regresión con proyecto previo y Service con repeticiones. Captura local en Presenter `test-results/lvmService-imports-Service-46353-ine-and-presents-its-lyrics/service-offline-preview.png`. El importador conserva el formato de proyecto existente y valida el lote antes de modificar stores. Estas comprobaciones no demuestran instalador firmado, salida física ni edición musical vinculada durante pérdida completa de Internet.
