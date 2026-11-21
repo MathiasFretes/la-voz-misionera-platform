@@ -33,3 +33,9 @@ Worship `7bd5330b9` completó el 21 de noviembre `:app:assembleDebug` para `arm6
 Es un build debug dependiente de Metro, sin bundle JavaScript incrustado; no es una distribución autónoma ni evidencia de login o Keystore en ejecución. El SDK local no incluye emulador y quedó aproximadamente 1,2 GB libre después de compilar; no se descargó una imagen ni se retomó el teléfono excluido por el usuario. El gate de instalación y recorrido autenticado continúa abierto. Más detalle en Worship `apps/web/public/wiki/Native-VPS-Session.md`.
 
 La comprobación móvil posterior a ese build, también sobre `7bd5330b9`, terminó con 930 pruebas aprobadas en 85 archivos y `tsc --noEmit` aprobado. Ese resultado actualiza el conteo histórico del preflight inicial; no convierte las pruebas con almacenamiento inyectado en una prueba del Keystore.
+
+## Aislamiento de eventos de cuenta
+
+Worship `b1e8fa353` amplió el control de generaciones a la decodificación JSON y a las notificaciones de sesión del adaptador. Una respuesta inicial, validación en primer plano o login superado no puede notificar la identidad anterior después de logout/reemplazo de cuenta. Las mutaciones invalidan consultas al comenzar y al completarse, incluso si la consulta empezó durante un login pendiente; el transporte impide que esa consulta vacía borre la credencial recién guardada. La persistencia cifrada también se vuelve a comprobar después de su escritura asíncrona.
+
+Las regresiones reprodujeron fallos antes de las correcciones. Sobre esa revisión pasaron 937 pruebas móviles en 85 archivos, el chequeo de tipos y los exports Metro Android/iOS con el modo VPS seleccionado. Es código TypeScript posterior al APK debug anterior; no se presenta como una instalación o validación de Keystore, ni se publicó la API nativa.
