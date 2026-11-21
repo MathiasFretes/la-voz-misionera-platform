@@ -26,7 +26,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:suite-api
-      - run: git diff --exit-code -- suite-api/service-record.mjs
+      - run: git diff --exit-code -- suite-api/service-record.mjs suite-api/worship-contract.mjs
       - run: npm run test:suite-api
       - name: Verify church schema, authorization, concurrency controls and idempotency
         run: |
@@ -34,6 +34,7 @@ jobs:
             docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < "$migration"
           done
           docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/planning.sql
+          docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/worship-exchange.sql
       - run: npx playwright install --with-deps chromium
       - run: npm run test:planning-journal
 

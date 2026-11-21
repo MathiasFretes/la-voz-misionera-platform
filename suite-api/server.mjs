@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import pg from 'pg'
 import { validateSiteDocument } from './site-content.mjs'
 import { planningPath, planningCommand } from './planning.mjs'
+import { worshipPath, worshipCommand } from './worship-exchange.mjs'
 import {
   passwordHash,
   passwordMatches,
@@ -141,7 +142,8 @@ const server = createServer(async (req, res) => {
       throw fail(403, 'Invalid request origin')
     if (write && !req.headers['content-type']?.startsWith('application/json'))
       throw fail(415, 'JSON required')
-    const planning = planningPath(url.pathname)
+    const worship = worshipPath(url.pathname)
+    const planning = worship || planningPath(url.pathname)
     if (planning) {
       const user = await currentUser(req)
       if (!user) throw fail(401, 'Ingresá para consultar los servicios')
@@ -159,7 +161,7 @@ const server = createServer(async (req, res) => {
           throw fail(400, 'JSON inválido')
         }
       }
-      const command = planningCommand(
+      const command = (worship ? worshipCommand : planningCommand)(
         req.method,
         planning,
         input,
