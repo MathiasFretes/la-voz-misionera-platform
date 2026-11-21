@@ -10,6 +10,8 @@ import {
 } from '../domain/service/service'
 import { ServiceSyncStatus } from '../features/services/ServiceSyncStatus'
 import { Button } from '../ui/Button'
+import { useSuiteUser } from '../features/auth/SuiteAuth'
+import { WorshipReview } from '../features/services/WorshipReview'
 
 export function ServiceEditorAccess() {
   const planning = usePlanning()
@@ -17,6 +19,8 @@ export function ServiceEditorAccess() {
   return <ReadonlyService />
 }
 function ReadonlyService() {
+  const planning = usePlanning()
+  const user = useSuiteUser()
   const { serviceId } = useParams({ strict: false })
   const { records, persistence, retry, migrationConflicts } = useServices()
   const record = records.find((row) => row.id === serviceId)
@@ -48,6 +52,18 @@ function ReadonlyService() {
         </p>
       )}
       <h1>{record.service.title}</h1>
+      {import.meta.env.VITE_SERVICE_WORSHIP === 'connected' &&
+        user &&
+        planning?.selected &&
+        planning.selected !== 'legacy' && (
+          <WorshipReview
+            userId={user.id}
+            churchId={planning.selected}
+            record={record}
+            persistence={persistence}
+            refreshService={retry}
+          />
+        )}
       <p>{record.venue}</p>
       <ol>
         {record.service.items.map((item) => (

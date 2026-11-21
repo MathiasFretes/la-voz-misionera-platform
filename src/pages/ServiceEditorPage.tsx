@@ -5,6 +5,9 @@ import { parseService } from '../contracts/service'
 import { parseWorshipPlan } from '../contracts/worshipPlan'
 import { ItemEditor } from '../features/services/ItemEditor'
 import { useServices } from '../features/services/useServices'
+import { usePlanning } from '../features/services/PlanningContext'
+import { useSuiteUser } from '../features/auth/SuiteAuth'
+import { WorshipReview } from '../features/services/WorshipReview'
 import { ServiceSyncStatus } from '../features/services/ServiceSyncStatus'
 import {
   downloadService,
@@ -43,6 +46,8 @@ const kindLabels: Record<ServiceItem['kind'], string> = {
 }
 
 export function ServiceEditorPage() {
+  const planning = usePlanning()
+  const user = useSuiteUser()
   const { serviceId } = useParams({ strict: false }) as { serviceId: string }
   const { records, save, remove, persistence, retry, migrationConflicts } =
     useServices()
@@ -212,6 +217,18 @@ export function ServiceEditorPage() {
         </div>
         <span className="save-status">{notice}</span>
       </div>
+      {import.meta.env.VITE_SERVICE_WORSHIP === 'connected' &&
+        user &&
+        planning?.selected &&
+        planning.selected !== 'legacy' && (
+          <WorshipReview
+            userId={user.id}
+            churchId={planning.selected}
+            record={record}
+            persistence={persistence}
+            refreshService={retry}
+          />
+        )}
       <div className="actions">
         <button
           className="button secondary"

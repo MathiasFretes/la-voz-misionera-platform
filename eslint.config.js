@@ -15,6 +15,7 @@ export default tseslint.config(
       'scripts/verify-vps-identity.mjs',
       'scripts/verify-planning-journal.mjs',
       'scripts/verify-planning-ui.mjs',
+      'scripts/verify-worship-review.mjs',
     ],
     languageOptions: {
       globals: {
@@ -34,6 +35,7 @@ export default tseslint.config(
       'scripts/verify-vps-identity.mjs',
       'scripts/verify-planning-journal.mjs',
       'scripts/verify-planning-ui.mjs',
+      'scripts/verify-worship-review.mjs',
     ],
     languageOptions: {
       globals: {
