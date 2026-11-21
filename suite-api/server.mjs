@@ -12,10 +12,11 @@ import {
 } from './security.mjs'
 
 const origin = new URL(process.env.LVM_ORIGIN).origin
+const restOrigin = process.env.LVM_REST_URL || 'http://rest:3000'
 const secret = (await readFile('/run/secrets/jwt_secret', 'utf8')).trim()
 const pool = new pg.Pool({
   host: 'postgres',
-  database: 'lvm_worship',
+  database: process.env.LVM_DATABASE || 'lvm_worship',
   user: 'lvm_api',
   password: (await readFile('/run/secrets/api_password', 'utf8')).trim(),
   max: 10,
@@ -129,7 +130,7 @@ const server = createServer(async (req, res) => {
     const url = new URL(req.url, origin)
     if (url.pathname === '/api/health' && req.method === 'GET') {
       await pool.query('SELECT 1')
-      const check = await fetch('http://rest:3000/songs?select=id&limit=0', {
+      const check = await fetch(`${restOrigin}/songs?select=id&limit=0`, {
         signal: AbortSignal.timeout(3000),
       })
       if (!check.ok) throw fail(503, 'Data service unavailable')
@@ -144,6 +145,11 @@ const server = createServer(async (req, res) => {
     if (planning) {
       const user = await currentUser(req)
       if (!user) throw fail(401, 'Ingresá para consultar los servicios')
+      if (req.headers['x-lvm-account'] !== user.id)
+        throw fail(
+          403,
+          'La cuenta cambió. Volvé a abrir la planificación con tu sesión actual.',
+        )
       let input
       if (write) {
         try {
@@ -153,8 +159,13 @@ const server = createServer(async (req, res) => {
           throw fail(400, 'JSON inválido')
         }
       }
-      const command = planningCommand(req.method, planning, input)
-      const upstream = await fetch(`http://rest:3000/rpc/${command.name}`, {
+      const command = planningCommand(
+        req.method,
+        planning,
+        input,
+        req.headers['x-lvm-operation'],
+      )
+      const upstream = await fetch(`${restOrigin}/rpc/${command.name}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -421,7 +432,7 @@ const server = createServer(async (req, res) => {
           throw fail(400, error.message)
         }
       }
-      const upstream = await fetch(`http://rest:3000/${path}${url.search}`, {
+      const upstream = await fetch(`${restOrigin}/${path}${url.search}`, {
         method: req.method,
         headers,
         body: payload,

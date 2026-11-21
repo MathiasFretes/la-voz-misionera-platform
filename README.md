@@ -1,12 +1,14 @@
 # LVM Service
 
-El panel administrativo de la suite se despliega en `/service/admin`, con la cuenta compartida de LVM. La autenticación y las tablas PostgreSQL de usuarios, Worship y contenido público están en [`suite-api/`](suite-api/README.md). La web pública reutiliza las pantallas V0; sus formularios guardan solicitudes en PostgreSQL y se consultan desde Service. La planificación Service 0.1 y los intercambios de archivos con Worship/Presenter conservan su funcionamiento existente. El backend de planificación anterior en `backend/` no se expone sin autenticación.
+El panel administrativo de la suite se despliega en `/service/admin`, con la cuenta compartida de LVM. La autenticación y las tablas PostgreSQL de usuarios, Worship y contenido público están en [`suite-api/`](suite-api/README.md). La web pública reutiliza las pantallas V0; sus formularios guardan solicitudes en PostgreSQL y se consultan desde Service. La planificación Service 0.1 ya usa PostgreSQL por iglesia con diario local transaccional; conserva los intercambios de archivos con Worship/Presenter. El backend de planificación anterior en `backend/` no se expone sin autenticación.
 
 El estado y el orden de trabajo de toda la suite están en el [roadmap de La Voz Misionera](docs/roadmap-suite.md).
 
 `/service/content` es el editor conectado de eventos, prédicas, sedes, pastores, ministerios y horarios. Guardar un borrador conserva la versión pública; publicar o retirar es una acción explícita. La API exige administración y revisión esperada; los borradores no son legibles por visitantes, aunque el documento tenga una versión publicada. El [estado integral](docs/auditoria-suite-2026-11-20.md) distingue lo desplegado de los gates locales y las funciones pendientes.
 
 El mismo editor administra Inicio/transmisión, Nosotros y devocional mediante los registros editoriales únicos `home`, `nosotros` y `general`. No crea copias aleatorias de una página. `node scripts/verify-vps-editorial.mjs` comprueba el recorrido real y limpia sus registros temporales; se niega a sobrescribir páginas editoriales preexistentes durante QA.
+
+La [planificación autenticada por iglesia](docs/planning-church-integration.md) está publicada en `/service/services`. El [gate de aceptación](docs/planning-acceptance.md) documenta navegador real, desconexión, reinicio, dos pestañas, respuesta atrasada, idempotencia, conflicto y revocación. Los planes anteriores del navegador siguen disponibles por selección explícita y no se suben automáticamente.
 
 ## Baseline local y documentación histórica
 

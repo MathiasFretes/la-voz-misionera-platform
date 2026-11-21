@@ -58,3 +58,17 @@ it('preserves global administration for the suite owner', async () => {
   )
   await screen.findByText('Datos globales')
 })
+it('admits a planning viewer only when church planning is enabled and still denies global administration', async () => {
+  session('user', ['planning:read'])
+  vi.stubEnv('VITE_SERVICE_PLANNING', 'church')
+  render(
+    <SuiteAuth>
+      <p>Planificación de consulta</p>
+      <GlobalAdministration>
+        <p>Datos globales</p>
+      </GlobalAdministration>
+    </SuiteAuth>,
+  )
+  await screen.findByText('Planificación de consulta')
+  expect(screen.queryByText('Datos globales')).toBeNull()
+})

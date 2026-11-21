@@ -1,22 +1,32 @@
-# Planificación por iglesia — integración en desarrollo
+# Planificación por iglesia — desplegada
 
-La producción sigue usando planificación local hasta completar el recorrido de interfaz, reconexión y autorización descrito aquí. No activar `VITE_SERVICE_BACKEND=postgres` sobre el singleton anterior: sus claves locales y su ruta histórica no identifican una cuenta ni iglesia.
+Service usa la sesión compartida y PostgreSQL para planificar por iglesia. El build productivo activa `VITE_SERVICE_PLANNING=church`; el modo histórico `VITE_SERVICE_BACKEND=postgres` se conserva para los gates M8 y no se publica como API sin autenticación.
 
-## Implementado y comprobado localmente
+## Interfaz y persistencia
 
-- Migración `010_church_planning`: planes por iglesia, revisión esperada, historial privado y borrado con marca persistente para impedir que una copia offline obsoleta resucite datos eliminados.
-- Permisos en PostgreSQL: iglesia activa y membresía activa; lectura para miembros, escritura solo para administradores/responsables; administración global conserva acceso. Las escrituras toman el mismo bloqueo de iglesia que la suspensión/asignación de membresías.
-- Rutas propuestas `/api/churches/:churchId/services` y `/api/churches/:churchId/services/:id` dentro de la API compartida: cookie de sesión, comprobación de origen, validación del contrato y token interno. No se expone el backend histórico sin autenticación.
-- El validador se genera desde `backend/src/validateRecord.ts` y el parser Service 0.1 existente mediante `npm run build:suite-api`. `suite-api/service-record.mjs` es un artefacto generado, no un segundo contrato mantenido manualmente.
-- `createChurchServiceRepository` reutiliza la cola/revisión del adaptador M8. Claves locales separadas por cuenta e iglesia para caché, pendientes y conflictos; no importa automáticamente datos locales anteriores cuya titularidad se desconoce. Las membresías de consulta no pueden crear escrituras desde la fachada.
-- Pruebas de ruta/contrato y repositorio. La migración y el aislamiento se comprobaron en una base desechable con `suite-api/test/planning.sql`, incluyendo suspensión, revisión obsoleta, lectura sin escritura e historial del borrado.
+- Selector de iglesia en lista, creación y editor. El proveedor se identifica por cuenta, iglesia y permiso; al cambiar de ámbito se desmonta el anterior y sus peticiones se cancelan. Ninguna respuesta anterior puede actualizar el nuevo ámbito.
+- `PlanningJournal` conserva borradores, generaciones, operaciones en vuelo y conflictos mediante transacciones IndexedDB. El diario se separa por `userId`, `churchId` y `serviceId`.
+- `JournalServiceRepository` coordina pestañas con BroadcastChannel; la corrección depende de transacciones/generaciones y recibos de operación, no de la entrega del mensaje. La revisión confirmada se incorpora sin reemplazar una edición de generación posterior.
+- Cada operación persistida tiene UUID y revisión esperada. PostgreSQL guarda su solicitud y respuesta; reintentar el mismo UUID no duplica la escritura ni el historial. Reutilizarlo con otro actor o payload se rechaza. Los permisos se vuelven a comprobar incluso al reintentar una operación confirmada.
+- Cancelar una creación aún no enviada elimina su operación pendiente. Si la creación está en vuelo, el borrado conserva su copia y utiliza la revisión confirmada; un borrado repetido es idempotente y las marcas persistentes impiden resurrecciones obsoletas.
+- HTTP 409 conserva la copia local y ofrece `Conservar mi versión` o `Usar versión del servidor`. Las copias también se pueden descargar. No se fuerza una revisión ni se sobrescribe automáticamente contenido remoto.
+- `saving-local` distingue la escritura IndexedDB todavía no confirmada de una operación ya guardada localmente y pendiente de servidor. Hay aviso al cerrar mientras existen cambios sin persistir y se comprueban esas escrituras antes de cambiar de iglesia.
+- Los planes anteriores del navegador siguen disponibles por opción explícita de administración global. No se asignan ni suben automáticamente a una iglesia. El adaptador inicial de prefijos localStorage fue sustituido por el diario transaccional; no se mantiene como segundo motor de sincronización.
 
-## Gate antes de publicar
+## API y seguridad
 
-1. Incorporar selector de iglesia y proveedor de repositorio en la interfaz; comprobar permiso de planificación en rutas además de la API. Conservar acceso explícito a los planes locales anteriores sin subirlos a una iglesia por defecto.
-2. Resolver el ciclo de borrado de un plan todavía no sincronizado, incluida una escritura en vuelo; la revisión de borrado no puede inventarse ni omitir el control de concurrencia.
-3. Conectar eventos de caché entre pestañas al almacenamiento con prefijo; conservar cambios concurrentes y su recuperación. El envoltorio de almacenamiento todavía no adapta el evento `storage` del repositorio local.
-4. Completar pruebas API de sesión real contra una instancia de preproducción y recorridos de navegador: dos iglesias, cuenta cambiada, pérdida de red, recuperación, conflicto y borrado pendiente.
-5. Publicar migración/API/interfaz juntos con backup previo, restauración comprobada y registro de versión. No dar por publicado este bloque basándose en las pruebas de componentes o la base aislada.
+`GET /api/churches/:churchId/services`, `PUT` y `DELETE /api/churches/:churchId/services/:id` viven en la API compartida. Requieren sesión; `X-LVM-Account` debe coincidir con la cuenta autenticada y cada escritura incorpora `X-LVM-Operation`. El ID y la iglesia proceden de la ruta. Se conservan los controles de origen, JSON y tamaño.
 
-La nueva API y la migración 010 todavía no están aplicadas a producción. El registro de despliegue sigue identificando la vertical anterior de identidad/CMS.
+La migración `010_church_planning` agrega planes, historial y recibos privados. Los usuarios no acceden directamente a esas tablas. Las funciones autorizan lectura de membresías activas y escritura de administradores/responsables; administración global conserva acceso a iglesias activas. Suspender la iglesia o membresía revoca permisos en PostgreSQL inmediatamente. Consulta muestra el plan sin controles de edición ni creación.
+
+El parser Service 0.1 existente se reutiliza mediante `npm run build:suite-api`; el archivo generado `suite-api/service-record.mjs` no se edita manualmente. Los contratos con Worship y Presenter permanecen iguales.
+
+## Evidencia
+
+Ver [gate de aceptación](planning-acceptance.md). Se ejecutó el recorrido con el build productivo, una API/PostgreSQL aislados en el VPS y nuevamente contra la aplicación HTTPS publicada. Los verificadores crean y eliminan exclusivamente sus cuentas e iglesias de QA.
+
+La publicación conserva un snapshot del frontend y la imagen/API anteriores en `releases/planning-20261121T124119Z`; la migración es aditiva. Se configuró La Voz Misionera como iglesia inicial con su cuenta propietaria como administradora de iglesia. No se asignaron otras cuentas por coincidencia de nombre.
+
+## Límites restantes de la suite
+
+Esta vertical conecta planificación, identidad y PostgreSQL; no cierra toda la suite. La apertura inicial de la aplicación necesita verificar la sesión y cargar el frontend. El gate offline parte de una aplicación abierta; el reinicio se verifica con sesión persistente y la API de planificación todavía no disponible. No se afirma que exista una distribución PWA completa ni que pueda abrirse por primera vez sin red. Siguen pendientes W2 hacia Worship/Presenter, clientes nativos, recuperación por email y demás gates del roadmap.

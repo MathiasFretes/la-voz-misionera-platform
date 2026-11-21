@@ -89,8 +89,11 @@ export function SuiteAuth({ children }: { children: ReactNode }) {
     )
   if (
     !['admin', 'owner'].includes(user.role) &&
-    !user.memberships?.some((membership) =>
-      membership.capabilities.includes('members:read'),
+    !user.memberships?.some(
+      (membership) =>
+        membership.capabilities.includes('members:read') ||
+        (import.meta.env.VITE_SERVICE_PLANNING === 'church' &&
+          membership.capabilities.includes('planning:read')),
     )
   )
     return (

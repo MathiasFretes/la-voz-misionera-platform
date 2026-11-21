@@ -308,7 +308,13 @@ export class ApiServiceRepository implements ServiceRepository {
     saved: ServiceRecord,
   ): ServiceRecord {
     const current = this.cache.get(sent.id)
-    if (!current) return saved
+    if (!current) {
+      if (this.deletes.has(sent.id) && saved.revision !== undefined) {
+        this.deleteRevisions.set(sent.id, saved.revision)
+        this.persistQueue()
+      }
+      return saved
+    }
     if (JSON.stringify(current) === JSON.stringify(sent)) {
       this.cache.save(saved)
       this.writes.delete(sent.id)

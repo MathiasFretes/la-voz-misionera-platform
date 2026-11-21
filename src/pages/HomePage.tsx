@@ -4,7 +4,21 @@ import { OrganizationPage } from './OrganizationPage'
 
 export function HomePage() {
   const user = useSuiteUser()
-  if (!isGlobalAdministrator(user)) return <OrganizationPage />
+  if (!isGlobalAdministrator(user))
+    return (
+      <section>
+        <h1>LVM Service</h1>
+        <p>
+          Consultá y prepará los servicios de tus iglesias según tu membresía.
+        </p>
+        <Link className="button primary" to="/services">
+          Ver servicios
+        </Link>
+        {user?.memberships?.some((membership) =>
+          membership.capabilities.includes('members:read'),
+        ) && <OrganizationPage />}
+      </section>
+    )
   if (import.meta.env.VITE_SERVICE_AUTH === '1')
     return (
       <section>

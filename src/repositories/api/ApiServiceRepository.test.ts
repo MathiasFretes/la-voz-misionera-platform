@@ -70,6 +70,39 @@ function fakeApi(initial: ServiceRecord[] = []) {
 
 describe('ApiServiceRepository', () => {
   beforeEach(() => localStorage.clear())
+  it('uses the acknowledged creation revision when deletion happens during an in-flight write', async () => {
+    const api = fakeApi()
+    let release!: () => void
+    let started!: () => void
+    const writeStarted = new Promise<void>((resolve) => {
+      started = resolve
+    })
+    const writeReleased = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const deletions: RequestInit[] = []
+    const fetcher: typeof fetch = async (path, init) => {
+      if (init?.method === 'PUT') {
+        started()
+        await writeReleased
+      }
+      if (init?.method === 'DELETE') deletions.push(init)
+      return api.fetcher(path, init)
+    }
+    const repository = new ApiServiceRepository(localStorage, fetcher)
+    await repository.ready()
+    const draft = copy('deleted-in-flight', 'Eliminar mientras guarda')
+    repository.save(draft)
+    const writing = repository.flush()
+    await writeStarted
+    repository.remove(draft.id)
+    release()
+    await writing
+    await repository.flush()
+    expect(new Headers(deletions[0].headers).get('if-match')).toBe('1')
+    expect(api.records.has(draft.id)).toBe(false)
+    expect(repository.status().phase).toBe('synced')
+  })
 
   it('migrates existing browser drafts without deleting them before server confirmation', async () => {
     const draft = copy('local-draft', 'Culto local')

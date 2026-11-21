@@ -4,17 +4,18 @@ import { Button } from '../ui/Button'
 import { isGlobalAdministrator, useSuiteUser } from '../features/auth/SuiteAuth'
 
 function Navigation({ close }: { close?: () => void }) {
-  const global = isGlobalAdministrator(useSuiteUser())
+  const user = useSuiteUser()
+  const global = isGlobalAdministrator(user)
   return (
     <nav aria-label="Secciones">
       <Link to="/" activeOptions={{ exact: true }} onClick={close}>
         Inicio
       </Link>
+      <Link to="/services" onClick={close}>
+        Servicios
+      </Link>
       {global && (
         <>
-          <Link to="/services" onClick={close}>
-            Servicios
-          </Link>
           <Link
             to={
               import.meta.env.VITE_SERVICE_AUTH === '1'
@@ -37,11 +38,15 @@ function Navigation({ close }: { close?: () => void }) {
           )}
         </>
       )}
-      {import.meta.env.VITE_SERVICE_AUTH === '1' && (
-        <Link to="/organization" onClick={close}>
-          Mi iglesia
-        </Link>
-      )}
+      {import.meta.env.VITE_SERVICE_AUTH === '1' &&
+        (global ||
+          user?.memberships?.some((membership) =>
+            membership.capabilities.includes('members:read'),
+          )) && (
+          <Link to="/organization" onClick={close}>
+            Mi iglesia
+          </Link>
+        )}
     </nav>
   )
 }

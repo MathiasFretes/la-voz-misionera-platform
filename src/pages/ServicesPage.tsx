@@ -5,6 +5,7 @@ import {
   selectDashboardServices,
 } from '../features/services/dashboardSelectors'
 import { useServices } from '../features/services/useServices'
+import { usePlanning } from '../features/services/PlanningContext'
 import { ServiceSyncStatus } from '../features/services/ServiceSyncStatus'
 import type { PersistenceStatus } from '../repositories/ServiceRepository'
 import { Card } from '../ui/Card'
@@ -45,9 +46,11 @@ function ServiceStatuses({
       <StatusBadge
         dimension="Persistencia"
         value={
-          persistence.mode === 'postgres' && persistence.phase === 'synced'
-            ? 'Guardado en servidor'
-            : 'Guardado local'
+          persistence.phase === 'saving-local'
+            ? 'Guardando en dispositivo…'
+            : persistence.mode === 'postgres' && persistence.phase === 'synced'
+              ? 'Guardado en servidor'
+              : 'Guardado local'
         }
         tone="success"
       />
@@ -70,6 +73,7 @@ function ServiceStatuses({
 }
 
 export function ServicesPage() {
+  const canEdit = usePlanning()?.canEdit ?? true
   const { records, persistence, retry, migrationConflicts } = useServices()
   const { upcoming, recent } = selectDashboardServices(records, new Date())
 
@@ -84,9 +88,11 @@ export function ServicesPage() {
             : 'El orden del culto vive en este navegador.'
         }
         actions={
-          <Link className={buttonClass('primary')} to="/services/new">
-            + Crear servicio
-          </Link>
+          canEdit && (
+            <Link className={buttonClass('primary')} to="/services/new">
+              + Crear servicio
+            </Link>
+          )
         }
       />
 
@@ -106,11 +112,21 @@ export function ServicesPage() {
           className="dashboard-empty"
           aria-labelledby="dashboard-empty-title"
         >
-          <h2 id="dashboard-empty-title">Organizá tu primer servicio</h2>
-          <p>Prepará el orden del culto y guardalo para volver a abrirlo.</p>
-          <Link className={buttonClass('primary')} to="/services/new">
-            Crear servicio
-          </Link>
+          <h2 id="dashboard-empty-title">
+            {canEdit
+              ? 'Organizá tu primer servicio'
+              : 'Todavía no hay servicios para consultar'}
+          </h2>
+          <p>
+            {canEdit
+              ? 'Prepará el orden del culto y guardalo para volver a abrirlo.'
+              : 'Los responsables de tu iglesia pueden preparar y guardar servicios.'}
+          </p>
+          {canEdit && (
+            <Link className={buttonClass('primary')} to="/services/new">
+              Crear servicio
+            </Link>
+          )}
         </Card>
       ) : (
         <div className="dashboard-content">

@@ -7,18 +7,25 @@ import { AppShell } from './shell'
 import { HomePage } from '../pages/HomePage'
 import { ServicesPage } from '../pages/ServicesPage'
 import { NewServicePage } from '../pages/NewServicePage'
-import { ServiceEditorPage } from '../pages/ServiceEditorPage'
+import { ServiceEditorAccess } from '../pages/ServiceEditorAccess'
 import { ContractInspectorPage } from '../pages/ContractInspectorPage'
 import { PublicPreviewPage } from '../pages/PublicPreviewPage'
 import { AdministrationPage } from '../pages/AdministrationPage'
 import { ContentPage } from '../pages/ContentPage'
 import { SuiteAuth, GlobalAdministration } from '../features/auth/SuiteAuth'
 import { OrganizationPage } from '../pages/OrganizationPage'
+import {
+  PlanningProvider,
+  PlanningRoute,
+  PlanningConflicts,
+} from '../features/services/PlanningContext'
 
 const rootRoute = createRootRoute({
   component: () => (
     <SuiteAuth>
-      <AppShell />
+      <PlanningProvider>
+        <AppShell />
+      </PlanningProvider>
     </SuiteAuth>
   ),
 })
@@ -49,27 +56,29 @@ const servicesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services',
   component: () => (
-    <GlobalAdministration>
+    <PlanningRoute>
+      <PlanningConflicts />
       <ServicesPage />
-    </GlobalAdministration>
+    </PlanningRoute>
   ),
 })
 const newServiceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services/new',
   component: () => (
-    <GlobalAdministration>
+    <PlanningRoute editing>
       <NewServicePage />
-    </GlobalAdministration>
+    </PlanningRoute>
   ),
 })
 const serviceEditorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services/$serviceId',
   component: () => (
-    <GlobalAdministration>
-      <ServiceEditorPage />
-    </GlobalAdministration>
+    <PlanningRoute>
+      <PlanningConflicts />
+      <ServiceEditorAccess />
+    </PlanningRoute>
   ),
 })
 const contractRoute = createRoute({

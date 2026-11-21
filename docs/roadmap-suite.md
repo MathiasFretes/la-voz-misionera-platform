@@ -6,7 +6,7 @@
 
 Por instrucción del usuario, el VPS compartido usa Docker y una base PostgreSQL nueva, sin importar datos de Supabase. La raíz de `srv2137598.hstgr.cloud` reutiliza las 18 pantallas públicas de V0, `/app` abre Worship y `/service/` aloja Service. **Service es el panel administrativo de la suite**: gestiona cuentas/roles y recibe las solicitudes de los formularios públicos. La API compartida está en `suite-api/`; Worship consume esa API y su anterior ruta `/admin` redirige a Service. La fuente V0 original quedó intacta.
 
-HTTPS, RLS, aislamiento de canciones/repertorios, activación de propietario, cookies HttpOnly, restauración de backups y el flujo formulario público → bandeja Service se comprobaron contra el VPS. Esto no cierra M9/W2/W3: faltan adopción integral de capacidades por iglesia, sincronización completa/offline de repertorios y migración de clientes nativos; la planificación Service 0.1 mantiene su persistencia local y sus handoffs existentes. La edición editorial completa, email/OAuth y pagos tampoco se dan por terminados. Los gates que siguen conservan su alcance.
+HTTPS, RLS, aislamiento de canciones/repertorios, activación de propietario, cookies HttpOnly, restauración de backups y el flujo formulario público → bandeja Service se comprobaron contra el VPS. Esto no cierra M9/W2/W3: faltan adopción integral de capacidades por iglesia, sincronización completa/offline de repertorios y migración de clientes nativos; la planificación Service 0.1 ya persiste por iglesia en PostgreSQL con diario local y conserva sus handoffs existentes. La edición editorial completa, email/OAuth y pagos tampoco se dan por terminados. Los gates que siguen conservan su alcance.
 
 Este documento es el índice canónico del avance de la suite. Los documentos de cada milestone conservan la evidencia técnica y los contratos versionados; este archivo fija el orden de producto y evita que los repositorios avancen con prioridades contradictorias.
 
@@ -20,7 +20,7 @@ La conexión editorial también está desplegada: Inicio y transmisión usan `co
 
 La trazabilidad del VPS está documentada con commits locales y `deployment.json`. Esto resuelve la incertidumbre sobre el código inspeccionado en el servidor, pero no equivale a integrar las ramas en GitHub/main ni a automatizar CI/CD. No se asigna un porcentaje global sin un inventario ponderado y criterios de aceptación aprobados.
 
-M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus gates locales/CI no prueban que toda la suite esté conectada en producción. En especial, la API anterior de planificación sigue privada; el despliegue de Service conserva planificación local. Las afirmaciones de PR y CI en documentos históricos deben leerse con su fecha, no como una verificación remota actual.
+M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus gates locales/CI no prueban que toda la suite esté conectada en producción. La API anterior de planificación sigue privada; Service usa ahora las rutas autenticadas por iglesia de `suite-api`, conservando el modo local anterior como opción explícita. Las afirmaciones de PR y CI en documentos históricos deben leerse con su fecha, no como una verificación remota actual.
 
 ## Estado actual
 
@@ -41,11 +41,13 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
+La [planificación por iglesia](planning-church-integration.md) está desplegada. El [gate de ocho escenarios](planning-acceptance.md) pasó en preproducción y contra el VPS publicado, con dos pestañas, reinicio del navegador, desconexión, respuestas atrasadas, conflicto 409 y revocación. Esto no completa W2 ni la adopción de identidad en clientes nativos.
+
 ## Orden de ejecución
 
 1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
 2. Completar M9: adoptar las membresías y capacidades ya disponibles en los clientes restantes y la planificación remota; incorporar recuperación segura de cuenta.
-3. Conectar de forma autenticada la persistencia de planificación Service con PostgreSQL, conservando cola local y revisión esperada.
+3. Mantener y ampliar la planificación autenticada ya desplegada: diario transaccional, reconexión, resolución explícita y revisiones por iglesia.
 4. Ejecutar W2 entre Service y Worship con reconexión y conflictos; migrar el cliente Expo sin duplicar usuarios.
 5. Completar M10 y las demás colecciones/editoriales de M12; después ampliar la API pública de M13.
 6. Retomar M14E.2/M14E.3 y gates de distribución con evidencia vigente. No reabrir NDI técnico ni sustituir Expo por la preview Flutter.

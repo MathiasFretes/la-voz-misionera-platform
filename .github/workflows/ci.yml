@@ -6,6 +6,37 @@ on:
   pull_request:
 
 jobs:
+  church-planning:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: lvm_owner
+          POSTGRES_PASSWORD: lvm_ci_only
+          POSTGRES_DB: lvm_planning_ci
+        options: >-
+          --health-cmd "pg_isready -U lvm_owner -d lvm_planning_ci"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run build:suite-api
+      - run: git diff --exit-code -- suite-api/service-record.mjs
+      - run: npm run test:suite-api
+      - name: Verify church schema, authorization, concurrency controls and idempotency
+        run: |
+          for migration in suite-api/schema/*.sql; do
+            docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < "$migration"
+          done
+          docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/planning.sql
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:planning-journal
+
   platform:
     runs-on: ubuntu-latest
     services:

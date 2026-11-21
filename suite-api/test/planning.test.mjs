@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { planningPath, planningCommand } from '../planning.mjs'
+import { planningPath, planningCommand as command } from '../planning.mjs'
+const planningCommand = (method, route, input) =>
+  command(method, route, input, '00000000-0000-4000-8000-000000000099')
 
 const church = '96a40990-fdd6-43e2-aa17-b30420fc5452'
 const record = {
@@ -62,6 +64,9 @@ test('planning writes require a matching revision and never allow GET mutations'
   const route = { church, id: record.id }
   assert.throws(() => planningCommand('GET', route), { status: 405 })
   assert.throws(() => planningCommand('DELETE', route, {}), { status: 400 })
+  const unsynced = planningCommand('DELETE', route, { revision: 0, record })
+  assert.equal(unsynced.data.p_record.id, record.id)
+  assert.equal(unsynced.data.p_expected_revision, 0)
   assert.throws(() => planningCommand('DELETE', route, { revision: 1.1 }), {
     status: 400,
   })

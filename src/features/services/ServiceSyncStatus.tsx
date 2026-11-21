@@ -27,6 +27,7 @@ export function ServiceSyncStatus({
   const message = {
     loading:
       'Conectando con Service API. Tus borradores locales siguen disponibles.',
+    'saving-local': 'Guardando borrador en este dispositivo…',
     pending: 'Cambios guardados en este navegador; sincronización pendiente.',
     synced: 'Servicios sincronizados con PostgreSQL.',
     error:
