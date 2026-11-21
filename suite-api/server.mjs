@@ -2,6 +2,7 @@ import { createServer } from 'node:http'
 import { readFile } from 'node:fs/promises'
 import pg from 'pg'
 import { validateSiteDocument } from './site-content.mjs'
+import { planningPath, planningCommand } from './planning.mjs'
 import {
   passwordHash,
   passwordMatches,
@@ -139,6 +140,31 @@ const server = createServer(async (req, res) => {
       throw fail(403, 'Invalid request origin')
     if (write && !req.headers['content-type']?.startsWith('application/json'))
       throw fail(415, 'JSON required')
+    const planning = planningPath(url.pathname)
+    if (planning) {
+      const user = await currentUser(req)
+      if (!user) throw fail(401, 'Ingresá para consultar los servicios')
+      let input
+      if (write) {
+        try {
+          input = JSON.parse((await body(req)).toString('utf8'))
+        } catch (error) {
+          if (error.status) throw error
+          throw fail(400, 'JSON inválido')
+        }
+      }
+      const command = planningCommand(req.method, planning, input)
+      const upstream = await fetch(`http://rest:3000/rpc/${command.name}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${signDatabaseToken({ role: 'lvm_user', sub: user.id }, secret)}`,
+        },
+        body: JSON.stringify(command.data),
+        signal: AbortSignal.timeout(15000),
+      })
+      return reply(res, upstream.status, await upstream.json())
+    }
     if (url.pathname === '/api/site/submit' && req.method === 'POST') {
       rateLimit(req)
       let input
