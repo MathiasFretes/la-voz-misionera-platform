@@ -4,6 +4,7 @@ import pg from 'pg'
 import { validateSiteDocument } from './site-content.mjs'
 import { planningPath, planningCommand } from './planning.mjs'
 import { worshipPath, worshipCommand } from './worship-exchange.mjs'
+import { nativeToken, nativeAuthAction } from './native-session.mjs'
 import {
   passwordHash,
   passwordMatches,
@@ -76,15 +77,19 @@ async function body(req) {
   return Buffer.concat(chunks)
 }
 function sessionToken(req) {
-  return req.headers.cookie
+  const device = nativeToken(req.headers)
+  if (device) return device
+  if (req.headers.authorization) return null
+  const cookie = req.headers.cookie
     ?.split(';')
     .map((s) => s.trim())
     .find((s) => s.startsWith(`${cookieName}=`))
     ?.slice(cookieName.length + 1)
+  return /^[\w-]{43}$/.test(cookie || '') ? cookie : null
 }
 async function currentUser(req) {
   const token = sessionToken(req)
-  if (!token || !/^[\w-]{43}$/.test(token)) return null
+  if (!token || !/^(?:n_)?[\w-]{43}$/.test(token)) return null
   const { rows } = await pool.query(
     `SELECT u.id,c.email,u.display_name,u.role,u.preferences FROM public.users u
     JOIN private.credentials c ON c.user_id=u.id JOIN private.auth_sessions s ON s.user_id=u.id WHERE s.token_hash=$1 AND s.expires_at>now()`,
@@ -92,17 +97,26 @@ async function currentUser(req) {
   )
   return rows[0] || null
 }
-async function establishSession(res, user) {
-  const token = newToken()
+async function establishSession(res, user, native = false) {
+  const token = `${native ? 'n_' : ''}${newToken()}`
   await pool.query(
     'INSERT INTO private.auth_sessions(token_hash,user_id) VALUES($1,$2)',
     [tokenHash(token), user.id],
   )
-  res.setHeader(
-    'Set-Cookie',
-    `${cookieName}=${token}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=604800`,
-  )
+  if (!native)
+    res.setHeader(
+      'Set-Cookie',
+      `${cookieName}=${token}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=604800`,
+    )
   return {
+    ...(native
+      ? {
+          access_token: token,
+          token_type: 'bearer',
+          expires_at: Math.floor(Date.now() / 1000) + 604800,
+          refresh_token: '',
+        }
+      : {}),
     user: {
       id: user.id,
       email: user.email,
@@ -129,6 +143,8 @@ function rateLimit(req) {
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, origin)
+    const deviceAction = nativeAuthAction(url.pathname, req.headers)
+    const device = deviceAction !== null
     if (url.pathname === '/api/health' && req.method === 'GET') {
       await pool.query('SELECT 1')
       const check = await fetch(`${restOrigin}/songs?select=id&limit=0`, {
@@ -138,7 +154,12 @@ const server = createServer(async (req, res) => {
       return reply(res, 200, { status: 'ok', database: 'postgresql' })
     }
     const write = !['GET', 'HEAD', 'OPTIONS'].includes(req.method)
-    if (write && req.headers.origin !== origin)
+    if (
+      write &&
+      req.headers.origin !== origin &&
+      !device &&
+      !nativeToken(req.headers)
+    )
       throw fail(403, 'Invalid request origin')
     if (write && !req.headers['content-type']?.startsWith('application/json'))
       throw fail(415, 'JSON required')
@@ -224,8 +245,8 @@ const server = createServer(async (req, res) => {
       )
       return reply(res, 201, { ok: true })
     }
-    if (url.pathname.startsWith('/api/auth/')) {
-      const action = url.pathname.slice('/api/auth/'.length)
+    if (device || url.pathname.startsWith('/api/auth/')) {
+      const action = deviceAction || url.pathname.slice('/api/auth/'.length)
       if (req.method === 'GET' && action === 'session') {
         const user = await currentUser(req)
         const memberships = user
@@ -287,7 +308,11 @@ const server = createServer(async (req, res) => {
               [rows[0].id, email, hash],
             )
             await connection.query('COMMIT')
-            const session = await establishSession(res, { ...rows[0], email })
+            const session = await establishSession(
+              res,
+              { ...rows[0], email },
+              device,
+            )
             return reply(res, 201, { user: session.user, session })
           } catch (error) {
             await connection.query('ROLLBACK')
@@ -307,7 +332,7 @@ const server = createServer(async (req, res) => {
           rows[0]?.password_hash || dummyHash,
         )
         if (!rows[0] || !match) throw fail(401, 'Invalid login credentials')
-        const session = await establishSession(res, rows[0])
+        const session = await establishSession(res, rows[0], device)
         return reply(res, 200, { user: session.user, session })
       }
       if (action === 'logout') {
@@ -315,10 +340,11 @@ const server = createServer(async (req, res) => {
           'DELETE FROM private.auth_sessions WHERE token_hash=$1',
           [tokenHash(sessionToken(req) || '')],
         )
-        res.setHeader(
-          'Set-Cookie',
-          `${cookieName}=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0`,
-        )
+        if (!device)
+          res.setHeader(
+            'Set-Cookie',
+            `${cookieName}=; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age=0`,
+          )
         return reply(res, 200, {})
       }
       if (action === 'activate') {
@@ -352,7 +378,7 @@ const server = createServer(async (req, res) => {
             [rows[0].user_id],
           )
           await connection.query('COMMIT')
-          const session = await establishSession(res, profile.rows[0])
+          const session = await establishSession(res, profile.rows[0], device)
           return reply(res, 200, { user: session.user, session })
         } catch (error) {
           await connection.query('ROLLBACK')
@@ -377,7 +403,7 @@ const server = createServer(async (req, res) => {
         await pool.query('DELETE FROM private.auth_sessions WHERE user_id=$1', [
           user.id,
         ])
-        const session = await establishSession(res, user)
+        const session = await establishSession(res, user, device)
         return reply(res, 200, { user: session.user, session })
       }
       throw fail(

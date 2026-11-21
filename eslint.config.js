@@ -17,6 +17,7 @@ export default tseslint.config(
       'scripts/verify-planning-ui.mjs',
       'scripts/verify-worship-review.mjs',
       'scripts/verify-worship-connected.mjs',
+      'scripts/verify-native-session.mjs',
     ],
     languageOptions: {
       globals: {
