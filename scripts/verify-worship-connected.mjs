@@ -73,79 +73,85 @@ async function user(label) {
   users.push(response.result.user.id)
   return { id: response.result.user.id, cookie: response.cookie }
 }
-async function context(actor) {
+async function context(actor, realNetwork = false) {
+  assert.ok(
+    !realNetwork || production,
+    'Real network verification requires published HTTPS assets',
+  )
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
-    serviceWorkers: 'block',
+    serviceWorkers: realNetwork ? 'allow' : 'block',
   })
   await context.addInitScript(() =>
     globalThis.localStorage.setItem('lvm.uiLanguage', 'es'),
   )
-  await context.route(`${origin}/**`, async (route) => {
-    const request = route.request(),
-      url = new URL(request.url())
-    if (url.pathname.startsWith('/api/')) {
-      if (
-        offline &&
-        url.pathname.includes('/worship') &&
-        request.method() === 'PUT'
-      )
-        return route.abort('internetdisconnected')
-      if (publishedApi) return route.continue()
-      const headers = Object.fromEntries(
-        Object.entries(request.headers()).filter(([name]) =>
-          [
-            'cookie',
-            'origin',
-            'content-type',
-            'x-lvm-account',
-            'x-lvm-operation',
-            'prefer',
-            'accept',
-          ].includes(name),
-        ),
-      )
-      const response = await fetch(`${backend}${url.pathname}${url.search}`, {
-        method: request.method(),
-        headers,
-        body: request.method() === 'GET' ? undefined : request.postDataBuffer(),
-      })
-      return route.fulfill({
-        status: response.status,
-        contentType: 'application/json',
-        body: await response.text(),
-      })
-    }
-    if (production) return route.continue()
-    const service = url.pathname.startsWith('/service/')
-    const root = service ? roots.service : roots.worship
-    const relative = service
-      ? url.pathname.startsWith('/service/assets/')
-        ? url.pathname.slice('/service/'.length)
-        : 'index.html'
-      : url.pathname.startsWith('/assets/') ||
-          url.pathname.startsWith('/fonts/')
-        ? url.pathname.slice(1)
-        : 'index.html'
-    const file = resolve(root, relative)
-    assert.ok(file.startsWith(root + sep))
-    try {
-      await route.fulfill({
-        status: 200,
-        contentType:
-          {
-            '.html': 'text/html',
-            '.js': 'text/javascript',
-            '.css': 'text/css',
-            '.woff': 'font/woff',
-            '.woff2': 'font/woff2',
-          }[extname(file)] || 'application/octet-stream',
-        body: await readFile(file),
-      })
-    } catch {
-      await route.fulfill({ status: 404, body: '' })
-    }
-  })
+  if (!realNetwork)
+    await context.route(`${origin}/**`, async (route) => {
+      const request = route.request(),
+        url = new URL(request.url())
+      if (url.pathname.startsWith('/api/')) {
+        if (
+          offline &&
+          url.pathname.includes('/worship') &&
+          request.method() === 'PUT'
+        )
+          return route.abort('internetdisconnected')
+        if (publishedApi) return route.continue()
+        const headers = Object.fromEntries(
+          Object.entries(request.headers()).filter(([name]) =>
+            [
+              'cookie',
+              'origin',
+              'content-type',
+              'x-lvm-account',
+              'x-lvm-operation',
+              'prefer',
+              'accept',
+            ].includes(name),
+          ),
+        )
+        const response = await fetch(`${backend}${url.pathname}${url.search}`, {
+          method: request.method(),
+          headers,
+          body:
+            request.method() === 'GET' ? undefined : request.postDataBuffer(),
+        })
+        return route.fulfill({
+          status: response.status,
+          contentType: 'application/json',
+          body: await response.text(),
+        })
+      }
+      if (production) return route.continue()
+      const service = url.pathname.startsWith('/service/')
+      const root = service ? roots.service : roots.worship
+      const relative = service
+        ? url.pathname.startsWith('/service/assets/')
+          ? url.pathname.slice('/service/'.length)
+          : 'index.html'
+        : url.pathname.startsWith('/assets/') ||
+            url.pathname.startsWith('/fonts/')
+          ? url.pathname.slice(1)
+          : 'index.html'
+      const file = resolve(root, relative)
+      assert.ok(file.startsWith(root + sep))
+      try {
+        await route.fulfill({
+          status: 200,
+          contentType:
+            {
+              '.html': 'text/html',
+              '.js': 'text/javascript',
+              '.css': 'text/css',
+              '.woff': 'font/woff',
+              '.woff2': 'font/woff2',
+            }[extname(file)] || 'application/octet-stream',
+          body: await readFile(file),
+        })
+      } catch {
+        await route.fulfill({ status: 404, body: '' })
+      }
+    })
   await context.addCookies([
     {
       name: '__Host-lvm_session',
@@ -430,9 +436,45 @@ try {
     path: 'test-results/worship-exchange/connected-worship-mobile.png',
     fullPage: true,
   })
+  if (process.env.LVM_WORSHIP_NETWORK === '1') {
+    await verifyNetworkConflict(musician, admin, path)
+    await planner.reload({ waitUntil: 'domcontentloaded' })
+    await review
+      .getByRole('button', { name: 'Revisar incorporación', exact: true })
+      .click()
+    await review
+      .getByRole('button', { name: 'Confirmar incorporación', exact: true })
+      .click()
+    await review
+      .getByText('Esta propuesta ya fue incorporada al culto.', { exact: true })
+      .waitFor()
+    const final = ok(await api(`churches/${church}/services`, admin))[0].service
+    assert.deepEqual(
+      final.items.map((item) => item.kind),
+      ['ANNOUNCEMENT', 'SONG', 'SONG'],
+    )
+    assert.equal(final.items[0].announcement.title, 'Bienvenida QA')
+    assert.equal(new Set(final.items.map((item) => item.id)).size, 3)
+    await planner
+      .getByRole('tab', { name: 'Presentación', exact: true })
+      .click()
+    const event = planner.waitForEvent('download')
+    await planner
+      .getByRole('button', { name: 'Descargar para Presenter', exact: true })
+      .click()
+    const exported = await event
+    const finalFile = resolve(
+      'test-results/worship-exchange/network-resolved-service.json',
+    )
+    await exported.saveAs(finalFile)
+    assert.deepEqual(JSON.parse(await readFile(finalFile, 'utf8')), final)
+    console.log(
+      'PASS: resolved offline proposal incorporated with manual welcome and unique repeated song IDs; actual final Service file downloaded for Presenter',
+    )
+  }
   assert.deepEqual(errors, [])
   console.log(
-    'PASS: real Service → Worship editor → queued proposal after reload/reconnection → Service review/application → canonical Presenter conversion; fresh-device proposal recovery preserves the previous draft. Desktop Presenter delivery and full offline network loss are separate gates.',
+    'PASS: real Service → Worship editor → queued proposal after reload/reconnection → Service review/application → canonical Presenter conversion; fresh-device recovery preserves the previous draft. Full network verification is opt-in; desktop import is verified separately in Presenter.',
   )
 } catch (error) {
   await mkdir('test-results/worship-exchange', { recursive: true })
@@ -463,4 +505,216 @@ try {
   sql(`DELETE FROM private.churches WHERE id='${church}'`)
   sql(`DELETE FROM public.songs WHERE id='${songId}'`)
   for (const id of users) sql(`DELETE FROM public.users WHERE id='${id}'`)
+}
+
+async function verifyNetworkConflict(musician, admin, path) {
+  const page = await context(musician, true)
+  let networkCut = false
+  // Block every outbound request, including worker-owned fetches, while keeping
+  // the real CacheStorage/service worker responsible for offline responses.
+  await page
+    .context()
+    .route('**/*', (route) =>
+      networkCut ? route.abort('internetdisconnected') : route.continue(),
+    )
+  const scopePrefix = `lvm.worship.service-draft.v1:${JSON.stringify([musician.id, church, serviceId])}:`
+  await page.goto(
+    `${origin}/setlist?churchId=${church}&serviceId=${serviceId}`,
+    { waitUntil: 'networkidle' },
+  )
+  let panel = page.getByRole('region', { name: 'LVM Service', exact: true })
+  await panel
+    .getByRole('button', {
+      name: 'Editar: Repertorio para LVM Service',
+      exact: true,
+    })
+    .click()
+  await page
+    .getByRole('button', { name: 'Duplicar — Canto de prueba QA', exact: true })
+    .waitFor()
+  await page
+    .getByRole('button', { name: 'Guardar ensayo', exact: true })
+    .click()
+  await page
+    .getByText('Ensayo guardado en este dispositivo.', { exact: true })
+    .waitFor({ timeout: 60000 })
+  networkCut = true
+  await page.context().setOffline(true)
+  assert.equal(await page.evaluate(() => globalThis.navigator.onLine), false)
+  assert.equal(
+    await page.evaluate(() =>
+      fetch('/api/health', { cache: 'no-store' }).then(
+        () => true,
+        () => false,
+      ),
+    ),
+    false,
+  )
+  await page
+    .getByRole('button', { name: 'Duplicar — Canto de prueba QA', exact: true })
+    .click()
+  await panel.getByRole('button', { name: 'Guardar', exact: true }).click()
+  await panel
+    .getByText('Guardado en este dispositivo', { exact: true })
+    .waitFor()
+  const pending = await page.evaluate(
+    (prefix) =>
+      Object.entries(globalThis.localStorage)
+        .filter(([key]) => key.startsWith(prefix) && key.endsWith(':exchange'))
+        .map(([, value]) => JSON.parse(value).pending)
+        .find(Boolean),
+    scopePrefix,
+  )
+  assert.equal(pending.input.plan.songs.length, 2)
+  const previous = ok(await api(`${path}/worship`, admin))
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  const recoveryLabel = await page.evaluate((prefix) => {
+    const drafts = Object.entries(globalThis.localStorage)
+      .filter(([key]) => key.startsWith(prefix) && !key.endsWith(':exchange'))
+      .map(([, value]) => JSON.parse(value))
+    const index = drafts.findIndex((draft) => draft.entries.length === 2)
+    return `${drafts[index].name} · ${index + 1}`
+  }, scopePrefix)
+  await page.getByRole('button', { name: recoveryLabel, exact: true }).click()
+  panel = page.getByRole('region', { name: 'LVM Service', exact: true })
+  await panel
+    .getByText('Guardado en este dispositivo', { exact: true })
+    .waitFor()
+  assert.equal(
+    await page
+      .getByRole('button', {
+        name: 'Duplicar — Canto de prueba QA',
+        exact: true,
+      })
+      .count(),
+    2,
+  )
+  const cachePaths = await page.evaluate(async () => {
+    const paths = []
+    for (const key of await globalThis.caches.keys())
+      for (const request of await (await globalThis.caches.open(key)).keys())
+        paths.push(new URL(request.url).pathname)
+    return paths
+  })
+  assert.equal(
+    cachePaths.some((path) => path.startsWith('/api/')),
+    false,
+  )
+  const unchanged = ok(await api(`${path}/worship`, admin))
+  if (unchanged.revision !== previous.revision) {
+    console.error('Offline diagnostic', {
+      before: previous.revision,
+      after: unchanged.revision,
+      pendingId: pending.id,
+      online: await page.evaluate(() => globalThis.navigator.onLine),
+    })
+    console.error(
+      sql(
+        `SELECT operation_id,actor_id,request->>'kind',response->>'revision' FROM private.service_plan_operations WHERE church_id='${church}' ORDER BY created_at`,
+      ),
+    )
+  }
+  assert.equal(
+    unchanged.revision,
+    previous.revision,
+    'Offline editing must not submit a proposal',
+  )
+  assert.equal(
+    unchanged.serviceRevision,
+    previous.serviceRevision,
+    'Service revision changed during isolated musical editing',
+  )
+  const otherPlan = globalThis.structuredClone(previous.plan)
+  otherPlan.songs[0].title = 'Propuesta de otro músico QA'
+  const concurrent = ok(
+    await api(
+      `${path}/worship`,
+      admin,
+      {
+        plan: otherPlan,
+        revision: previous.revision,
+        serviceRevision: previous.serviceRevision,
+      },
+      'PUT',
+      randomUUID(),
+    ),
+  )
+  assert.equal(concurrent.revision, previous.revision + 1)
+  const conflictResponse = page.waitForResponse(
+    (response) =>
+      response.url().endsWith(`/${serviceId}/worship`) &&
+      response.request().method() === 'PUT',
+  )
+  networkCut = false
+  await page.context().setOffline(false)
+  assert.equal((await conflictResponse).status(), 409)
+  await panel.getByRole('alert').waitFor()
+  await panel.getByRole('button', { name: 'Cancelar', exact: true }).waitFor()
+  await page.screenshot({
+    path: 'test-results/worship-exchange/network-conflict.png',
+    fullPage: true,
+  })
+  const retained = await page.evaluate(
+    (prefix) =>
+      Object.entries(globalThis.localStorage)
+        .filter(([key]) => key.startsWith(prefix) && key.endsWith(':exchange'))
+        .map(([, value]) => JSON.parse(value).pending)
+        .filter(Boolean),
+    scopePrefix,
+  )
+  assert.ok(retained.length > 0)
+  assert.ok(retained.every((operation) => operation.id === pending.id))
+  assert.equal(
+    ok(await api(`${path}/worship`, admin)).plan.songs[0].title,
+    otherPlan.songs[0].title,
+  )
+  await panel.getByRole('button', { name: 'Cancelar', exact: true }).click()
+  assert.equal(
+    await page
+      .getByRole('button', {
+        name: 'Duplicar — Canto de prueba QA',
+        exact: true,
+      })
+      .count(),
+    2,
+  )
+  await panel
+    .getByRole('button', { name: 'Abrir contexto de LVM Service', exact: true })
+    .click()
+  await panel
+    .getByRole('button', { name: 'Guardar', exact: true })
+    .waitFor({ state: 'visible' })
+  await page.waitForFunction(
+    (prefix) =>
+      Object.entries(globalThis.localStorage).some(
+        ([key, value]) =>
+          key.startsWith(prefix) &&
+          key.endsWith(':exchange') &&
+          JSON.parse(value).exchange?.revision === 2,
+      ),
+    scopePrefix,
+  )
+  await panel.getByRole('button', { name: 'Guardar', exact: true }).click()
+  await panel.getByText('Repertorio guardado.', { exact: true }).waitFor()
+  const resolved = ok(await api(`${path}/worship`, admin))
+  assert.equal(resolved.revision, concurrent.revision + 1)
+  assert.equal(resolved.plan.songs.length, 2)
+  assert.ok(
+    resolved.plan.songs.every((song) => song.title === 'Canto de prueba QA'),
+  )
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.screenshot({
+    path: 'test-results/worship-exchange/network-resolved-mobile.png',
+    fullPage: true,
+  })
+  assert.ok(
+    await page.evaluate(
+      () =>
+        globalThis.document.documentElement.scrollWidth <=
+        globalThis.innerWidth,
+    ),
+  )
+  console.log(
+    'PASS: published HTTPS, real service worker, full network loss, musical edits and queued operation after offline reload, real concurrent 409, explicit local resolution, no API cache and mobile layout',
+  )
 }

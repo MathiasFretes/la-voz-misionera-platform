@@ -24,20 +24,20 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 
 ## Estado actual
 
-| Bloque                              | Estado                      | Evidencia y límite actual                                                                                                                 |
-| ----------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                                  |
-| M7.8A–E — LVM NDI                   | Gate histórico funcional    | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                         |
-| M7.8F — distribución NDI            | Pendiente de release        | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                               |
-| M8 — Backend y datos                | Cerrado en alcance local/CI | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                                      |
-| M9 — Identidad y capacidades        | En curso                    | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.             |
-| M10 — Organización                  | Pendiente                   | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                                  |
-| M11 / W2 — Ecosistema conectado     | Vertical Web desplegada     | Service → Worship → Service por HTTPS y JSON importado en Presenter Windows; quedan red completa/conflictos del editor y adopción nativa. |
-| M12 — CMS                           | En curso                    | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo.          |
-| M13 — API pública y Web 2           | Parcial                     | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                           |
-| M14A.1 — Fundación Flutter          | Gate histórico cerrado      | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                             |
-| M14E — Presenter Remote Core        | Gate físico histórico       | No se repitió QA de dispositivo en esta revisión.                                                                                         |
-| M14E.2/M14E.3/M14A.2                | Revisión pendiente          | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.                                        |
+| Bloque                              | Estado                      | Evidencia y límite actual                                                                                                             |
+| ----------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                              |
+| M7.8A–E — LVM NDI                   | Gate histórico funcional    | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                     |
+| M7.8F — distribución NDI            | Pendiente de release        | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                           |
+| M8 — Backend y datos                | Cerrado en alcance local/CI | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                                  |
+| M9 — Identidad y capacidades        | En curso                    | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.         |
+| M10 — Organización                  | Pendiente                   | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                              |
+| M11 / W2 — Ecosistema conectado     | Vertical Web verificada     | Edición offline, conflicto y resolución en HTTPS, incorporación y entrega por archivo a Presenter Windows; adopción nativa pendiente. |
+| M12 — CMS                           | En curso                    | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo.      |
+| M13 — API pública y Web 2           | Parcial                     | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                       |
+| M14A.1 — Fundación Flutter          | Gate histórico cerrado      | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                         |
+| M14E — Presenter Remote Core        | Gate físico histórico       | No se repitió QA de dispositivo en esta revisión.                                                                                     |
+| M14E.2/M14E.3/M14A.2                | Revisión pendiente          | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.                                    |
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
@@ -115,7 +115,7 @@ La vertical debe usar PostgreSQL/API para sincronización y una cola local para 
 
 **Evidencia del 21 de noviembre:** la vertical Web está publicada con PostgreSQL/migración 011: Service crea el contexto, Worship prepara y conserva una operación tras interrupción/recarga, reconecta y Service revisa e incorpora sin reemplazar elementos manuales. Pasaron la recuperación desde otro navegador y el retorno a la iglesia autorizada, incluso con otra selección guardada; los enlaces a iglesias no disponibles no abren otro ámbito. Se actualizaron también las entradas HTML directas de Worship.
 
-El JSON descargado mediante «Presentación → Descargar para Presenter» del HTTPS publicado se importó directamente en la compilación Windows de Presenter `43e00b9`, sin conversión por consola; se guardó, se reinició sin Internet y se mostró su letra en `.previewOutput`. No demuestra un instalador firmado ni una salida física. W2 mantiene pendientes la prueba de pérdida completa de red durante la edición vinculada y la resolución de conflicto musical desde esa interfaz; las pruebas SQL/API y del ensayo offline no sustituyen ese recorrido. La evidencia y límites están en [worship-connected-exchange.md](worship-connected-exchange.md).
+El JSON descargado mediante «Presentación → Descargar para Presenter» del HTTPS publicado se importó directamente en la compilación Windows de Presenter, sin conversión por consola; se guardó, se reinició sin Internet y se mostró su letra en `.previewOutput`. Después se completó la pérdida total de red durante edición vinculada, recarga offline, conflicto 409 concurrente real y resolución explícita desde Worship. La versión resuelta se incorporó en Service conservando la bienvenida y ambas apariciones musicales; ese archivo final también pasó importación, persistencia y reinicio offline en Presenter. Esto verifica la vertical W2 Web → escritorio por archivo; no demuestra sincronización automática del escritorio, adopción Expo, instalador firmado ni salida física. La evidencia y límites están en [worship-connected-exchange.md](worship-connected-exchange.md).
 
 ### W3 — Producto Worship
 
