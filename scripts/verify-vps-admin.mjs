@@ -90,7 +90,11 @@ try {
     .click()
   await page.getByText('Mensaje recibido. Gracias por contactarnos.').waitFor()
   await page.goto(`${origin}/service/admin`, { waitUntil: 'networkidle' })
-  await page.getByText(email, { exact: true }).waitFor()
+  await page
+    .getByRole('heading', { name: 'Solicitudes de la web', exact: true })
+    .locator('..')
+    .getByText(email, { exact: true })
+    .waitFor()
   await page.setViewportSize({ width: 390, height: 844 })
   assert.equal(
     await page.evaluate(

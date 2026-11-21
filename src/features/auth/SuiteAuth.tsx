@@ -5,9 +5,37 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-type SuiteUser = { id: string; email: string; role: string }
+export type ChurchMembership = {
+  church_id: string
+  church_name: string
+  church_status: 'active' | 'suspended'
+  role: string
+  status: 'active' | 'suspended'
+  capabilities: string[]
+}
+type SuiteUser = {
+  id: string
+  email: string
+  role: string
+  memberships?: ChurchMembership[]
+}
 const Context = createContext<SuiteUser | null>(null)
 export const useSuiteUser = () => useContext(Context)
+export const isGlobalAdministrator = (user: SuiteUser | null) =>
+  !user || ['admin', 'owner'].includes(user.role)
+export function GlobalAdministration({ children }: { children: ReactNode }) {
+  const user = useSuiteUser()
+  if (isGlobalAdministrator(user)) return <>{children}</>
+  return (
+    <section>
+      <h1>Administración global</h1>
+      <p>Tu rol de iglesia no autoriza esta sección.</p>
+      <a className="button secondary" href="/service/organization">
+        Ver mi iglesia
+      </a>
+    </section>
+  )
+}
 export function SuiteAuth({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SuiteUser | null>(null)
   const [loading, setLoading] = useState(true)
@@ -59,7 +87,12 @@ export function SuiteAuth({ children }: { children: ReactNode }) {
         </a>
       </main>
     )
-  if (!['admin', 'owner'].includes(user.role))
+  if (
+    !['admin', 'owner'].includes(user.role) &&
+    !user.memberships?.some((membership) =>
+      membership.capabilities.includes('members:read'),
+    )
+  )
     return (
       <main className="page">
         <h1>LVM Service</h1>

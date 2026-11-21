@@ -874,6 +874,18 @@ p {
   margin-top: var(--lvm-space-6);
   align-items: start;
 }
+.church-administration {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.church-administration :where(form, section, label, select, input, .actions) {
+  min-width: 0;
+  max-width: 100%;
+}
+.church-administration .button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
 .content-fields {
   display: grid;
   gap: 1rem;

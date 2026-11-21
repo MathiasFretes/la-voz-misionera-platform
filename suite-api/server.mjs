@@ -43,6 +43,12 @@ const functions = new Set([
   'list_site_inbox',
   'list_site_documents',
   'save_site_document',
+  'my_church_memberships',
+  'list_churches',
+  'save_church',
+  'list_church_memberships',
+  'save_church_membership',
+  'list_suite_accounts',
 ])
 
 function reply(res, status, body, headers = {}) {
@@ -183,6 +189,14 @@ const server = createServer(async (req, res) => {
       const action = url.pathname.slice('/api/auth/'.length)
       if (req.method === 'GET' && action === 'session') {
         const user = await currentUser(req)
+        const memberships = user
+          ? (
+              await pool.query(
+                'SELECT private.identity_memberships($1) AS memberships',
+                [user.id],
+              )
+            ).rows[0].memberships
+          : []
         return reply(res, 200, {
           session: user
             ? {
@@ -190,6 +204,7 @@ const server = createServer(async (req, res) => {
                   id: user.id,
                   email: user.email,
                   role: user.role,
+                  memberships,
                   user_metadata: { full_name: user.display_name },
                 },
               }
@@ -339,6 +354,11 @@ const server = createServer(async (req, res) => {
       ))
         throw fail(404, 'Not found')
       if (!['GET', 'HEAD', 'POST', 'PATCH', 'DELETE'].includes(req.method))
+        throw fail(405, 'Method not allowed')
+      if (
+        ['rpc/save_church', 'rpc/save_church_membership'].includes(path) &&
+        req.method !== 'POST'
+      )
         throw fail(405, 'Method not allowed')
       const user = await currentUser(req)
       const claims = {

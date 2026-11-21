@@ -12,7 +12,8 @@ import { ContractInspectorPage } from '../pages/ContractInspectorPage'
 import { PublicPreviewPage } from '../pages/PublicPreviewPage'
 import { AdministrationPage } from '../pages/AdministrationPage'
 import { ContentPage } from '../pages/ContentPage'
-import { SuiteAuth } from '../features/auth/SuiteAuth'
+import { SuiteAuth, GlobalAdministration } from '../features/auth/SuiteAuth'
+import { OrganizationPage } from '../pages/OrganizationPage'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -24,12 +25,20 @@ const rootRoute = createRootRoute({
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
-  component: AdministrationPage,
+  component: () => (
+    <GlobalAdministration>
+      <AdministrationPage />
+    </GlobalAdministration>
+  ),
 })
 const contentRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/content',
-  component: ContentPage,
+  component: () => (
+    <GlobalAdministration>
+      <ContentPage />
+    </GlobalAdministration>
+  ),
 })
 const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -39,27 +48,52 @@ const homeRoute = createRoute({
 const servicesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services',
-  component: ServicesPage,
+  component: () => (
+    <GlobalAdministration>
+      <ServicesPage />
+    </GlobalAdministration>
+  ),
 })
 const newServiceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services/new',
-  component: NewServicePage,
+  component: () => (
+    <GlobalAdministration>
+      <NewServicePage />
+    </GlobalAdministration>
+  ),
 })
 const serviceEditorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services/$serviceId',
-  component: ServiceEditorPage,
+  component: () => (
+    <GlobalAdministration>
+      <ServiceEditorPage />
+    </GlobalAdministration>
+  ),
 })
 const contractRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/development/contract',
-  component: ContractInspectorPage,
+  component: () => (
+    <GlobalAdministration>
+      <ContractInspectorPage />
+    </GlobalAdministration>
+  ),
 })
 const publicPreviewRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/public-preview',
-  component: PublicPreviewPage,
+  component: () => (
+    <GlobalAdministration>
+      <PublicPreviewPage />
+    </GlobalAdministration>
+  ),
+})
+const organizationRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/organization',
+  component: OrganizationPage,
 })
 
 export const router = createRouter({
@@ -73,6 +107,7 @@ export const router = createRouter({
     publicPreviewRoute,
     adminRoute,
     contentRoute,
+    organizationRoute,
   ]),
 })
 

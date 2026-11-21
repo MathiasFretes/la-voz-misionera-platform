@@ -12,6 +12,7 @@ export default tseslint.config(
       'scripts/verify-vps-admin.mjs',
       'scripts/verify-vps-content.mjs',
       'scripts/verify-vps-editorial.mjs',
+      'scripts/verify-vps-identity.mjs',
     ],
     languageOptions: {
       globals: {
@@ -28,6 +29,7 @@ export default tseslint.config(
       'scripts/verify-vps-admin.mjs',
       'scripts/verify-vps-content.mjs',
       'scripts/verify-vps-editorial.mjs',
+      'scripts/verify-vps-identity.mjs',
     ],
     languageOptions: {
       globals: {

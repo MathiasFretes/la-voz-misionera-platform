@@ -1,34 +1,45 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { Button } from '../ui/Button'
+import { isGlobalAdministrator, useSuiteUser } from '../features/auth/SuiteAuth'
 
 function Navigation({ close }: { close?: () => void }) {
+  const global = isGlobalAdministrator(useSuiteUser())
   return (
     <nav aria-label="Secciones">
       <Link to="/" activeOptions={{ exact: true }} onClick={close}>
         Inicio
       </Link>
-      <Link to="/services" onClick={close}>
-        Servicios
-      </Link>
-      <Link
-        to={
-          import.meta.env.VITE_SERVICE_AUTH === '1'
-            ? '/content'
-            : '/public-preview'
-        }
-        onClick={close}
-      >
-        Contenido público
-      </Link>
-      {import.meta.env.VITE_SERVICE_AUTH === '1' && (
-        <Link to="/admin" onClick={close}>
-          Administración
-        </Link>
+      {global && (
+        <>
+          <Link to="/services" onClick={close}>
+            Servicios
+          </Link>
+          <Link
+            to={
+              import.meta.env.VITE_SERVICE_AUTH === '1'
+                ? '/content'
+                : '/public-preview'
+            }
+            onClick={close}
+          >
+            Contenido público
+          </Link>
+          {import.meta.env.VITE_SERVICE_AUTH === '1' && (
+            <Link to="/admin" onClick={close}>
+              Administración
+            </Link>
+          )}
+          {import.meta.env.DEV && (
+            <Link to="/development/contract" onClick={close}>
+              Contract Inspector
+            </Link>
+          )}
+        </>
       )}
-      {import.meta.env.DEV && (
-        <Link to="/development/contract" onClick={close}>
-          Contract Inspector
+      {import.meta.env.VITE_SERVICE_AUTH === '1' && (
+        <Link to="/organization" onClick={close}>
+          Mi iglesia
         </Link>
       )}
     </nav>
@@ -77,9 +88,11 @@ export function AppShell() {
       : localPath.startsWith('/public-preview') ||
           localPath.startsWith('/content')
         ? 'Contenido público'
-        : localPath.startsWith('/development')
-          ? 'Desarrollo'
-          : 'Inicio'
+        : localPath.startsWith('/organization')
+          ? 'Mi iglesia'
+          : localPath.startsWith('/development')
+            ? 'Desarrollo'
+            : 'Inicio'
 
   useEffect(() => {
     if (menuOpen) menuDrawer.current?.querySelector('a')?.focus()

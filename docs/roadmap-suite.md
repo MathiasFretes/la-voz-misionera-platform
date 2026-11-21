@@ -1,12 +1,12 @@
 # Roadmap de La Voz Misionera
 
-**Actualizado:** 2026-11-20 · **Alcance:** LVM Service, LVM Worship, LVM Presenter, LVM Web Pública y LVM Mobile.
+**Actualizado:** 2026-11-21 · **Alcance:** LVM Service, LVM Worship, LVM Presenter, LVM Web Pública y LVM Mobile.
 
 ## Despliegue del 20 de noviembre
 
 Por instrucción del usuario, el VPS compartido usa Docker y una base PostgreSQL nueva, sin importar datos de Supabase. La raíz de `srv2137598.hstgr.cloud` reutiliza las 18 pantallas públicas de V0, `/app` abre Worship y `/service/` aloja Service. **Service es el panel administrativo de la suite**: gestiona cuentas/roles y recibe las solicitudes de los formularios públicos. La API compartida está en `suite-api/`; Worship consume esa API y su anterior ruta `/admin` redirige a Service. La fuente V0 original quedó intacta.
 
-HTTPS, RLS, aislamiento de canciones/repertorios, activación de propietario, cookies HttpOnly, restauración de backups y el flujo formulario público → bandeja Service se comprobaron contra el VPS. Esto no cierra M9/W2/W3: faltan identidad de iglesia y membresías, sincronización completa/offline de repertorios y migración de clientes nativos; la planificación Service 0.1 mantiene su persistencia local y sus handoffs existentes. La edición editorial completa, email/OAuth y pagos tampoco se dan por terminados. Los gates que siguen conservan su alcance.
+HTTPS, RLS, aislamiento de canciones/repertorios, activación de propietario, cookies HttpOnly, restauración de backups y el flujo formulario público → bandeja Service se comprobaron contra el VPS. Esto no cierra M9/W2/W3: faltan adopción integral de capacidades por iglesia, sincronización completa/offline de repertorios y migración de clientes nativos; la planificación Service 0.1 mantiene su persistencia local y sus handoffs existentes. La edición editorial completa, email/OAuth y pagos tampoco se dan por terminados. Los gates que siguen conservan su alcance.
 
 Este documento es el índice canónico del avance de la suite. Los documentos de cada milestone conservan la evidencia técnica y los contratos versionados; este archivo fija el orden de producto y evita que los repositorios avancen con prioridades contradictorias.
 
@@ -30,7 +30,7 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 | M7.8A–E — LVM NDI                   | Gate histórico funcional     | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                |
 | M7.8F — distribución NDI            | Pendiente de release         | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                      |
 | M8 — Backend y datos                | Cerrado en alcance local/CI  | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                             |
-| M9 — Identidad y capacidades        | En curso                     | Sesión web/roles globales desplegados; iglesia, membresías y capacidades pendientes.                                             |
+| M9 — Identidad y capacidades        | En curso                     | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.    |
 | M10 — Organización                  | Pendiente                    | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                         |
 | M11 / W2 — Ecosistema conectado     | Pendiente de vertical remota | Intercambios locales disponibles; falta sincronización autenticada completa y conflictos entre productos.                        |
 | M12 — CMS                           | En curso                     | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo. |
@@ -39,10 +39,12 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 | M14E — Presenter Remote Core        | Gate físico histórico        | No se repitió QA de dispositivo en esta revisión.                                                                                |
 | M14E.2/M14E.3/M14A.2                | Revisión pendiente           | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.                               |
 
+La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
+
 ## Orden de ejecución
 
 1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
-2. Implementar lo pendiente de M9: iglesia, membresía y capacidades sobre la identidad compartida ya desplegada.
+2. Completar M9: adoptar las membresías y capacidades ya disponibles en los clientes restantes y la planificación remota; incorporar recuperación segura de cuenta.
 3. Conectar de forma autenticada la persistencia de planificación Service con PostgreSQL, conservando cola local y revisión esperada.
 4. Ejecutar W2 entre Service y Worship con reconexión y conflictos; migrar el cliente Expo sin duplicar usuarios.
 5. Completar M10 y las demás colecciones/editoriales de M12; después ampliar la API pública de M13.

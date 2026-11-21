@@ -1,6 +1,10 @@
 import { Link } from '@tanstack/react-router'
+import { isGlobalAdministrator, useSuiteUser } from '../features/auth/SuiteAuth'
+import { OrganizationPage } from './OrganizationPage'
 
 export function HomePage() {
+  const user = useSuiteUser()
+  if (!isGlobalAdministrator(user)) return <OrganizationPage />
   if (import.meta.env.VITE_SERVICE_AUTH === '1')
     return (
       <section>

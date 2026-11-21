@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Button } from '../ui/Button'
 import { useSuiteUser } from '../features/auth/SuiteAuth'
-type Profile = { id: string; display_name: string; role: string }
+import { ChurchAdministration } from '../features/auth/ChurchAdministration'
+type Profile = { id: string; display_name: string; email: string; role: string }
 type Inbox = {
   id: string
   kind: string
@@ -33,9 +34,7 @@ export function AdministrationPage() {
     setError('')
     try {
       const [profiles, messages] = await Promise.all([
-        api<Profile[]>(
-          'users?select=id,display_name,role&order=account_created_at.desc',
-        ),
+        api<Profile[]>('rpc/list_suite_accounts', {}),
         api<Inbox[]>('rpc/list_site_inbox', {}),
       ])
       setUsers(profiles)
@@ -53,9 +52,7 @@ export function AdministrationPage() {
   useEffect(() => {
     let active = true
     Promise.all([
-      api<Profile[]>(
-        'users?select=id,display_name,role&order=account_created_at.desc',
-      ),
+      api<Profile[]>('rpc/list_suite_accounts', {}),
       api<Inbox[]>('rpc/list_site_inbox', {}),
     ])
       .then(([profiles, messages]) => {
@@ -107,11 +104,13 @@ export function AdministrationPage() {
         </a>
       </div>
       {error && <p role="alert">{error}</p>}
+      <ChurchAdministration users={users} />
       <section className="card">
         <h2>Usuarios y roles</h2>
         {users.map((user) => (
           <article className="card" key={user.id}>
             <h3>{user.display_name || 'Sin nombre'}</h3>
+            <p style={{ overflowWrap: 'anywhere' }}>{user.email}</p>
             <label>
               Rol
               <select
