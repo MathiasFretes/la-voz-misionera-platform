@@ -4,7 +4,7 @@
 
 La API y la migración 011 se implementaron y comprobaron en una **base aislada** con PostgreSQL/PostgREST y sesiones HTTP reales. No se aplicaron a producción. El VPS sigue usando el commit de planificación publicado `6301397`; el flujo completo Service → Worship → Service → Presenter todavía no se considera terminado.
 
-La revisión de propuestas en Service ya está implementada detrás de `VITE_SERVICE_WORSHIP=connected` y verificada contra el backend aislado. El siguiente trabajo es conectar la interfaz de Worship, su borrador privado por cuenta/iglesia/culto y la cola offline. Los cambios offline existentes de Worship se conservan por separado. No se modificaron sus locales revisados ni sus archivos durante esta entrega.
+La revisión de propuestas en Service está implementada detrás de `VITE_SERVICE_WORSHIP=connected`. El editor conectado de Worship, su borrador privado por cuenta/iglesia/culto y la cola offline ya pasaron el flujo real con el backend aislado. La publicación coordinada permanece pendiente. No se modificaron locales con revisión humana.
 
 ## API preparada
 
@@ -38,6 +38,8 @@ El workflow preparado agrega el test musical SQL y el control de regeneración d
 
 `WorshipReview` muestra las canciones y tonos recibidos, la revisión de la propuesta y el culto sobre el que se preparó. Exige revisión y confirmación antes de incorporar, bloquea la acción con cambios locales pendientes y conserva la propuesta ante HTTP 409. El UUID de incorporación se conserva en almacenamiento local por cuenta/iglesia/culto para recuperar un reintento tras interrupción. El componente se remonta por ámbito y aborta sus consultas al salir: una respuesta anterior no vuelve a mostrar datos de otra iglesia.
 
-La vista de consulta también permite ver la propuesta y el acceso a preparación cuando la API devuelve `canPrepare`, sin controles de incorporación. La activación del build permanece apagada en producción hasta que el editor conectado de Worship esté verificado; el enlace de preparación no se considera operativo todavía.
+La vista de consulta también permite ver la propuesta y el acceso a preparación cuando la API devuelve `canPrepare`, sin controles de incorporación. El enlace de preparación ya fue comprobado con el editor real de Worship en QA; la activación permanece apagada en producción hasta publicar ambos clientes y la API juntos.
 
 Seis pruebas de componente cubren confirmación, ambas revisiones, UUID persistente, respuesta atrasada, contexto obsoleto, cambios locales y permisos. `scripts/verify-worship-review.mjs` pasó en Chromium con el build productivo y la API/PostgreSQL aislados: vista musical, incorporación confirmada, elementos manuales intactos, estado ya incorporado, HTTP 409 real, actualización explícita de contexto, consulta de músico y ancho móvil de 390 px. El script limpia sus cuentas e iglesia; no se publican fixtures.
+
+`scripts/verify-worship-connected.mjs` pasó con ambos clientes productivos: acceso desde Service como músico, catálogo real de QA, propuesta musical conservada tras interrupción y recarga, reintento, revisión e incorporación como administrador y conservación de la bienvenida manual. Además convierte el resultado con `serviceToProject` de Presenter y abre la propuesta guardada desde un contexto nuevo de navegador, conservando el borrador local anterior. La conversión de proyecto no demuestra recepción por la aplicación de escritorio. El verificador usa únicamente la base aislada y limpia cuentas, canciones e iglesia. Capturas en `test-results/worship-exchange/` (artefactos locales, no fixtures de producción).

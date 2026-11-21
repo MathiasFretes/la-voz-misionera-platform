@@ -16,6 +16,7 @@ export default tseslint.config(
       'scripts/verify-planning-journal.mjs',
       'scripts/verify-planning-ui.mjs',
       'scripts/verify-worship-review.mjs',
+      'scripts/verify-worship-connected.mjs',
     ],
     languageOptions: {
       globals: {
@@ -36,6 +37,7 @@ export default tseslint.config(
       'scripts/verify-planning-journal.mjs',
       'scripts/verify-planning-ui.mjs',
       'scripts/verify-worship-review.mjs',
+      'scripts/verify-worship-connected.mjs',
     ],
     languageOptions: {
       globals: {
