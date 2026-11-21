@@ -276,6 +276,12 @@ try {
     'Cantamos juntos',
   )
   const planner = await context(admin)
+  await planner.goto(`${origin}/service/services`, {
+    waitUntil: 'domcontentloaded',
+  })
+  await planner
+    .getByRole('combobox', { name: 'Iglesia de planificación' })
+    .selectOption(church)
   await planner.goto(`${origin}/service/services/${serviceId}`, {
     waitUntil: 'domcontentloaded',
   })
@@ -368,6 +374,30 @@ try {
   console.log(
     'PASS: real Service → Worship editor → queued proposal after reload/reconnection → Service review/application → canonical Presenter conversion; fresh-device proposal recovery preserves the previous draft. Desktop Presenter delivery and full offline network loss are separate gates.',
   )
+} catch (error) {
+  await mkdir('test-results/worship-exchange', { recursive: true })
+  for (const [index, current] of browser
+    .contexts()
+    .flatMap((context) => context.pages())
+    .entries()) {
+    await current
+      .screenshot({
+        path: `test-results/worship-exchange/failure-${index}.png`,
+        fullPage: true,
+      })
+      .catch(() => {})
+    console.error(
+      current.url(),
+      (
+        await current
+          .locator('body')
+          .innerText()
+          .catch(() => '')
+      ).slice(0, 5000),
+    )
+  }
+  console.error('Browser errors:', errors)
+  throw error
 } finally {
   await browser.close()
   sql(`DELETE FROM private.churches WHERE id='${church}'`)
