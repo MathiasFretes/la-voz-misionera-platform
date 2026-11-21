@@ -71,6 +71,22 @@ function ChurchPlanningProvider({ children }: { children: ReactNode }) {
         const previous = localStorage.getItem(
           `lvm.service.selected-church.${user.id}`,
         )
+        const requested = new URLSearchParams(window.location.search).get(
+          'churchId',
+        )
+        if (requested !== null) {
+          const allowed = available.some((row) => row.id === requested)
+          setSelected(allowed ? requested : '')
+          if (!allowed)
+            setError('La iglesia del enlace no está disponible para tu cuenta.')
+          else
+            localStorage.setItem(
+              `lvm.service.selected-church.${user.id}`,
+              requested,
+            )
+          setLoading(false)
+          return
+        }
         setSelected(
           previous === 'legacy' && global
             ? 'legacy'

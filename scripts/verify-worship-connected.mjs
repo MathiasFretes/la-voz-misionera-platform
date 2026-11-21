@@ -7,8 +7,12 @@ import { pathToFileURL } from 'node:url'
 import { chromium } from '@playwright/test'
 const origin = 'https://srv2137598.hstgr.cloud'
 const production = process.env.LVM_WORSHIP_TARGET === 'production'
-const backend = production ? origin : 'http://127.0.0.1:54319'
-const database = production ? 'lvm_worship' : 'lvm_planning_qa_20261121'
+// Preflight checks local client builds against the published API using its own
+// temporary fixtures, without replacing the deployed interfaces.
+const publishedApi =
+  production || process.env.LVM_WORSHIP_TARGET === 'preflight'
+const backend = publishedApi ? origin : 'http://127.0.0.1:54319'
+const database = publishedApi ? 'lvm_worship' : 'lvm_planning_qa_20261121'
 const roots = {
   service: resolve('dist'),
   worship: resolve('../LVM Worship/apps/web/dist'),
@@ -87,7 +91,7 @@ async function context(actor) {
         request.method() === 'PUT'
       )
         return route.abort('internetdisconnected')
-      if (production) return route.continue()
+      if (publishedApi) return route.continue()
       const headers = Object.fromEntries(
         Object.entries(request.headers()).filter(([name]) =>
           [
@@ -353,6 +357,47 @@ try {
     .getByText('Canto de prueba QA', { exact: true })
     .first()
     .waitFor()
+  const returnPath = await freshEditor
+    .getByRole('link', { name: 'Volver a LVM Service' })
+    .getAttribute('href')
+  assert.equal(new URL(returnPath, origin).searchParams.get('churchId'), church)
+  const returning = await context(admin)
+  await returning.addInitScript(
+    (userId) =>
+      globalThis.localStorage.setItem(
+        `lvm.service.selected-church.${userId}`,
+        'legacy',
+      ),
+    admin.id,
+  )
+  await returning.goto(new URL(returnPath, origin).href, {
+    waitUntil: 'domcontentloaded',
+  })
+  await returning
+    .getByRole('region', { name: 'Repertorio conectado de Worship' })
+    .getByText('Canto de prueba QA', { exact: true })
+    .waitFor()
+  assert.equal(
+    await returning
+      .getByRole('combobox', { name: 'Iglesia de planificación' })
+      .inputValue(),
+    church,
+  )
+  const invalid = await context(admin)
+  await invalid.goto(
+    `${origin}/service/services/${serviceId}?churchId=${randomUUID()}`,
+    { waitUntil: 'domcontentloaded' },
+  )
+  await invalid
+    .getByRole('alert')
+    .getByText('La iglesia del enlace no está disponible para tu cuenta.')
+    .waitFor()
+  assert.equal(
+    await invalid
+      .getByRole('combobox', { name: 'Iglesia de planificación' })
+      .inputValue(),
+    '',
+  )
   await mkdir('test-results/worship-exchange', { recursive: true })
   await planner.screenshot({
     path: 'test-results/worship-exchange/connected-service-review.png',
