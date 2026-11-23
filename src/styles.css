@@ -10,6 +10,8 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-family: monospace;
+  font-size: 1rem;
+  line-height: 1.6;
   padding: var(--lvm-space-4);
   background: var(--lvm-bg-app);
   border-radius: var(--lvm-radius-control);

@@ -150,9 +150,9 @@ function ReviewQueue({ admin }: { admin: boolean }) {
       {busy && <p role="status">Comprobando propuestas…</p>}
       {!busy && !rows.length && !error && <p>No hay propuestas pendientes.</p>}
       <div className="song-review-layout">
-        <section aria-label="Propuestas pendientes">
+        <section className="form-stack" aria-label="Propuestas pendientes">
           {rows.map((row) => (
-            <article className="card" key={row.id}>
+            <article className="panel" key={row.id}>
               <p className="eyebrow">{labels[row.type]}</p>
               <h2>{text(row.payload.title) || 'Sin título'}</h2>
               <p>{new Date(row.created_at).toLocaleString('es-PY')}</p>
@@ -180,7 +180,7 @@ function ReviewQueue({ admin }: { admin: boolean }) {
         </section>
         {selected && (
           <section
-            className="card song-review-detail"
+            className="panel form-stack song-review-detail"
             aria-label="Detalle de la propuesta"
             ref={detail}
             tabIndex={-1}

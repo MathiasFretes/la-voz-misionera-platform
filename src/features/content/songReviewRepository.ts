@@ -27,8 +27,12 @@ async function request<T>(path: string, data?: unknown): Promise<T> {
       throw new Error(
         'La propuesta cambió. Actualizá la bandeja antes de decidir.',
       )
+    if (response.status === 401 || response.status === 403)
+      throw new Error(
+        'Tu cuenta no tiene permisos para completar esta revisión.',
+      )
     throw new Error(
-      result.message || 'No se pudo completar la revisión musical',
+      'No se pudo completar la revisión musical. Conservamos tu decisión para que puedas reintentar.',
     )
   }
   return result
