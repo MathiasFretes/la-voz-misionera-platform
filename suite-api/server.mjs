@@ -44,6 +44,7 @@ const functions = new Set([
   'delete_user',
   'admin_delete_user',
   'review_song_suggestion',
+  'mutate_editor_song',
   'list_site_inbox',
   'list_site_documents',
   'save_site_document',
