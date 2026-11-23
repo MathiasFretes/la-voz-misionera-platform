@@ -78,3 +78,19 @@ bases. El Worker histórico de carga binaria PPTX y el CRUD Supabase/nativo no s
 activan ni quedan certificados por este gate del VPS. Solo se prueba el guardado
 de metadatos PPTX; no una carga real a ese Worker. Mantener bloqueada su activación
 hasta migración y pruebas específicas. No hay despliegue productivo en esta entrega.
+
+### Borradores: estados y conservación de historial
+
+Solo el estado `draft` admite guardar, enviar o eliminar. Un rechazo devuelve
+`submitted` a `draft`; una aprobación lo pasa a `published`. `submitted`,
+`published` y `archived` rechazan modificaciones ordinarias con 409 incluso con
+revisión actual. Los recibos de operaciones ya confirmadas se consultan antes
+de validar el estado, para permitir reintentar una respuesta perdida.
+
+Eliminar un borrador con cualquier propuesta histórica o vínculo a repertorio
+responde 409 y conserva todos los registros. Un borrador nunca enviado y sin
+vínculos puede eliminarse, con recibo idempotente. Las dos claves foráneas hacia
+`personal_songs` usan NO ACTION en lugar de CASCADE, incluyendo durante rollback.
+No se introduce un archivado automático ni se descartan propuestas rechazadas.
+`test/editor-draft-lifecycle.sql` cubre envío/rechazo/edición/reenvío/aprobación,
+estados bloqueados, borrado con dependencias y borrado seguro de un borrador libre.

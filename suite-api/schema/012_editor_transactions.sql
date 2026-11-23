@@ -6,6 +6,13 @@ REVOKE UPDATE,DELETE ON public.personal_songs FROM PUBLIC,lvm_anon,lvm_user;
 REVOKE INSERT ON public.personal_songs FROM PUBLIC,lvm_anon,lvm_user;
 ALTER TABLE public.song_suggestions ADD COLUMN IF NOT EXISTS base_song_updated_at timestamptz;
 ALTER TABLE public.personal_songs ADD COLUMN IF NOT EXISTS source_song_updated_at timestamptz;
+-- Preserve proposal history and repertoire links even if a caller deletes a parent.
+ALTER TABLE public.song_suggestions DROP CONSTRAINT IF EXISTS song_suggestions_personal_song_id_fkey;
+ALTER TABLE public.song_suggestions ADD CONSTRAINT song_suggestions_personal_song_id_fkey
+  FOREIGN KEY (personal_song_id) REFERENCES public.personal_songs(id) ON DELETE NO ACTION;
+ALTER TABLE public.setlist_songs DROP CONSTRAINT IF EXISTS setlist_songs_personal_song_id_fkey;
+ALTER TABLE public.setlist_songs ADD CONSTRAINT setlist_songs_personal_song_id_fkey
+  FOREIGN KEY (personal_song_id) REFERENCES public.personal_songs(id) ON DELETE NO ACTION;
 CREATE OR REPLACE FUNCTION private.editor_revision_clock() RETURNS trigger
 LANGUAGE plpgsql SET search_path='' AS $$
 BEGIN
@@ -102,6 +109,9 @@ BEGIN
     RAISE SQLSTATE 'PT409' USING MESSAGE='Draft changed; reload before saving';
   END IF;
   IF p_action IN ('save_draft','submit_draft') AND p_personal_song_id IS NULL THEN RAISE EXCEPTION 'A private draft is required'; END IF;
+  IF p_action IN ('save_draft','submit_draft','delete_draft') AND v_draft.status IS DISTINCT FROM 'draft' THEN
+    RAISE SQLSTATE 'PT409' USING MESSAGE='Only drafts in draft status can be edited, submitted or deleted';
+  END IF;
 
   IF p_action NOT IN ('delete','delete_draft','update_pptx','create_draft') THEN
     IF jsonb_typeof(p_payload) IS DISTINCT FROM 'object' OR nullif(trim(p_payload->>'title'),'') IS NULL
@@ -125,6 +135,10 @@ BEGIN
         coalesce(p_payload->>'chordpro_content',''),v_song.id,v_song.updated_at,nullif(p_payload->>'tempo','')::int,p_payload->>'time_signature',p_payload->>'country',p_payload->>'youtube_id',p_payload->>'language',p_payload->>'pptx_url') RETURNING * INTO v_draft;
     v_result=jsonb_build_object('kind','personal','row',to_jsonb(v_draft));
   ELSIF p_action='delete_draft' THEN
+    IF EXISTS(SELECT FROM public.song_suggestions WHERE personal_song_id=v_draft.id)
+      OR EXISTS(SELECT FROM public.setlist_songs WHERE personal_song_id=v_draft.id) THEN
+      RAISE SQLSTATE 'PT409' USING MESSAGE='Draft has proposal history or repertoire links and cannot be deleted';
+    END IF;
     DELETE FROM public.personal_songs WHERE id=v_draft.id;
     v_result=jsonb_build_object('kind','deleted');
   ELSIF p_action='update_pptx' THEN
@@ -134,7 +148,6 @@ BEGIN
   END IF;
 
   IF p_action IN ('save_draft','submit_draft') THEN
-    IF p_action='submit_draft' AND v_draft.status IN ('submitted','published') THEN RAISE SQLSTATE 'PT409' USING MESSAGE='Draft already submitted or published'; END IF;
     UPDATE public.personal_songs SET title=trim(p_payload->>'title'),artist=p_payload->>'artist',default_key=p_payload->>'default_key',
       tempo=nullif(p_payload->>'tempo','')::int,time_signature=p_payload->>'time_signature',country=p_payload->>'country',
       youtube_id=p_payload->>'youtube_id',language=p_payload->>'language',pptx_url=p_payload->>'pptx_url',tags=v_tags,
