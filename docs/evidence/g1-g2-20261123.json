@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-23",
+  "serviceRuntimeCommit": "b2018221172efe6b762fa6950d38f82ef38e1a30",
+  "productionModified": false,
+  "mergeAuthorized": false,
+  "environment": "Disposable PostgreSQL tmpfs, private Compose network, no published ports, independent temporary secrets",
+  "officialIntegration": {
+    "flagAbsent": "pass",
+    "flagZero": "pass",
+    "flagOne": "pass"
+  },
+  "nativeGate": "pass: disabled routes and previously issued Bearer denied; enabled signup/login/permissions/logout/password revocation; web sessions in all modes",
+  "churchIdentity": "pass",
+  "apiUnitTests": 15,
+  "serviceTests": 57,
+  "logSha256": "866171ea8e2eeaeff1f7036febaddaaae30510c91fd0cdb33f94e6074e07102a",
+  "runner": "suite-api/test/run-isolated.sh",
+  "limits": [
+    "No production rollout",
+    "No physical Android/iOS gate",
+    "B1-B5 unchanged; existing SQL regressions remain in CI"
+  ]
+}
