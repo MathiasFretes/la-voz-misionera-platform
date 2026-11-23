@@ -1,5 +1,36 @@
 @import url('../design-system/tokens.css');
 
+.song-review-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--lvm-space-6);
+  align-items: start;
+}
+.song-review-chart {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: monospace;
+  padding: var(--lvm-space-4);
+  background: var(--lvm-bg-app);
+  border-radius: var(--lvm-radius-control);
+}
+.song-review-layout article {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.song-review-detail {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.song-review-detail dd {
+  margin: 0 0 var(--lvm-space-3);
+}
+@media (max-width: 850px) {
+  .song-review-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 :root {
   color: var(--lvm-text-primary);
   background: var(--lvm-bg-app);

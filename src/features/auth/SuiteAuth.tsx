@@ -21,6 +21,8 @@ type SuiteUser = {
 }
 const Context = createContext<SuiteUser | null>(null)
 export const useSuiteUser = () => useContext(Context)
+export const canReviewSongs = (user: SuiteUser | null) =>
+  !!user && ['editor', 'admin', 'owner'].includes(user.role)
 export const isGlobalAdministrator = (user: SuiteUser | null) =>
   !user || ['admin', 'owner'].includes(user.role)
 export function GlobalAdministration({ children }: { children: ReactNode }) {
@@ -88,7 +90,7 @@ export function SuiteAuth({ children }: { children: ReactNode }) {
       </main>
     )
   if (
-    !['admin', 'owner'].includes(user.role) &&
+    !canReviewSongs(user) &&
     !user.memberships?.some(
       (membership) =>
         membership.capabilities.includes('members:read') ||

@@ -14,6 +14,7 @@ import { AdministrationPage } from '../pages/AdministrationPage'
 import { ContentPage } from '../pages/ContentPage'
 import { SuiteAuth, GlobalAdministration } from '../features/auth/SuiteAuth'
 import { OrganizationPage } from '../pages/OrganizationPage'
+import { SongReviewPage } from '../pages/SongReviewPage'
 import {
   PlanningProvider,
   PlanningRoute,
@@ -104,6 +105,11 @@ const organizationRoute = createRoute({
   path: '/organization',
   component: OrganizationPage,
 })
+const songReviewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/song-review',
+  component: SongReviewPage,
+})
 
 export const router = createRouter({
   basepath: import.meta.env.VITE_SERVICE_BASEPATH || '/',
@@ -117,6 +123,7 @@ export const router = createRouter({
     adminRoute,
     contentRoute,
     organizationRoute,
+    songReviewRoute,
   ]),
 })
 

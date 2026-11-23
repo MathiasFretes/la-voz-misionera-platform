@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { Button } from '../ui/Button'
-import { isGlobalAdministrator, useSuiteUser } from '../features/auth/SuiteAuth'
+import {
+  canReviewSongs,
+  isGlobalAdministrator,
+  useSuiteUser,
+} from '../features/auth/SuiteAuth'
 
 function Navigation({ close }: { close?: () => void }) {
   const user = useSuiteUser()
@@ -14,6 +18,11 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/services" onClick={close}>
         Servicios
       </Link>
+      {import.meta.env.VITE_SERVICE_AUTH === '1' && canReviewSongs(user) && (
+        <Link to="/song-review" onClick={close}>
+          Revisión de canciones
+        </Link>
+      )}
       {global && (
         <>
           <Link
@@ -88,16 +97,18 @@ export function AppShell() {
     : pathname
   const section = localPath.startsWith('/admin')
     ? 'Administración'
-    : localPath.startsWith('/services')
-      ? 'Servicios'
-      : localPath.startsWith('/public-preview') ||
-          localPath.startsWith('/content')
-        ? 'Contenido público'
-        : localPath.startsWith('/organization')
-          ? 'Mi iglesia'
-          : localPath.startsWith('/development')
-            ? 'Desarrollo'
-            : 'Inicio'
+    : localPath.startsWith('/song-review')
+      ? 'Revisión de canciones'
+      : localPath.startsWith('/services')
+        ? 'Servicios'
+        : localPath.startsWith('/public-preview') ||
+            localPath.startsWith('/content')
+          ? 'Contenido público'
+          : localPath.startsWith('/organization')
+            ? 'Mi iglesia'
+            : localPath.startsWith('/development')
+              ? 'Desarrollo'
+              : 'Inicio'
 
   useEffect(() => {
     if (menuOpen) menuDrawer.current?.querySelector('a')?.focus()
