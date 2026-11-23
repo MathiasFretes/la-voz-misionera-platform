@@ -6,7 +6,7 @@ La infraestructura y configuración están documentadas en `LVM Worship/infra/vp
 
 Las tablas públicas tienen RLS. `lvm_api` autentica con SQL parametrizado y privilegios limitados; `lvm_rest` cambia a roles sin login con JWT internos de 60 segundos. Las contraseñas usan scrypt con sal, los tokens de sesión se guardan como hash y la cookie es HttpOnly/Secure. No se concede automáticamente el rol propietario al primer registro. `provision-owner.mjs` reserva explícitamente la cuenta indicada y genera un enlace de activación de un solo uso, válido 24 horas, en un archivo protegido del servidor.
 
-`node --test test/security.test.mjs` verifica hashing y expiración de credenciales internas. `test/integration.mjs`, ejecutado con el perfil Compose de administración sobre la base del VPS, crea y limpia cuentas propias y comprueba autenticación, CSRF, aislamiento entre usuarios, escalamiento de roles rechazado, canciones, repertorios anidados, favoritos, códigos de sesión, activación única y bandeja privada. Nunca usa ni borra cuentas reales.
+`node --test test/security.test.mjs` verifica hashing y expiración de credenciales internas. `test/integration.mjs`, ejecutado exclusivamente con `sh suite-api/test/run-isolated.sh` sobre PostgreSQL/API desechables, crea y limpia cuentas propias y comprueba autenticación, CSRF, aislamiento entre usuarios, escalamiento de roles rechazado, canciones, repertorios anidados, favoritos, códigos de sesión, activación única y bandeja privada. Nunca usa ni borra cuentas reales.
 
 Los mensajes y solicitudes se almacenan, sin enviar correos automáticamente. OAuth y recuperación por email requieren configurar el proveedor. La API de datos incluye un adaptador de consultas en `LVM Worship/packages/core/src/backend/client.js`; el nombre de exportación web `supabase` permanece por compatibilidad de imports, sin conectar al servicio Supabase. Las sesiones musicales se actualizan mediante consultas periódicas de 1,2 segundos, con control de acceso por código.
 
@@ -94,3 +94,32 @@ vínculos puede eliminarse, con recibo idempotente. Las dos claves foráneas hac
 No se introduce un archivado automático ni se descartan propuestas rechazadas.
 `test/editor-draft-lifecycle.sql` cubre envío/rechazo/edición/reenvío/aprobación,
 estados bloqueados, borrado con dependencias y borrado seguro de un borrador libre.
+
+## G1/G2: activación nativa y verificación oficial aislada
+
+`LVM_NATIVE_AUTH_ENABLED` es una opción **del servidor**: solo el valor exacto `1`
+habilita rutas de autenticación y uso de tokens Bearer nativos. Ausente, `0` o
+cualquier otro valor deja ambas funciones apagadas; los tokens emitidos antes no
+se aceptan mientras esté apagada. Las cookies web siguen su recorrido habitual.
+La configuración Expo no habilita el servidor. El Compose productivo omite el
+flag; el preparador nativo de QA lo define expresamente para su API aislada.
+Cambiar este flag requiere recrear el proceso/API y autorización de rollout nativo.
+
+El test oficial `test/integration.mjs` crea borradores y canciones con RPC y sigue
+comprobando que los INSERT/PATCH directos están prohibidos. Rechaza destinos fuera
+de los tres servicios de QA. No usar el antiguo comando de provision-owner para
+probarlo contra producción.
+
+```sh
+# Desde un checkout de Service en un host Linux con Docker Compose y openssl.
+sh suite-api/test/run-isolated.sh
+```
+
+El runner crea un proyecto Compose aleatorio con PostgreSQL tmpfs, red interna sin
+puertos publicados, secretos independientes y migraciones 001–012 (omite down).
+Ejecuta el archivo oficial contra API sin flag, con `0` y con `1`; luego identidad
+y el gate nativo. Ese gate emite un token en modo activo y comprueba que el mismo
+token no permite leer/escribir datos privados en las APIs apagadas; también prueba
+permisos, logout y revocación por contraseña. Las sesiones web se comprueban en
+los tres modos. El runner retira contenedores/red/secretos incluso si falla y se
+ejecuta en el job church-planning de GitHub Actions. No conecta al PostgreSQL del VPS.

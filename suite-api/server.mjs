@@ -23,6 +23,8 @@ const pool = new pg.Pool({
   password: (await readFile('/run/secrets/api_password', 'utf8')).trim(),
   max: 10,
 })
+// Server-side opt-in; the Expo setting never enables native authentication.
+const nativeEnabled = process.env.LVM_NATIVE_AUTH_ENABLED === '1'
 const cookieName = '__Host-lvm_session'
 const buckets = new Map()
 const dummyHash = await passwordHash(newToken())
@@ -79,7 +81,7 @@ async function body(req) {
   return Buffer.concat(chunks)
 }
 function sessionToken(req) {
-  const device = nativeToken(req.headers)
+  const device = nativeToken(req.headers, nativeEnabled)
   if (device) return device
   if (req.headers.authorization) return null
   const cookie = req.headers.cookie
@@ -145,7 +147,11 @@ function rateLimit(req) {
 const server = createServer(async (req, res) => {
   try {
     const url = new URL(req.url, origin)
-    const deviceAction = nativeAuthAction(url.pathname, req.headers)
+    const deviceAction = nativeAuthAction(
+      url.pathname,
+      req.headers,
+      nativeEnabled,
+    )
     const device = deviceAction !== null
     if (url.pathname === '/api/health' && req.method === 'GET') {
       await pool.query('SELECT 1')
@@ -160,7 +166,7 @@ const server = createServer(async (req, res) => {
       write &&
       req.headers.origin !== origin &&
       !device &&
-      !(nativeToken(req.headers) && (await currentUser(req)))
+      !(nativeToken(req.headers, nativeEnabled) && (await currentUser(req)))
     )
       throw fail(403, 'Invalid request origin')
     if (write && !req.headers['content-type']?.startsWith('application/json'))

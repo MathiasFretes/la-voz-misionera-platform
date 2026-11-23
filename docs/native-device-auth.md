@@ -2,6 +2,13 @@
 
 La app Expo conserva por defecto su autenticación anterior. Esta entrega prepara y comprueba la frontera de sesión del dispositivo con los mismos usuarios de PostgreSQL; el adaptador y SecureStore ya se integraron detrás de la variable optativa `EXPO_PUBLIC_LVM_API_URL`, sin publicar esta API ni distribuir un build activado. No se afirma una migración nativa terminada.
 
+## Activación explícita del servidor
+
+La API nativa queda deshabilitada por defecto, incluso para tokens ya emitidos.
+Solo `LVM_NATIVE_AUTH_ENABLED=1` en el servidor permite rutas y Bearer nativos;
+Expo no habilita esa opción. El preparador nativo la define exclusivamente en QA.
+El gate G1/G2 prueba ausente, `0` y `1` con las mismas sesiones/datos aislados.
+
 ## API
 
 `/api/native/auth/{signup,login,session,logout,password}` requiere `X-LVM-Client: native`, ausencia de Origin/Sec-Fetch-Site y ausencia de cookies. Login/signup emiten un token opaco `n_…` con siete días de vigencia; solo su hash se guarda en `private.auth_sessions`. No emiten Set-Cookie. Es el mismo sistema de cuentas y revocación que usa la web, sin otra tabla de usuarios ni JWT de PostgREST en el cliente.

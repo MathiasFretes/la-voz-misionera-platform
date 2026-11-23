@@ -71,7 +71,7 @@ if ! docker inspect lvm-planning-qa-api >/dev/null 2>&1; then
 docker run -d --name lvm-planning-qa-api --label 'lvm.qa.run=${run}' --network lvm-planning-qa-front --security-opt no-new-privileges:true --memory 512m -p 127.0.0.1:4319:4318 \
   --mount 'type=bind,src=${stage}/secrets/api_password,dst=/run/secrets/api_password,readonly' \
   --mount 'type=bind,src=${stage}/secrets/jwt_secret,dst=/run/secrets/jwt_secret,readonly' \
-  -e LVM_ORIGIN=https://srv2137598.hstgr.cloud -e LVM_DATABASE=${database} -e LVM_REST_URL=http://lvm-planning-qa-rest:3000 '${image}'
+  -e LVM_ORIGIN=https://srv2137598.hstgr.cloud -e LVM_NATIVE_AUTH_ENABLED=1 -e LVM_DATABASE=${database} -e LVM_REST_URL=http://lvm-planning-qa-rest:3000 '${image}'
 docker network connect lvm-worship_database lvm-planning-qa-api
 fi
 attempt=0

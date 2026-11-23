@@ -6,6 +6,19 @@ import { newToken, tokenHash } from '../security.mjs'
 
 const base = process.env.LVM_TEST_URL || 'http://api:4318'
 const origin = process.env.LVM_ORIGIN
+assert.equal(
+  origin,
+  'https://lvm-qa.invalid',
+  'Run the official test with sh suite-api/test/run-isolated.sh',
+)
+assert.ok(
+  [
+    'http://api-off:4318',
+    'http://api-disabled:4318',
+    'http://api-on:4318',
+  ].includes(base),
+  'Only disposable integration APIs are allowed',
+)
 const admin = new pg.Pool({
   host: 'postgres',
   database: 'lvm_worship',
@@ -86,13 +99,28 @@ try {
       })
     ).status >= 400,
   )
-  const privateSong = await request('data/personal_songs', {
+  assert.ok(
+    (
+      await request('data/personal_songs', {
+        method: 'POST',
+        cookie: a.cookie,
+        data: { owner_id: a.data.user.id, title: 'Denied direct draft' },
+      })
+    ).status >= 400,
+  )
+  const privateSong = await request('data/rpc/mutate_editor_song', {
     method: 'POST',
     cookie: a.cookie,
-    data: { owner_id: a.data.user.id, title: 'Private integration probe' },
+    data: {
+      p_operation_id: randomUUID(),
+      p_action: 'create_draft',
+      p_song_id: null,
+      p_personal_song_id: null,
+      p_payload: { title: 'Private integration probe' },
+    },
   })
-  assert.equal(privateSong.status, 201, JSON.stringify(privateSong.data))
-  const privateId = privateSong.data[0].id
+  assert.equal(privateSong.status, 200, JSON.stringify(privateSong.data))
+  const privateId = privateSong.data.row.id
   assert.deepEqual(
     (
       await request(`data/personal_songs?id=eq.${privateId}`, {
@@ -101,15 +129,14 @@ try {
     ).data,
     [],
   )
-  assert.deepEqual(
+  assert.ok(
     (
       await request(`data/personal_songs?id=eq.${privateId}`, {
         method: 'PATCH',
         cookie: b.cookie,
-        data: { title: 'attack' },
+        data: { title: 'denied' },
       })
-    ).data,
-    [],
+    ).status >= 400,
   )
   const denied = await request('data/songs', {
     method: 'POST',
@@ -120,13 +147,28 @@ try {
   await admin.query("UPDATE public.users SET role='editor' WHERE id=$1", [
     a.data.user.id,
   ])
-  const published = await request('data/songs', {
+  assert.ok(
+    (
+      await request('data/songs', {
+        method: 'POST',
+        cookie: a.cookie,
+        data: { title: 'Denied direct editor write', slug: `denied-${runId}` },
+      })
+    ).status >= 400,
+  )
+  const published = await request('data/rpc/mutate_editor_song', {
     method: 'POST',
     cookie: a.cookie,
-    data: { title: 'Integration probe', slug: `probe-${runId}` },
+    data: {
+      p_operation_id: randomUUID(),
+      p_action: 'save_published',
+      p_song_id: null,
+      p_personal_song_id: null,
+      p_payload: { title: 'Integration probe', default_key: 'G', tags: ['QA'] },
+    },
   })
-  assert.equal(published.status, 201, JSON.stringify(published.data))
-  songs.push(published.data[0].id)
+  assert.equal(published.status, 200, JSON.stringify(published.data))
+  songs.push(published.data.row.id)
   assert.ok(
     (
       await request(`data/songs?id=eq.${songs[0]}`, {

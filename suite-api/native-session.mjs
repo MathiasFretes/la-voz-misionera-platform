@@ -6,16 +6,20 @@ export function nativeRequest(headers) {
   )
 }
 
-export function nativeToken(headers) {
-  if (!nativeRequest(headers) || headers.cookie) return null
+export function nativeToken(headers, enabled = false) {
+  if (!enabled || !nativeRequest(headers) || headers.cookie) return null
   return (
     /^Bearer (n_[A-Za-z0-9_-]{43})$/.exec(headers.authorization || '')?.[1] ||
     null
   )
 }
 
-export function nativeAuthAction(path, headers) {
+export function nativeAuthAction(path, headers, enabled = false) {
   if (!path.startsWith('/api/native/auth/')) return null
+  if (!enabled)
+    throw Object.assign(new Error('Native authentication is disabled'), {
+      status: 404,
+    })
   if (!nativeRequest(headers) || headers.cookie)
     throw Object.assign(
       new Error('Native authentication requires a cookie-free device request'),

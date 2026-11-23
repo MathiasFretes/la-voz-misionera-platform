@@ -46,6 +46,8 @@ jobs:
           docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/editor-draft-lifecycle.sql
       - run: npx playwright install --with-deps chromium
       - run: npm run test:planning-journal
+      - name: Official suite integration and native activation modes (isolated Docker PostgreSQL)
+        run: sh suite-api/test/run-isolated.sh
 
   platform:
     runs-on: ubuntu-latest
