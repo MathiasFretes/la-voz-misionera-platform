@@ -19,3 +19,29 @@ La migración `007_site_editor.sql` separa `draft_data` de la versión publicada
 Las migraciones 008/009 agregan membresías/capacidades y un directorio de correos limitado a administración global. La migración 010 protege planes, revisiones, historial y recibos de operación en tablas privadas. Las rutas `/api/churches/:churchId/services` usan la sesión compartida; `X-LVM-Account` comprueba la cuenta y `X-LVM-Operation` identifica cada escritura persistida. La API valida Service 0.1 antes de invocar las funciones autorizadas de PostgreSQL. Las funciones de planificación no se añaden a la lista genérica de RPC expuestos.
 
 `LVM_DATABASE` y `LVM_REST_URL` permiten una instancia de QA con base/PostgREST propios; producción conserva los valores por defecto `lvm_worship` y `http://rest:3000`. No configurar QA sobre la base productiva. Ver el [gate ejecutado](../docs/planning-acceptance.md) y la [arquitectura del diario](../docs/planning-church-integration.md).
+
+## Editor transaccional (candidato; solo QA)
+
+La migración `012_editor_transactions.sql` y el RPC allowlisted
+`mutate_editor_song` se revisan junto con Worship PR #4. No están desplegados en
+producción. El RPC exige sesión/rol desde PostgreSQL, bloquea la fila de destino,
+comprueba su revisión y conserva un recibo privado por usuario/UUID. Repetir el
+mismo comando devuelve el resultado confirmado; cambiar el contenido con el
+mismo UUID devuelve 409. Guardar borrador y enviarlo a revisión es una sola
+transacción, incluyendo propuesta/estado/recibo.
+
+La auditoría ya no depende de INSERT desde el navegador: triggers del servidor
+la escriben y un error revierte la mutación. Los roles de cliente pierden INSERT
+sobre `editor_audit_log`. El wrapper de revisión devuelve la publicación previa
+en un reintento idéntico de aprobación/rechazo y rechaza decisiones contradictorias.
+El script de migración debe omitir `*.down.sql`; el rollback se aplica solo de forma
+expresa, coordinando la versión del cliente y API. Nunca ejecutar toda la carpeta
+con un glob que incluya rollbacks.
+
+`test/editor-transactions.sql` verifica permisos reales, reintentos, revisión
+obsoleta, denegación tras revocación e inyección de fallos en auditoría. Se ejecuta
+con PostgreSQL aislado en CI. El gate real de navegador/API/SQL y sus versiones
+están en Worship `apps/web/public/wiki/Editor-Postgres-Acceptance.md` y su reporte
+JSON: 18 comprobaciones, limpieza confirmada y cero cambios productivos. Mantener
+ambos PR en borrador hasta revisión y autorización. El nuevo cliente requiere
+que la migración y API se publiquen primero; no sustituye ni activa la API nativa.
