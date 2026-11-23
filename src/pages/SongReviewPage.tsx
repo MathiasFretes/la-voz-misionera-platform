@@ -4,6 +4,7 @@ import {
   listSongProposals,
   getReviewSong,
   reviewSongProposal,
+  rebaseSongProposal,
   type SongProposal,
 } from '../features/content/songReviewRepository'
 import { Button } from '../ui/Button'
@@ -32,12 +33,20 @@ function ReviewQueue({ admin }: { admin: boolean }) {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [reason, setReason] = useState('')
-  const [decision, setDecision] = useState<'approve' | 'reject' | null>(null)
+  const [decision, setDecision] = useState<
+    'approve' | 'reject' | 'rebase' | null
+  >(null)
   const [more, setMore] = useState(false)
   const [currentSong, setCurrentSong] = useState<
     (Record<string, unknown> & { slug: string }) | null
   >(null)
 
+  const stale =
+    !!selected?.song_id &&
+    selected.type !== 'addition' &&
+    !!currentSong &&
+    (!selected.base_song_updated_at ||
+      selected.base_song_updated_at !== currentSong.updated_at)
   const detail = useRef<HTMLElement>(null)
   useEffect(() => {
     if (selected) detail.current?.focus()
@@ -106,6 +115,21 @@ function ReviewQueue({ admin }: { admin: boolean }) {
     setError('')
     setNotice('')
     try {
+      if (decision === 'rebase') {
+        const result = await rebaseSongProposal(
+          selected.id,
+          String(currentSong?.updated_at || ''),
+        )
+        setSelected(result)
+        setRows((current) =>
+          current.map((row) => (row.id === result.id ? result : row)),
+        )
+        setDecision(null)
+        setNotice(
+          'Base actualizada tras la comparación. La propuesta todavía no está aprobada.',
+        )
+        return
+      }
       await reviewSongProposal(selected.id, decision, reason)
       setNotice(
         decision === 'approve'
@@ -237,11 +261,25 @@ function ReviewQueue({ admin }: { admin: boolean }) {
                 onChange={(event) => setReason(event.target.value)}
               />
             </label>
+            {stale && (
+              <section className="notice" aria-label="Propuesta desactualizada">
+                <p>
+                  La canción cambió desde que se preparó la propuesta, o su
+                  revisión base es desconocida. Compará la versión publicada con
+                  la propuesta antes de continuar.
+                </p>
+                <Button disabled={busy} onClick={() => setDecision('rebase')}>
+                  Comparé las versiones; actualizar base
+                </Button>
+              </section>
+            )}
             {!decision ? (
               <div className="actions">
                 {(selected.type !== 'deletion' || admin) && (
                   <Button
-                    disabled={busy || (!!selected.song_id && !currentSong)}
+                    disabled={
+                      busy || (!!selected.song_id && !currentSong) || stale
+                    }
                     onClick={() => setDecision('approve')}
                   >
                     Aprobar propuesta
@@ -256,17 +294,21 @@ function ReviewQueue({ admin }: { admin: boolean }) {
                 <p>
                   {decision === 'approve'
                     ? '¿Confirmás publicar esta propuesta en la biblioteca?'
-                    : '¿Confirmás rechazar esta propuesta sin cambiar la canción publicada?'}
+                    : decision === 'rebase'
+                      ? '¿Confirmás usar la versión publicada que acabás de comparar como nueva base? Se registrará la decisión; esto no publica la propuesta.'
+                      : '¿Confirmás rechazar esta propuesta sin cambiar la canción publicada?'}
                 </p>
                 <div className="actions">
                   <Button
-                    variant={decision === 'approve' ? 'primary' : 'danger'}
+                    variant={decision === 'reject' ? 'danger' : 'primary'}
                     loading={busy}
                     onClick={() => void confirm()}
                   >
                     {decision === 'approve'
                       ? 'Confirmar aprobación'
-                      : 'Confirmar rechazo'}
+                      : decision === 'rebase'
+                        ? 'Confirmar actualización de base'
+                        : 'Confirmar rechazo'}
                   </Button>
                   <Button disabled={busy} onClick={() => setDecision(null)}>
                     Seguir revisando

@@ -45,6 +45,7 @@ const functions = new Set([
   'admin_delete_user',
   'review_song_suggestion',
   'mutate_editor_song',
+  'rebase_song_suggestion',
   'list_site_inbox',
   'list_site_documents',
   'save_site_document',

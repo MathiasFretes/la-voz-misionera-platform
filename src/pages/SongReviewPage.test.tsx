@@ -10,6 +10,8 @@ import { SongReviewPage } from './SongReviewPage'
 import {
   listSongProposals,
   reviewSongProposal,
+  getReviewSong,
+  rebaseSongProposal,
 } from '../features/content/songReviewRepository'
 
 const state = vi.hoisted(() => ({ role: 'editor' }))
@@ -22,6 +24,7 @@ vi.mock('../features/content/songReviewRepository', () => ({
   listSongProposals: vi.fn(),
   reviewSongProposal: vi.fn(),
   getReviewSong: vi.fn(),
+  rebaseSongProposal: vi.fn(),
 }))
 const proposal = {
   id: 'proposal-1',
@@ -112,4 +115,53 @@ it('keeps deletion approval restricted to administrators', async () => {
   expect(
     screen.getByRole('button', { name: 'Rechazar propuesta' }),
   ).toBeInTheDocument()
+})
+
+it('blocks approval of a stale proposal until comparison and a separately confirmed rebase', async () => {
+  const stale = {
+    ...proposal,
+    type: 'edit' as const,
+    song_id: 'song-1',
+    base_song_updated_at: 'old-version',
+  }
+  vi.mocked(listSongProposals).mockResolvedValue([stale])
+  vi.mocked(getReviewSong).mockResolvedValue({
+    slug: 'song',
+    title: 'Publicado',
+    chordpro_content: '[D]Cambio posterior',
+    updated_at: 'current-version',
+  })
+  vi.mocked(rebaseSongProposal).mockResolvedValue({
+    ...stale,
+    base_song_updated_at: 'current-version',
+  })
+  render(<SongReviewPage />)
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Revisar Canción de QA' }),
+  )
+  await screen.findByRole('region', { name: 'Propuesta desactualizada' })
+  expect(
+    screen.getByRole('button', { name: 'Aprobar propuesta' }),
+  ).toBeDisabled()
+  expect(screen.getByText('[D]Cambio posterior')).toBeInTheDocument()
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: 'Comparé las versiones; actualizar base',
+    }),
+  )
+  expect(rebaseSongProposal).not.toHaveBeenCalled()
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Confirmar actualización de base' }),
+  )
+  await screen.findByText(
+    'Base actualizada tras la comparación. La propuesta todavía no está aprobada.',
+  )
+  expect(rebaseSongProposal).toHaveBeenCalledWith(
+    'proposal-1',
+    'current-version',
+  )
+  expect(reviewSongProposal).not.toHaveBeenCalled()
+  expect(
+    screen.getByRole('button', { name: 'Aprobar propuesta' }),
+  ).toBeEnabled()
 })

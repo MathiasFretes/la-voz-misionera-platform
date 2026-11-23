@@ -4,8 +4,8 @@ INSERT INTO public.users(id,display_name,role) VALUES
  ('00000000-0000-4000-9000-000000000001','Editor QA user','user'),
  ('00000000-0000-4000-9000-000000000002','Editor QA reviewer','editor'),
  ('00000000-0000-4000-9000-000000000003','Editor QA other','user');
-CREATE TEMP TABLE editor_fixture(payload jsonb, draft_id uuid, song_id uuid, suggestion_id uuid);
-INSERT INTO editor_fixture VALUES ('{"title":"QA original","artist":"QA","default_key":"G","tags":["QA"],"chordpro_content":"{start_of_verse: Estrofa}\n[G]Prueba original [D]con acordes\n{end_of_verse}"}',NULL,NULL,NULL);
+CREATE TEMP TABLE editor_fixture(payload jsonb, draft_id uuid, song_id uuid, suggestion_id uuid, draft_revision timestamptz);
+INSERT INTO editor_fixture VALUES ('{"title":"QA original","artist":"QA","default_key":"G","tags":["QA"],"chordpro_content":"{start_of_verse: Estrofa}\n[G]Prueba original [D]con acordes\n{end_of_verse}"}',NULL,NULL,NULL,NULL);
 SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-4000-9000-000000000001"}',true);
 SET LOCAL ROLE lvm_user;
 DO $$ BEGIN
@@ -77,14 +77,15 @@ UPDATE editor_fixture SET draft_id=(SELECT id FROM public.personal_songs WHERE o
 SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-4000-9000-000000000003"}',true);
 DO $$ BEGIN
   BEGIN
-    PERFORM public.mutate_editor_song(gen_random_uuid(),'save_draft',NULL,(SELECT draft_id FROM editor_fixture),(SELECT payload FROM editor_fixture));
+    PERFORM public.mutate_editor_song(gen_random_uuid(),'save_draft',NULL,(SELECT draft_id FROM editor_fixture),(SELECT payload FROM editor_fixture),(SELECT updated_at FROM public.personal_songs WHERE id=(SELECT draft_id FROM editor_fixture)));
     RAISE EXCEPTION 'Cross-account draft overwritten';
   EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
+UPDATE editor_fixture SET draft_revision=(SELECT updated_at FROM public.personal_songs WHERE id=(SELECT draft_id FROM editor_fixture));
 SELECT set_config('request.jwt.claims','{"sub":"00000000-0000-4000-9000-000000000001"}',true);
 DO $$ DECLARE first jsonb; again jsonb; BEGIN
-  first:=public.mutate_editor_song('00000000-0000-4000-9000-000000000013','submit_draft',NULL,(SELECT draft_id FROM editor_fixture),(SELECT payload FROM editor_fixture));
-  again:=public.mutate_editor_song('00000000-0000-4000-9000-000000000013','submit_draft',NULL,(SELECT draft_id FROM editor_fixture),(SELECT payload FROM editor_fixture));
+  first:=public.mutate_editor_song('00000000-0000-4000-9000-000000000013','submit_draft',NULL,(SELECT draft_id FROM editor_fixture),(SELECT payload FROM editor_fixture),(SELECT draft_revision FROM editor_fixture));
+  again:=public.mutate_editor_song('00000000-0000-4000-9000-000000000013','submit_draft',NULL,(SELECT draft_id FROM editor_fixture),(SELECT payload FROM editor_fixture),(SELECT draft_revision FROM editor_fixture));
   IF first IS DISTINCT FROM again THEN RAISE EXCEPTION 'Draft submission duplicated'; END IF;
   IF (SELECT status FROM public.personal_songs WHERE id=(SELECT draft_id FROM editor_fixture))<>'submitted' THEN RAISE EXCEPTION 'Draft status missing'; END IF;
   UPDATE editor_fixture SET suggestion_id=(first->>'suggestionId')::uuid;

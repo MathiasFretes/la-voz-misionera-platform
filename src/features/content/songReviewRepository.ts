@@ -4,6 +4,7 @@ export type SongProposal = {
   type: 'addition' | 'edit' | 'deletion'
   payload: Record<string, unknown>
   created_at: string
+  base_song_updated_at?: string | null
 }
 
 async function request<T>(path: string, data?: unknown): Promise<T> {
@@ -40,12 +41,12 @@ async function request<T>(path: string, data?: unknown): Promise<T> {
 
 export const listSongProposals = (offset = 0) =>
   request<SongProposal[]>(
-    `song_suggestions?select=id,song_id,type,payload,created_at&status=eq.pending&order=created_at.asc,id.asc&limit=25&offset=${offset}`,
+    `song_suggestions?select=id,song_id,type,payload,created_at,base_song_updated_at&status=eq.pending&order=created_at.asc,id.asc&limit=25&offset=${offset}`,
   )
 
 export const getReviewSong = (id: string) =>
   request<(Record<string, unknown> & { slug: string })[]>(
-    `songs?select=slug,title,artist,default_key,tags,chordpro_content&id=eq.${encodeURIComponent(id)}`,
+    `songs?select=slug,title,artist,default_key,tags,chordpro_content,updated_at&id=eq.${encodeURIComponent(id)}`,
   ).then((rows) => {
     if (!rows[0]) throw new Error('La canción original ya no está disponible.')
     return rows[0]
@@ -60,4 +61,10 @@ export const reviewSongProposal = (
     p_suggestion_id: id,
     p_action: action,
     p_reason: action === 'reject' ? reason.trim() || null : null,
+  })
+
+export const rebaseSongProposal = (id: string, expectedRevision: string) =>
+  request<SongProposal>('rpc/rebase_song_suggestion', {
+    p_suggestion_id: id,
+    p_expected_song_updated_at: expectedRevision,
   })
