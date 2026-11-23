@@ -119,5 +119,38 @@ BEGIN
 END $$;
 REVOKE EXECUTE ON FUNCTION public.mutate_editor_song(uuid,text,uuid,uuid,jsonb,timestamptz) FROM PUBLIC,lvm_anon;
 GRANT EXECUTE ON FUNCTION public.mutate_editor_song(uuid,text,uuid,uuid,jsonb,timestamptz) TO lvm_user;
+
+DO $$ BEGIN
+  IF to_regprocedure('private.review_song_suggestion_v1(uuid,text,text)') IS NULL THEN
+    ALTER FUNCTION public.review_song_suggestion(uuid,text,text) SET SCHEMA private;
+    ALTER FUNCTION private.review_song_suggestion(uuid,text,text) RENAME TO review_song_suggestion_v1;
+  END IF;
+END $$;
+REVOKE EXECUTE ON FUNCTION private.review_song_suggestion_v1(uuid,text,text) FROM PUBLIC,lvm_anon,lvm_user;
+CREATE OR REPLACE FUNCTION public.review_song_suggestion(p_suggestion_id uuid,p_action text,p_reason text DEFAULT NULL)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path='' AS $$
+DECLARE v_suggestion public.song_suggestions%ROWTYPE; v_result jsonb;
+BEGIN
+  IF NOT public.has_min_role('editor') THEN RAISE insufficient_privilege USING MESSAGE='Only editors can review suggestions'; END IF;
+  IF p_action IS NULL OR p_action NOT IN ('approve','reject') THEN RAISE EXCEPTION 'Invalid review action'; END IF;
+  SELECT * INTO v_suggestion FROM public.song_suggestions WHERE id=p_suggestion_id FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Suggestion not found'; END IF;
+  IF v_suggestion.status='approved' AND p_action='approve' THEN
+    RETURN jsonb_build_object('status','approved','song_id',v_suggestion.song_id);
+  ELSIF v_suggestion.status='rejected' AND p_action='reject' AND v_suggestion.rejection_reason IS NOT DISTINCT FROM p_reason THEN
+    RETURN jsonb_build_object('status','rejected');
+  ELSIF v_suggestion.status<>'pending' THEN
+    RAISE SQLSTATE 'PT409' USING MESSAGE='Suggestion already reviewed with a different decision';
+  END IF;
+  IF p_action='approve' AND v_suggestion.type IN ('edit','deletion') THEN
+    PERFORM 1 FROM public.songs WHERE id=v_suggestion.song_id AND NOT is_deleted FOR UPDATE;
+    IF NOT FOUND THEN RAISE SQLSTATE 'PT409' USING MESSAGE='Published song is no longer available'; END IF;
+  END IF;
+  v_result=private.review_song_suggestion_v1(p_suggestion_id,p_action,p_reason);
+  IF p_action='approve' THEN UPDATE public.song_suggestions SET song_id=(v_result->>'song_id')::uuid WHERE id=p_suggestion_id; END IF;
+  RETURN v_result;
+END $$;
+REVOKE EXECUTE ON FUNCTION public.review_song_suggestion(uuid,text,text) FROM PUBLIC,lvm_anon;
+GRANT EXECUTE ON FUNCTION public.review_song_suggestion(uuid,text,text) TO lvm_user;
 INSERT INTO private.migrations(version) VALUES('012_editor_transactions') ON CONFLICT DO NOTHING;
 COMMIT;

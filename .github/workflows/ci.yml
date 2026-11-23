@@ -31,10 +31,12 @@ jobs:
       - name: Verify church schema, authorization, concurrency controls and idempotency
         run: |
           for migration in suite-api/schema/*.sql; do
+            case "$migration" in *.down.sql) continue ;; esac
             docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < "$migration"
           done
           docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/planning.sql
           docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/worship-exchange.sql
+          docker exec -i ${{ job.services.postgres.id }} psql -U lvm_owner -d lvm_planning_ci -v ON_ERROR_STOP=1 < suite-api/test/editor-transactions.sql
       - run: npx playwright install --with-deps chromium
       - run: npm run test:planning-journal
 

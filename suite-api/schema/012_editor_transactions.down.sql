@@ -2,6 +2,10 @@
 -- Roll back the web client together with the API allowlist before using this.
 BEGIN;
 DROP FUNCTION IF EXISTS public.mutate_editor_song(uuid,text,uuid,uuid,jsonb,timestamptz);
+DROP FUNCTION public.review_song_suggestion(uuid,text,text);
+ALTER FUNCTION private.review_song_suggestion_v1(uuid,text,text) RENAME TO review_song_suggestion;
+ALTER FUNCTION private.review_song_suggestion(uuid,text,text) SET SCHEMA public;
+GRANT EXECUTE ON FUNCTION public.review_song_suggestion(uuid,text,text) TO lvm_user;
 DROP TRIGGER IF EXISTS audit_editor_song ON public.songs;
 DROP TRIGGER IF EXISTS audit_editor_suggestion ON public.song_suggestions;
 DROP FUNCTION IF EXISTS private.audit_editor_write();
