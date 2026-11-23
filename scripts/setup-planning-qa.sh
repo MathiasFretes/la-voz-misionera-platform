@@ -16,6 +16,7 @@ mkdir -p planning-qa
 chmod 700 planning-qa
 docker compose exec -T postgres createdb -U lvm_owner "$qa_database"
 for migration in planning-preflight/schema/*.sql; do
+  case "$migration" in *.down.sql) continue ;; esac
   docker compose exec -T postgres psql -U lvm_owner -d "$qa_database" -v ON_ERROR_STOP=1 < "$migration" > /dev/null
 done
 printf 'postgres://lvm_rest:%s@postgres:5432/%s' "$(cat secrets/rest_password)" "$qa_database" > planning-qa/rest_uri

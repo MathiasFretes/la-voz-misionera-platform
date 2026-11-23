@@ -34,6 +34,12 @@ assert.ok(
 
 function startQa(manifest) {
   const { image, serviceCommit, sourceArchiveSha256: hash } = manifest
+  const migrationCount = manifest.migrationCount ?? 10
+  assert.ok(
+    Number.isInteger(migrationCount) &&
+      migrationCount > 0 &&
+      migrationCount < 1000,
+  )
   assert.equal(manifest.database, database)
   assert.equal(manifest.run, run)
   assert.match(serviceCommit, /^[a-f0-9]{40}$/)
@@ -43,7 +49,7 @@ function startQa(manifest) {
 cd /srv/apps/la-voz-misionera
 test "$(sha256sum '${stage}/suite-api.tar.gz' | cut -d ' ' -f 1)" = '${hash}'
 test "$(cat '${stage}/qa-database')" = '${database}'
-test "$(docker compose exec -T postgres psql -U lvm_owner -d '${database}' -Atc 'SELECT count(*) FROM private.migrations')" = '10'
+test "$(docker compose exec -T postgres psql -U lvm_owner -d '${database}' -Atc 'SELECT count(*) FROM private.migrations')" = '${migrationCount}'
 test "$(docker compose exec -T postgres psql -U lvm_owner -d '${database}' -Atc 'SELECT count(*) FROM public.users')" = '0'
 for name in lvm-planning-qa-api lvm-planning-qa-rest; do
   if docker inspect "$name" >/dev/null 2>&1; then test "$(docker inspect -f '{{index .Config.Labels "lvm.qa.run"}}' "$name")" = '${run}'; fi
@@ -130,6 +136,21 @@ assert.equal(
   '',
   'API must match its recorded commit',
 )
+// 002 installs functions but predates the migrations ledger.
+const migrationCount = git(
+  'ls-tree',
+  '-r',
+  '--name-only',
+  'HEAD',
+  'suite-api/schema',
+)
+  .split('\n')
+  .filter(
+    (name) =>
+      name.endsWith('.sql') &&
+      !name.endsWith('.down.sql') &&
+      !name.includes('/002_'),
+  ).length
 const output = join(tmpdir(), run)
 await mkdir(output, { recursive: true })
 const archive = join(output, 'suite-api.tar.gz')
@@ -170,6 +191,7 @@ const manifest = {
   apiTree,
   clientCommit,
   sourceArchiveSha256: hash,
+  migrationCount,
   image,
   loopback: '127.0.0.1:4319',
   productionDeploymentChanged: false,
@@ -205,9 +227,10 @@ chmod 400 '${stage}/secrets/'*
 docker compose exec -T postgres createdb -U lvm_owner -T template0 '${database}'
 docker compose exec -T postgres psql -U lvm_owner -d postgres -v ON_ERROR_STOP=1 -c 'REVOKE ALL ON DATABASE ${database} FROM PUBLIC; GRANT CONNECT ON DATABASE ${database} TO lvm_api,lvm_rest;'
 for migration in '${stage}/source/schema/'*.sql; do
+  case "$migration" in *.down.sql) continue ;; esac
   docker compose exec -T postgres psql -U lvm_owner -d '${database}' -v ON_ERROR_STOP=1 < "$migration" >/dev/null
 done
-test "$(docker compose exec -T postgres psql -U lvm_owner -d '${database}' -Atc 'SELECT count(*) FROM private.migrations')" = '10'
+test "$(docker compose exec -T postgres psql -U lvm_owner -d '${database}' -Atc 'SELECT count(*) FROM private.migrations')" = '${migrationCount}'
 test "$(docker compose exec -T postgres psql -U lvm_owner -d '${database}' -Atc 'SELECT count(*) FROM public.users')" = '0'
 `),
 )
