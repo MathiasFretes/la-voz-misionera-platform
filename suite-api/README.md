@@ -42,6 +42,39 @@ con un glob que incluya rollbacks.
 obsoleta, denegación tras revocación e inyección de fallos en auditoría. Se ejecuta
 con PostgreSQL aislado en CI. El gate real de navegador/API/SQL y sus versiones
 están en Worship `apps/web/public/wiki/Editor-Postgres-Acceptance.md` y su reporte
-JSON: 18 comprobaciones, limpieza confirmada y cero cambios productivos. Mantener
+JSON, con versiones exactas, comprobaciones de navegador/API/SQL y limpieza confirmada. Mantener
 ambos PR en borrador hasta revisión y autorización. El nuevo cliente requiere
 que la migración y API se publiquen primero; no sustituye ni activa la API nativa.
+
+### Cierre de los tres bloqueantes de revisión (candidato)
+
+- **Escrituras protegidas:** se revoca INSERT/UPDATE/DELETE a los roles de cliente
+  sobre canciones, propuestas y borradores. Todas las mutaciones del editor web
+  pasan por `mutate_editor_song`; también los metadatos PPTX (`update_pptx`).
+  La auditoría permanece exclusivamente en servidor.
+- **Revisión obligatoria:** cualquier mutación de un registro existente exige
+  `p_expected_updated_at` no nulo y coincidente. El reloj de revisión avanza incluso
+  dentro de una misma transacción. Actualizar solo el contador de favoritos no
+  invalida la revisión musical.
+- **Propuestas antiguas:** se captura `base_song_updated_at` al proponer; aprobar
+  una edición/eliminación con base ausente u obsoleta devuelve 409 y conserva la
+  propuesta. No se rellenan bases históricas automáticamente. Service muestra la
+  comparación y exige confirmar `rebase_song_suggestion` con la revisión que se
+  comparó, antes de una aprobación separada. Actualizar la base queda auditado y
+  nunca publica por sí mismo.
+
+`test/editor-revisions.sql` comprueba estos casos con roles PostgreSQL reales.
+CI ejecuta además `012_editor_transactions.down.sql`, verifica con
+`test/editor-rollback.sql` que el rollback conserva las prohibiciones de escritura
+incluida auditoría, reaplica 012 y repite la regresión de revisiones. El rollback
+es deliberadamente **de solo lectura para edición**: conserva datos/recibos y
+revoca los RPC de edición/revisión; no restaura la escritura directa insegura.
+Para volver a editar se debe reaplicar una versión revisada de 012 y coordinar
+API y cliente, sin ejecutar migraciones históricas.
+
+Compatibilidad: el editor web activo usa RPC para guardar/publicar, borradores,
+envíos y metadatos de presentaciones; Service usa RPC para revisar y actualizar
+bases. El Worker histórico de carga binaria PPTX y el CRUD Supabase/nativo no se
+activan ni quedan certificados por este gate del VPS. Solo se prueba el guardado
+de metadatos PPTX; no una carga real a ese Worker. Mantener bloqueada su activación
+hasta migración y pruebas específicas. No hay despliegue productivo en esta entrega.
