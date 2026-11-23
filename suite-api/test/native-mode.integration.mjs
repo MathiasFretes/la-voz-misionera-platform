@@ -31,6 +31,14 @@ async function request(
     cookie: response.headers.get('set-cookie')?.split(';')[0],
   }
 }
+const nativeSignup = await request(on, 'native/auth/signup', {
+  method: 'POST',
+  native: true,
+  data: { email: `native-signup-${randomUUID()}@example.invalid`, password },
+})
+assert.equal(nativeSignup.status, 201)
+assert.match(nativeSignup.data.session.access_token, /^n_[\w-]{43}$/)
+assert.equal(nativeSignup.cookie, undefined)
 const signup = await request(off[0], 'auth/signup', {
   method: 'POST',
   data: { email, password },
