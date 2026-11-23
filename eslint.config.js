@@ -31,6 +31,11 @@ export default tseslint.config(
   {
     files: [
       'suite-api/**/*.mjs',
+      'scripts/build-native-gate-android.mjs',
+      'scripts/native-android-gate.mjs',
+      'scripts/native-gate-https-proxy.mjs',
+      'scripts/native-gate-qa.mjs',
+      'scripts/verify-native-connected.mjs',
       'scripts/verify-vps-admin.mjs',
       'scripts/verify-vps-content.mjs',
       'scripts/verify-vps-editorial.mjs',
@@ -47,6 +52,7 @@ export default tseslint.config(
         Buffer: 'readonly',
         URL: 'readonly',
         fetch: 'readonly',
+        Response: 'readonly',
         AbortSignal: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
