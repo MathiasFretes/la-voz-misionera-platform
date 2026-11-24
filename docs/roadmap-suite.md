@@ -30,28 +30,28 @@ El CMS conectado incorpora eventos, prédicas, sedes, pastores, ministerios y ho
 
 La conexión editorial también está desplegada: Inicio y transmisión usan `contenido/home`, Nosotros usa `contenido/nosotros` y el devocional usa `contenido/general`. Service edita registros únicos, conserva borradores privados y publica con revisión esperada. Inicio refleja la misión y el devocional publicados. La transmisión valida y abre su enlace y permite desactivarla; el devocional ofrece impresión y compartir reales. El recorrido se verificó en el VPS a 1440/390 px, incluyendo carga fallida y reintento, y se corrigieron controles móviles recortados y el acceso flotante que tapaba contenido. Se conserva el resto de M12 pendiente.
 
-La trazabilidad del VPS está documentada con commits locales y `deployment.json`. Esto resuelve la incertidumbre sobre el código inspeccionado en el servidor, pero no equivale a integrar las ramas en GitHub/main ni a automatizar CI/CD. No se asigna un porcentaje global sin un inventario ponderado y criterios de aceptación aprobados.
+La trazabilidad del VPS está documentada con commits y `deployment.json`. Al 24 de noviembre, Service #19 y Worship #4 ya están integrados en sus respectivos `main`, con CI posterior aprobado. Esa consolidación no actualiza por sí sola el VPS ni automatiza CI/CD: la versión desplegada y la publicación coordinada siguen siendo verificaciones separadas. No se asigna un porcentaje global sin un inventario ponderado y criterios de aceptación aprobados.
 
 M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus gates locales/CI no prueban que toda la suite esté conectada en producción. La API anterior de planificación sigue privada; Service usa ahora las rutas autenticadas por iglesia de `suite-api`, conservando el modo local anterior como opción explícita. Las afirmaciones de PR y CI en documentos históricos deben leerse con su fecha, no como una verificación remota actual.
 
 ## Estado actual
 
-| Bloque                              | Estado                      | Evidencia y límite actual                                                                                                             |
-| ----------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                              |
-| M7.8A–E — LVM NDI                   | Gate histórico funcional    | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                     |
-| M7.8F — distribución NDI            | Pendiente de release        | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                           |
-| M8 — Backend y datos                | Cerrado en alcance local/CI | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                                  |
-| M9 — Identidad y capacidades        | En curso                    | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.         |
-| M10 — Organización                  | Pendiente                   | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                              |
-| M11 / W2 — Ecosistema conectado     | Vertical Web verificada     | Edición offline, conflicto y resolución en HTTPS, incorporación y entrega por archivo a Presenter Windows; adopción nativa pendiente. |
-| M12 — CMS                           | En curso                    | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo.      |
-| M13 — API pública y Web 2           | Parcial                     | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                       |
-| M14A.1 — Fundación Flutter          | Gate histórico cerrado      | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                         |
-| M14E — Presenter Remote Core        | Gate físico histórico       | No se repitió QA de dispositivo en esta revisión.                                                                                     |
-| M14E.2 — Presenter enriquecido | Gate técnico validado | Candidato `107d18e`: unitarias, contratos, build y Electron aprobados; PR #13 aún sin fusionar. |
-| M14E.3 — Mobile Remote | CI aprobado; QA físico pendiente | Candidato `57288cf`: 5/5 checks y 8 pruebas Remote; la prueba física anterior no certifica este APK. |
-| M14A.2 — Identidad institucional | Auditoría pendiente | Mobile #11 documental; maestro oficial del sello y variante histórica Android pendientes de resolución. |
+| Bloque                              | Estado                           | Evidencia y límite actual                                                                                                             |
+| ----------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local      | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                              |
+| M7.8A–E — LVM NDI                   | Gate histórico funcional         | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                     |
+| M7.8F — distribución NDI            | Pendiente de release             | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                           |
+| M8 — Backend y datos                | Cerrado en alcance local/CI      | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                                  |
+| M9 — Identidad y capacidades        | En curso                         | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.         |
+| M10 — Organización                  | Pendiente                        | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                              |
+| M11 / W2 — Ecosistema conectado     | Vertical Web verificada          | Edición offline, conflicto y resolución en HTTPS, incorporación y entrega por archivo a Presenter Windows; adopción nativa pendiente. |
+| M12 — CMS                           | En curso                         | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo.      |
+| M13 — API pública y Web 2           | Parcial                          | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                       |
+| M14A.1 — Fundación Flutter          | Gate histórico cerrado           | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                         |
+| M14E — Presenter Remote Core        | Gate físico histórico            | No se repitió QA de dispositivo en esta revisión.                                                                                     |
+| M14E.2 — Presenter enriquecido      | Gate técnico validado            | Candidato `107d18e`: unitarias, contratos, build y Electron aprobados; PR #13 aún sin fusionar.                                       |
+| M14E.3 — Mobile Remote              | CI aprobado; QA físico pendiente | Candidato `57288cf`: 5/5 checks y 8 pruebas Remote; la prueba física anterior no certifica este APK.                                  |
+| M14A.2 — Identidad institucional    | Auditoría pendiente              | Mobile #11 documental; maestro oficial del sello y variante histórica Android pendientes de resolución.                               |
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
@@ -154,9 +154,11 @@ El JSON descargado mediante «Presentación → Descargar para Presenter» del H
 
 **Gate:** build firmado en macOS y compatibilidad de datos con Web/Expo.
 
-## Primer slice recomendado
+## Primer slice musical — referencia histórica
 
-El primer cambio de implementación debe ser pequeño y vertical:
+Esta secuencia documenta la recomendación inicial, no una nueva lista de tareas pendientes. La vertical Web de W2 ya implementó y verificó el intercambio con Service, el trabajo offline, la reconexión y el retorno de WorshipPlan con revisión esperada; su evidencia está en la sección W2. La adopción completa en Expo sigue pendiente y no se da por cerrada por el avance Web.
+
+La recomendación inicial consistía en:
 
 1. Crear la matriz W0 y fijar Web/Expo como clientes canónicos.
 2. Introducir `WorshipRepository` detrás del listado de repertorios, sin cambiar la UI.
@@ -164,7 +166,7 @@ El primer cambio de implementación debe ser pequeño y vertical:
 4. Mantener el adaptador local y probar modo offline.
 5. Guardar y devolver `WorshipPlan 0.1` con control de revisión, sin modificar el contrato.
 
-El slice musical no introduce un editor Flutter, CMS dentro de Worship, blog, identidad propia de Worship, reescritura de ChordPro ni cambios a M7.8F. La publicación autorizada de las aplicaciones web y el CMS de Service se gestionan en el bloque de despliegue y en la prioridad actual, fuera de ese slice musical.
+Se conservan los límites de ese slice: no introduce un editor Flutter, CMS dentro de Worship, blog, identidad propia de Worship, reescritura de ChordPro ni cambios a M7.8F. La publicación autorizada de las aplicaciones web y el CMS de Service se gestionan en el bloque de despliegue y en la prioridad actual, fuera de ese slice musical.
 
 ## Gates transversales
 

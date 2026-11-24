@@ -4,10 +4,10 @@ Esta revisión acredita desarrollo y QA; no autoriza merge, distribución ni des
 
 ## Candidatos y evidencia
 
-| Producto | SHA revisado | Resultado |
-| --- | --- | --- |
+| Producto      | SHA revisado                               | Resultado                                              |
+| ------------- | ------------------------------------------ | ------------------------------------------------------ |
 | Presenter #13 | `107d18ed8eb792c8fea6329044dd850ba3385609` | Unitarias, contratos, build y Electron real aprobados. |
-| Mobile #17 | `57288cf0f03a6a962e2bb4b8a11c856c0c7393bd` | Análisis, pruebas y cuatro builds Android aprobados. |
+| Mobile #17    | `57288cf0f03a6a962e2bb4b8a11c856c0c7393bd` | Análisis, pruebas y cuatro builds Android aprobados.   |
 
 - [Presenter #13: alcance y revisión](https://github.com/MathiasFretes/lvm-presenter/pull/13).
 - [Mobile #17: correcciones y revisión](https://github.com/MathiasFretes/lvm-mobile/pull/17).
