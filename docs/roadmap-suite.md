@@ -1,6 +1,18 @@
 # Roadmap de La Voz Misionera
 
-**Actualizado:** 2026-11-21 · **Alcance:** LVM Service, LVM Worship, LVM Presenter, LVM Web Pública y LVM Mobile.
+**Actualizado:** 2026-11-24 · **Alcance:** LVM Service, LVM Worship, LVM Presenter, LVM Web Pública y LVM Mobile.
+
+## Consolidación y revisión del 24 de noviembre
+
+La fase actual es **ecosistema conectado (M9–M14)**. M7 y M8 conservan su cierre histórico; no se declara cerrada la adopción nativa, la organización ni el CMS completo.
+
+Service [#19](https://github.com/MathiasFretes/la-voz-misionera-platform/pull/19) y Worship [#4](https://github.com/MathiasFretes/lvm-worship/pull/4) están fusionados mediante merge commits en sus respectivos `main`: `097508bdf4ec8d59cb5c0c9d78af5e07f2ae38d8` y `cf6c3bf0132d10b01ae02d908d3397497331a7a4`. Sus verificaciones posteriores a la integración fueron aprobadas. B1–B5 y G1/G2 permanecen cerrados; solo una regresión demostrada justificaría reabrirlos.
+
+**Integración en GitHub no equivale a despliegue.** El último registro operativo conserva Worship `7364f3ee8ae15ca2b4fb919cdc0c1e57951fd18e` en el VPS. Esta actualización documental no vuelve a inspeccionar producción ni acredita la aplicación allí de la migración 012. La publicación coordinada requiere autorización independiente, respaldo y restauración comprobados, orden de migraciones y rollback.
+
+Presenter [#13](https://github.com/MathiasFretes/lvm-presenter/pull/13), candidato `107d18ed8eb792c8fea6329044dd850ba3385609`, superó la revisión técnica con 188 unitarias aprobadas (9 omitidas), 8 contratos, build y E2E con Electron real. Mobile [#17](https://github.com/MathiasFretes/lvm-mobile/pull/17), candidato `57288cf0f03a6a962e2bb4b8a11c856c0c7393bd`, incorpora protección contra conexiones tardías y compatibilidad con snapshots anteriores; sus cinco checks están aprobados, incluidas las cuatro compilaciones Android. La [evidencia y límites de M14E](remote-integration-review-2026-11-24.md) separan la prueba Electron, las regresiones Flutter y la prueba física todavía pendiente del nuevo APK.
+
+La consolidación original lleva **2 de 5 PR integrados**. Presenter #13 y Mobile #17 continúan en borrador; Mobile [#11](https://github.com/MathiasFretes/lvm-mobile/pull/11) conserva la auditoría institucional pendiente. No se autorizan con esta actualización nuevas fusiones, distribución, protección o eliminación de ramas, ni despliegue. La variante histórica Android debe compararse por archivo; no se incorpora completa ni se sustituye el sello provisional por un recurso sin aprobación institucional.
 
 ## Despliegue del 20 de noviembre
 
@@ -37,7 +49,9 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 | M13 — API pública y Web 2           | Parcial                     | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                       |
 | M14A.1 — Fundación Flutter          | Gate histórico cerrado      | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                         |
 | M14E — Presenter Remote Core        | Gate físico histórico       | No se repitió QA de dispositivo en esta revisión.                                                                                     |
-| M14E.2/M14E.3/M14A.2                | Revisión pendiente          | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.                                    |
+| M14E.2 — Presenter enriquecido | Gate técnico validado | Candidato `107d18e`: unitarias, contratos, build y Electron aprobados; PR #13 aún sin fusionar. |
+| M14E.3 — Mobile Remote | CI aprobado; QA físico pendiente | Candidato `57288cf`: 5/5 checks y 8 pruebas Remote; la prueba física anterior no certifica este APK. |
+| M14A.2 — Identidad institucional | Auditoría pendiente | Mobile #11 documental; maestro oficial del sello y variante histórica Android pendientes de resolución. |
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
@@ -49,12 +63,11 @@ Worship `5cd6845fb` incorpora además el editor Expo conectado por enlace de Ser
 
 ## Orden de ejecución
 
-1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
-2. Completar M9: adoptar las membresías y capacidades ya disponibles en los clientes restantes y la planificación remota; incorporar recuperación segura de cuenta.
-3. Mantener y ampliar la planificación autenticada ya desplegada: diario transaccional, reconexión, resolución explícita y revisiones por iglesia.
-4. Ejecutar W2 entre Service y Worship con reconexión y conflictos; migrar el cliente Expo sin duplicar usuarios.
-5. Completar M10 y las demás colecciones/editoriales de M12; después ampliar la API pública de M13.
-6. Retomar M14E.2/M14E.3 y gates de distribución con evidencia vigente. No reabrir NDI técnico ni sustituir Expo por la preview Flutter.
+1. Preparar la publicación coordinada de Service + Worship: respaldo/restauración, migración 012, compatibilidad y rollback. Ejecutarla solo tras autorización de despliegue.
+2. Validar físicamente el APK candidato de Mobile #17 contra Presenter #13: QR, navegación del culto, desconexión, nuevo emparejamiento, blackout y restauración. Luego solicitar autorización de integración, primero Presenter y después Mobile, con CI sobre ambos `main`.
+3. Resolver Mobile #11 y evaluar la variante histórica de recursos por archivo. La aprobación del sello y la protección/limpieza de ramas son decisiones separadas.
+4. Completar M9 y W2 en Expo: identidad por iglesia, recuperación de cuenta, planificación musical y recuperación offline verificadas contra API/PostgreSQL y en Android físico. Conservar los contratos 0.1.
+5. Avanzar M10, las páginas/colecciones, medios y flujo editorial restantes de M12, y la API pública versionada/migración funcional de M13. Service sigue siendo la administración central y se conserva la apariencia V0.
 
 M7.8F se retoma solo con evidencia nueva de electron-builder/NSIS, una actualización relevante de esas herramientas o una VM limpia. No se reabre NDI técnico.
 
