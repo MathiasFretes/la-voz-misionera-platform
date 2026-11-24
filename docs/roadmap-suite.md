@@ -28,7 +28,7 @@ Web #4 cambió su base a main después de integrar #3; se comprobó que conserva
 
 La [prueba física de identidad](https://github.com/MathiasFretes/lvm-mobile/blob/e1deaaff70750190e49442bfff96c27fb0fe3a21/docs/qa/brand-device-2026-11-24.md) pasó en HONOR ELP-NX9 / Android 16: icono, apertura desde el launcher, arranque en frío, cinco pestañas y temas claro, oscuro y automático. El candidato `f4f1c157` conserva el mismo código de aplicación en el main final, que añade únicamente los dos documentos de #11. Esta prueba de apariencia no repite ni sustituye el gate funcional Remote anterior; tampoco certifica Expo, otros dispositivos o distribución firmada.
 
-La suite comparte el SVG institucional aprobado y los mismos valores de tokens. M14A.2 queda integrado en ese alcance. La variante histórica Android solo se rescata por archivo si existe valor exclusivo; no se fusiona indiscriminadamente. La protección o eliminación de ramas, distribución y producción mantienen gates separados. La restauración aislada del respaldo reciente debe acreditarse antes del despliegue coordinado y la migración 012.
+La suite comparte el SVG institucional aprobado y los mismos valores de tokens. M14A.2 queda integrado en ese alcance. La variante histórica Android solo se rescata por archivo si existe valor exclusivo; no se fusiona indiscriminadamente. La protección o eliminación de ramas, distribución y producción mantienen gates separados. La [restauración aislada del respaldo del 24 de noviembre](backup-restore-2026-11-24.md) fue satisfactoria. Antes de publicar deberá tomarse y validarse un respaldo nuevo; la migración 012 y el despliegue siguen pendientes de autorización.
 
 ## Despliegue del 20 de noviembre
 
