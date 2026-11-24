@@ -14,7 +14,21 @@ Presenter [#13](https://github.com/MathiasFretes/lvm-presenter/pull/13) y Mobile
 
 El gate físico M14E.3 pasó en el HONOR ELP-NX9 / Android 16 autorizado y la LAN Wi-Fi ensayada: QR, navegación, blackout, interrupción de transporte, nuevo emparejamiento manteniendo la salida en negro y restauración explícita. El APK proviene del SHA exacto de Mobile y fue archivado con manifiestos y checksums. Esto no certifica Samsung A12, todas las redes, clic manual de aprobación en escritorio, instalador firmado ni salida física NDI/proyector; no incorpora reconexión automática.
 
-La consolidación original lleva **4 de 5 PR integrados**. Mobile [#11](https://github.com/MathiasFretes/lvm-mobile/pull/11) conserva la auditoría institucional pendiente y sigue fuera de esta autorización. La distribución, protección o eliminación de ramas y el despliegue también quedan fuera. La rama QA que conserva la receta y evidencia física no se fusiona como producto ni se elimina antes de conservar su contenido. La variante histórica Android se evalúa por archivo, sin sustituir recursos aprobados ni adoptar un sello sin aprobación institucional.
+La consolidación original está **completada: 5 de 5 PR integrados**, incluido Mobile #11. La identidad oficial blanco sobre círculo dorado también quedó integrada mediante los siete PR autorizados, con merge commits y CI posterior aprobado en cada paso.
+
+| Producto            | Main tras la integración                   | CI posterior                        |
+| ------------------- | ------------------------------------------ | ----------------------------------- |
+| Service #22         | `238ff5c91a29fa5df4ff24f8323f4ec3e1ff49ba` | 3/3                                 |
+| Worship #5          | `71850c7f5e0037c928202a503d511e53a70d57f4` | 4/4                                 |
+| Presenter #14       | `4527819e0d0791fced6acdf487460cccae91d694` | 1/1                                 |
+| Web Pública #3 y #4 | `3d4c9b19ddd536334678f1df094dc894b04a91dc` | 1/1 en cada main intermedio y final |
+| Mobile #11 y #18    | `995a4e61219b26926e9980c492f0573efa609bde` | 5/5 en cada main intermedio y final |
+
+Web #4 cambió su base a main después de integrar #3; se comprobó que conservaba sus 31 archivos de identidad y se repitió CI antes del merge. Mobile #11 aporta únicamente dos documentos históricos y no sustituye recursos institucionales. La referencia a estos SHA registra esta entrega; no impide futuros commits documentales.
+
+La [prueba física de identidad](https://github.com/MathiasFretes/lvm-mobile/blob/e1deaaff70750190e49442bfff96c27fb0fe3a21/docs/qa/brand-device-2026-11-24.md) pasó en HONOR ELP-NX9 / Android 16: icono, apertura desde el launcher, arranque en frío, cinco pestañas y temas claro, oscuro y automático. El candidato `f4f1c157` conserva el mismo código de aplicación en el main final, que añade únicamente los dos documentos de #11. Esta prueba de apariencia no repite ni sustituye el gate funcional Remote anterior; tampoco certifica Expo, otros dispositivos o distribución firmada.
+
+La suite comparte el SVG institucional aprobado y los mismos valores de tokens. M14A.2 queda integrado en ese alcance. La variante histórica Android solo se rescata por archivo si existe valor exclusivo; no se fusiona indiscriminadamente. La protección o eliminación de ramas, distribución y producción mantienen gates separados. La [restauración aislada del respaldo del 24 de noviembre](backup-restore-2026-11-24.md) fue satisfactoria. Antes de publicar deberá tomarse y validarse un respaldo nuevo; la migración 012 y el despliegue siguen pendientes de autorización.
 
 ## Despliegue del 20 de noviembre
 
@@ -53,7 +67,7 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 | M14E — Presenter Remote Core        | Gate físico histórico                 | No se repitió QA de dispositivo en esta revisión.                                                                                                 |
 | M14E.2 — Presenter enriquecido      | Integrado; CI aprobado                | Main `fb2ce69`: contratos, unitarias y compilación completos; gate técnico y Electron real verificados.                                           |
 | M14E.3 — Mobile Remote              | Integrado; gate físico HONOR aprobado | Main `cfa37a5`, 5/5 checks; QR, navegación y recuperación en LAN ensayados con APK de `57288cf`. Distribución y proyección física fuera del gate. |
-| M14A.2 — Identidad institucional    | Auditoría pendiente                   | Mobile #11 documental; maestro oficial del sello y variante histórica Android pendientes de resolución.                                           |
+| M14A.2 — Identidad institucional    | Integrada; QA HONOR aprobado          | Sello blanco/dorado compartido en cinco main; auditoría #11 integrada. Otros dispositivos y distribución conservan gates propios.                 |
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
@@ -67,7 +81,7 @@ Worship `5cd6845fb` incorpora además el editor Expo conectado por enlace de Ser
 
 1. Preparar la publicación coordinada de Service + Worship: respaldo/restauración, migración 012, compatibilidad y rollback. Ejecutarla solo tras autorización de despliegue.
 2. Conservar la integración Presenter–Remote ya verificada y su evidencia física. La firma/distribución y la salida física NDI/proyector requieren gates propios; no se repiten como pendientes los escenarios ya aprobados en el HONOR y la LAN ensayada.
-3. Resolver Mobile #11 y evaluar la variante histórica de recursos por archivo. La aprobación del sello y la protección/limpieza de ramas son decisiones separadas.
+3. Mantener la identidad aprobada y su evidencia. Evaluar cualquier recurso histórico exclusivo por archivo; la protección/limpieza de ramas y la distribución requieren decisiones separadas.
 4. Completar M9 y W2 en Expo: identidad por iglesia, recuperación de cuenta, planificación musical y recuperación offline verificadas contra API/PostgreSQL y en Android físico. Conservar los contratos 0.1.
 5. Avanzar M10, las páginas/colecciones, medios y flujo editorial restantes de M12, y la API pública versionada/migración funcional de M13. Service sigue siendo la administración central y se conserva la apariencia V0.
 
