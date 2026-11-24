@@ -16,13 +16,13 @@ El gate físico M14E.3 pasó en el HONOR ELP-NX9 / Android 16 autorizado y la LA
 
 La consolidación original está **completada: 5 de 5 PR integrados**, incluido Mobile #11. La identidad oficial blanco sobre círculo dorado también quedó integrada mediante los siete PR autorizados, con merge commits y CI posterior aprobado en cada paso.
 
-| Producto | Main tras la integración | CI posterior |
-| --- | --- | --- |
-| Service #22 | `238ff5c91a29fa5df4ff24f8323f4ec3e1ff49ba` | 3/3 |
-| Worship #5 | `71850c7f5e0037c928202a503d511e53a70d57f4` | 4/4 |
-| Presenter #14 | `4527819e0d0791fced6acdf487460cccae91d694` | 1/1 |
+| Producto            | Main tras la integración                   | CI posterior                        |
+| ------------------- | ------------------------------------------ | ----------------------------------- |
+| Service #22         | `238ff5c91a29fa5df4ff24f8323f4ec3e1ff49ba` | 3/3                                 |
+| Worship #5          | `71850c7f5e0037c928202a503d511e53a70d57f4` | 4/4                                 |
+| Presenter #14       | `4527819e0d0791fced6acdf487460cccae91d694` | 1/1                                 |
 | Web Pública #3 y #4 | `3d4c9b19ddd536334678f1df094dc894b04a91dc` | 1/1 en cada main intermedio y final |
-| Mobile #11 y #18 | `995a4e61219b26926e9980c492f0573efa609bde` | 5/5 en cada main intermedio y final |
+| Mobile #11 y #18    | `995a4e61219b26926e9980c492f0573efa609bde` | 5/5 en cada main intermedio y final |
 
 Web #4 cambió su base a main después de integrar #3; se comprobó que conservaba sus 31 archivos de identidad y se repitió CI antes del merge. Mobile #11 aporta únicamente dos documentos históricos y no sustituye recursos institucionales. La referencia a estos SHA registra esta entrega; no impide futuros commits documentales.
 
@@ -67,7 +67,7 @@ M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus
 | M14E — Presenter Remote Core        | Gate físico histórico                 | No se repitió QA de dispositivo en esta revisión.                                                                                                 |
 | M14E.2 — Presenter enriquecido      | Integrado; CI aprobado                | Main `fb2ce69`: contratos, unitarias y compilación completos; gate técnico y Electron real verificados.                                           |
 | M14E.3 — Mobile Remote              | Integrado; gate físico HONOR aprobado | Main `cfa37a5`, 5/5 checks; QR, navegación y recuperación en LAN ensayados con APK de `57288cf`. Distribución y proyección física fuera del gate. |
-| M14A.2 — Identidad institucional | Integrada; QA HONOR aprobado | Sello blanco/dorado compartido en cinco main; auditoría #11 integrada. Otros dispositivos y distribución conservan gates propios. |
+| M14A.2 — Identidad institucional    | Integrada; QA HONOR aprobado          | Sello blanco/dorado compartido en cinco main; auditoría #11 integrada. Otros dispositivos y distribución conservan gates propios.                 |
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
