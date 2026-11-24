@@ -1,0 +1,17 @@
+srv2137598.hstgr.cloud {
+    route {
+        header {
+            X-Content-Type-Options nosniff
+            Referrer-Policy strict-origin-when-cross-origin
+        }
+        handle /api/health {
+            reverse_proxy lvm-worship-api:4318
+        }
+        handle {
+            header Retry-After "120"
+            header Cache-Control "no-store, max-age=0"
+            header X-LVM-Maintenance "1"
+            respond "LVM esta en mantenimiento. Intenta nuevamente en unos minutos." 503
+        }
+    }
+}

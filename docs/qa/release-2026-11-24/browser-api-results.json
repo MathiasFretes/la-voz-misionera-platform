@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "HTTPS, API health, exact source manifests and native auth disabled",
+    "real web sessions, cookies, login and server-side permissions",
+    "Worship browser editor saves and reloads PostgreSQL draft; retries, 409 and isolation",
+    "proposal review permissions, rejection and editable draft recovery",
+    "church planning persistence, idempotent save and revision conflict",
+    "18 public routes at desktop/mobile, real contact form and Service inbox persistence",
+    "Service authenticated dashboard, planning and song review browser routes",
+    "session logout and revocation",
+    "temporary QA users, draft/proposal, church/planning and form removed"
+  ],
+  "failure": null,
+  "source": "published HTTPS + actual PostgreSQL",
+  "institutionalRecordsModified": false
+}

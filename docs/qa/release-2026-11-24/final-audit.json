@@ -1,0 +1,18 @@
+{
+  "checkedAt": "2026-11-24T19:50:41.854835+00:00",
+  "allPreExistingTableFingerprintsPreserved": true,
+  "artifactFilesVerified": 300,
+  "caddyOriginalRoutesPreserved": true,
+  "backupChecksumValid": true,
+  "migration012Present": true,
+  "directEditorWritesRevoked": true,
+  "historyForeignKeysProtected": true,
+  "databaseNotPublished": true,
+  "apiHealthy": true,
+  "nativeAuthEnabled": false,
+  "commits": {
+    "service": "a622fd0171eb469b2a42ca8bd3820cbd1a8e58a3",
+    "public": "3d4c9b19ddd536334678f1df094dc894b04a91dc",
+    "worship": "71850c7f5e0037c928202a503d511e53a70d57f4"
+  }
+}
