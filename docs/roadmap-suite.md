@@ -1,6 +1,18 @@
 # Roadmap de La Voz Misionera
 
-**Actualizado:** 2026-11-21 · **Alcance:** LVM Service, LVM Worship, LVM Presenter, LVM Web Pública y LVM Mobile.
+**Actualizado:** 2026-11-24 · **Alcance:** LVM Service, LVM Worship, LVM Presenter, LVM Web Pública y LVM Mobile.
+
+## Consolidación y revisión del 24 de noviembre
+
+La fase actual es **ecosistema conectado (M9–M14)**. M7 y M8 conservan su cierre histórico; no se declara cerrada la adopción nativa, la organización ni el CMS completo.
+
+Service [#19](https://github.com/MathiasFretes/la-voz-misionera-platform/pull/19) y Worship [#4](https://github.com/MathiasFretes/lvm-worship/pull/4) están fusionados mediante merge commits en sus respectivos `main`: `097508bdf4ec8d59cb5c0c9d78af5e07f2ae38d8` y `cf6c3bf0132d10b01ae02d908d3397497331a7a4`. Sus verificaciones posteriores a la integración fueron aprobadas. B1–B5 y G1/G2 permanecen cerrados; solo una regresión demostrada justificaría reabrirlos.
+
+**Integración en GitHub no equivale a despliegue.** El último registro operativo conserva Worship `7364f3ee8ae15ca2b4fb919cdc0c1e57951fd18e` en el VPS. Esta actualización documental no vuelve a inspeccionar producción ni acredita la aplicación allí de la migración 012. La publicación coordinada requiere autorización independiente, respaldo y restauración comprobados, orden de migraciones y rollback.
+
+Presenter [#13](https://github.com/MathiasFretes/lvm-presenter/pull/13), candidato `107d18ed8eb792c8fea6329044dd850ba3385609`, superó la revisión técnica con 188 unitarias aprobadas (9 omitidas), 8 contratos, build y E2E con Electron real. Mobile [#17](https://github.com/MathiasFretes/lvm-mobile/pull/17), candidato `57288cf0f03a6a962e2bb4b8a11c856c0c7393bd`, incorpora protección contra conexiones tardías y compatibilidad con snapshots anteriores; sus cinco checks están aprobados, incluidas las cuatro compilaciones Android. La [evidencia y límites de M14E](remote-integration-review-2026-11-24.md) separan la prueba Electron, las regresiones Flutter y la prueba física todavía pendiente del nuevo APK.
+
+La consolidación original lleva **2 de 5 PR integrados**. Presenter #13 y Mobile #17 continúan en borrador; Mobile [#11](https://github.com/MathiasFretes/lvm-mobile/pull/11) conserva la auditoría institucional pendiente. No se autorizan con esta actualización nuevas fusiones, distribución, protección o eliminación de ramas, ni despliegue. La variante histórica Android debe compararse por archivo; no se incorpora completa ni se sustituye el sello provisional por un recurso sin aprobación institucional.
 
 ## Despliegue del 20 de noviembre
 
@@ -18,26 +30,28 @@ El CMS conectado incorpora eventos, prédicas, sedes, pastores, ministerios y ho
 
 La conexión editorial también está desplegada: Inicio y transmisión usan `contenido/home`, Nosotros usa `contenido/nosotros` y el devocional usa `contenido/general`. Service edita registros únicos, conserva borradores privados y publica con revisión esperada. Inicio refleja la misión y el devocional publicados. La transmisión valida y abre su enlace y permite desactivarla; el devocional ofrece impresión y compartir reales. El recorrido se verificó en el VPS a 1440/390 px, incluyendo carga fallida y reintento, y se corrigieron controles móviles recortados y el acceso flotante que tapaba contenido. Se conserva el resto de M12 pendiente.
 
-La trazabilidad del VPS está documentada con commits locales y `deployment.json`. Esto resuelve la incertidumbre sobre el código inspeccionado en el servidor, pero no equivale a integrar las ramas en GitHub/main ni a automatizar CI/CD. No se asigna un porcentaje global sin un inventario ponderado y criterios de aceptación aprobados.
+La trazabilidad del VPS está documentada con commits y `deployment.json`. Al 24 de noviembre, Service #19 y Worship #4 ya están integrados en sus respectivos `main`, con CI posterior aprobado. Esa consolidación no actualiza por sí sola el VPS ni automatiza CI/CD: la versión desplegada y la publicación coordinada siguen siendo verificaciones separadas. No se asigna un porcentaje global sin un inventario ponderado y criterios de aceptación aprobados.
 
 M7 y M8 se conservan cerrados **dentro del alcance histórico documentado**. Sus gates locales/CI no prueban que toda la suite esté conectada en producción. La API anterior de planificación sigue privada; Service usa ahora las rutas autenticadas por iglesia de `suite-api`, conservando el modo local anterior como opción explícita. Las afirmaciones de PR y CI en documentos históricos deben leerse con su fecha, no como una verificación remota actual.
 
 ## Estado actual
 
-| Bloque                              | Estado                      | Evidencia y límite actual                                                                                                             |
-| ----------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                              |
-| M7.8A–E — LVM NDI                   | Gate histórico funcional    | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                     |
-| M7.8F — distribución NDI            | Pendiente de release        | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                           |
-| M8 — Backend y datos                | Cerrado en alcance local/CI | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                                  |
-| M9 — Identidad y capacidades        | En curso                    | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.         |
-| M10 — Organización                  | Pendiente                   | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                              |
-| M11 / W2 — Ecosistema conectado     | Vertical Web verificada     | Edición offline, conflicto y resolución en HTTPS, incorporación y entrega por archivo a Presenter Windows; adopción nativa pendiente. |
-| M12 — CMS                           | En curso                    | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo.      |
-| M13 — API pública y Web 2           | Parcial                     | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                       |
-| M14A.1 — Fundación Flutter          | Gate histórico cerrado      | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                         |
-| M14E — Presenter Remote Core        | Gate físico histórico       | No se repitió QA de dispositivo en esta revisión.                                                                                     |
-| M14E.2/M14E.3/M14A.2                | Revisión pendiente          | HEAD locales Presenter `e3c8d4b` y Mobile `187b683`; estados remotos de PR/CI no revalidados aquí.                                    |
+| Bloque                              | Estado                           | Evidencia y límite actual                                                                                                             |
+| ----------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| M7 — Suite funcional e identidad V0 | Cerrado en su alcance local      | Contratos 0.1 y handoffs offline; no equivale a toda la suite conectada.                                                              |
+| M7.8A–E — LVM NDI                   | Gate histórico funcional         | No se repitieron pruebas físicas ni benchmarks en esta auditoría.                                                                     |
+| M7.8F — distribución NDI            | Pendiente de release             | NSIS, VM limpia y firma; no bloquea el CMS.                                                                                           |
+| M8 — Backend y datos                | Cerrado en alcance local/CI      | Persistencia y concurrencia de planificación probadas en su entorno; backend anterior sigue privado.                                  |
+| M9 — Identidad y capacidades        | En curso                         | Sesión, iglesias/membresías y permisos administrativos por organización desplegados; falta adopción integral en los clientes.         |
+| M10 — Organización                  | Pendiente                        | Personas, equipos y permisos por iglesia/sede. Una tarjeta editorial de sede no implementa este dominio.                              |
+| M11 / W2 — Ecosistema conectado     | Vertical Web verificada          | Edición offline, conflicto y resolución en HTTPS, incorporación y entrega por archivo a Presenter Windows; adopción nativa pendiente. |
+| M12 — CMS                           | En curso                         | Seis colecciones y cuatro pantallas editoriales conectadas; faltan otras páginas/colecciones, medios y flujo editorial completo.      |
+| M13 — API pública y Web 2           | Parcial                          | Web V0 publicada; faltan API pública versionada y migración funcional completa.                                                       |
+| M14A.1 — Fundación Flutter          | Gate histórico cerrado           | Cuatro bases Android; no reemplazan Expo ni prueban API real.                                                                         |
+| M14E — Presenter Remote Core        | Gate físico histórico            | No se repitió QA de dispositivo en esta revisión.                                                                                     |
+| M14E.2 — Presenter enriquecido      | Gate técnico validado            | Candidato `107d18e`: unitarias, contratos, build y Electron aprobados; PR #13 aún sin fusionar.                                       |
+| M14E.3 — Mobile Remote              | CI aprobado; QA físico pendiente | Candidato `57288cf`: 5/5 checks y 8 pruebas Remote; la prueba física anterior no certifica este APK.                                  |
+| M14A.2 — Identidad institucional    | Auditoría pendiente              | Mobile #11 documental; maestro oficial del sello y variante histórica Android pendientes de resolución.                               |
 
 La [primera vertical de identidad por iglesia](identity-churches.md) agrega gestión global de iglesias y membresías, acceso limitado de responsables a `/service/organization`, aislamiento en PostgreSQL y revocación efectiva sobre sesiones existentes. El directorio de correos solo es visible para administración global. Las capacidades de planificación son un contrato para la siguiente integración; no convierten el planificador local ni los clientes nativos en clientes conectados. M9 permanece abierto.
 
@@ -49,12 +63,11 @@ Worship `5cd6845fb` incorpora además el editor Expo conectado por enlace de Ser
 
 ## Orden de ejecución
 
-1. Completar y verificar la administración Web → Service: publicación, borradores, permisos y bandeja; mantener la apariencia V0.
-2. Completar M9: adoptar las membresías y capacidades ya disponibles en los clientes restantes y la planificación remota; incorporar recuperación segura de cuenta.
-3. Mantener y ampliar la planificación autenticada ya desplegada: diario transaccional, reconexión, resolución explícita y revisiones por iglesia.
-4. Ejecutar W2 entre Service y Worship con reconexión y conflictos; migrar el cliente Expo sin duplicar usuarios.
-5. Completar M10 y las demás colecciones/editoriales de M12; después ampliar la API pública de M13.
-6. Retomar M14E.2/M14E.3 y gates de distribución con evidencia vigente. No reabrir NDI técnico ni sustituir Expo por la preview Flutter.
+1. Preparar la publicación coordinada de Service + Worship: respaldo/restauración, migración 012, compatibilidad y rollback. Ejecutarla solo tras autorización de despliegue.
+2. Validar físicamente el APK candidato de Mobile #17 contra Presenter #13: QR, navegación del culto, desconexión, nuevo emparejamiento, blackout y restauración. Luego solicitar autorización de integración, primero Presenter y después Mobile, con CI sobre ambos `main`.
+3. Resolver Mobile #11 y evaluar la variante histórica de recursos por archivo. La aprobación del sello y la protección/limpieza de ramas son decisiones separadas.
+4. Completar M9 y W2 en Expo: identidad por iglesia, recuperación de cuenta, planificación musical y recuperación offline verificadas contra API/PostgreSQL y en Android físico. Conservar los contratos 0.1.
+5. Avanzar M10, las páginas/colecciones, medios y flujo editorial restantes de M12, y la API pública versionada/migración funcional de M13. Service sigue siendo la administración central y se conserva la apariencia V0.
 
 M7.8F se retoma solo con evidencia nueva de electron-builder/NSIS, una actualización relevante de esas herramientas o una VM limpia. No se reabre NDI técnico.
 
@@ -141,9 +154,11 @@ El JSON descargado mediante «Presentación → Descargar para Presenter» del H
 
 **Gate:** build firmado en macOS y compatibilidad de datos con Web/Expo.
 
-## Primer slice recomendado
+## Primer slice musical — referencia histórica
 
-El primer cambio de implementación debe ser pequeño y vertical:
+Esta secuencia documenta la recomendación inicial, no una nueva lista de tareas pendientes. La vertical Web de W2 ya implementó y verificó el intercambio con Service, el trabajo offline, la reconexión y el retorno de WorshipPlan con revisión esperada; su evidencia está en la sección W2. La adopción completa en Expo sigue pendiente y no se da por cerrada por el avance Web.
+
+La recomendación inicial consistía en:
 
 1. Crear la matriz W0 y fijar Web/Expo como clientes canónicos.
 2. Introducir `WorshipRepository` detrás del listado de repertorios, sin cambiar la UI.
@@ -151,7 +166,7 @@ El primer cambio de implementación debe ser pequeño y vertical:
 4. Mantener el adaptador local y probar modo offline.
 5. Guardar y devolver `WorshipPlan 0.1` con control de revisión, sin modificar el contrato.
 
-El slice musical no introduce un editor Flutter, CMS dentro de Worship, blog, identidad propia de Worship, reescritura de ChordPro ni cambios a M7.8F. La publicación autorizada de las aplicaciones web y el CMS de Service se gestionan en el bloque de despliegue y en la prioridad actual, fuera de ese slice musical.
+Se conservan los límites de ese slice: no introduce un editor Flutter, CMS dentro de Worship, blog, identidad propia de Worship, reescritura de ChordPro ni cambios a M7.8F. La publicación autorizada de las aplicaciones web y el CMS de Service se gestionan en el bloque de despliegue y en la prioridad actual, fuera de ese slice musical.
 
 ## Gates transversales
 
