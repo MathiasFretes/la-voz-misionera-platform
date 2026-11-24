@@ -1,0 +1,8 @@
+{
+  "checks": [
+    "oracion",
+    "visita",
+    "boletin"
+  ],
+  "temporaryRowsRemoved": true
+}
