@@ -50,3 +50,14 @@ export function downloadService(service: Service): void {
   link.click()
   setTimeout(() => URL.revokeObjectURL(url), 30_000)
 }
+export function downloadServiceDraft(record: ServiceRecord): void {
+  const blob = new Blob([`${JSON.stringify(record, null, 2)}\n`], {
+    type: 'application/json',
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `lvm-borrador-${record.id}.json`
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(url), 30_000)
+}

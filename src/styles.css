@@ -1,5 +1,38 @@
 @import url('../design-system/tokens.css');
 
+.song-review-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--lvm-space-6);
+  align-items: start;
+}
+.song-review-chart {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: monospace;
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: var(--lvm-space-4);
+  background: var(--lvm-bg-app);
+  border-radius: var(--lvm-radius-control);
+}
+.song-review-layout article {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.song-review-detail {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.song-review-detail dd {
+  margin: 0 0 var(--lvm-space-3);
+}
+@media (max-width: 850px) {
+  .song-review-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 :root {
   color: var(--lvm-text-primary);
   background: var(--lvm-bg-app);
@@ -865,5 +898,63 @@ p {
   .mobile-backdrop {
     transition: none;
     animation: none;
+  }
+}
+.content-workspace {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+  gap: var(--lvm-space-6);
+  margin-top: var(--lvm-space-6);
+  align-items: start;
+}
+.church-administration {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.church-administration :where(form, section, label, select, input, .actions) {
+  min-width: 0;
+  max-width: 100%;
+}
+.church-administration .button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.content-fields {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.content-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.content-list button {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.75rem;
+  border: 1px solid var(--lvm-border-subtle);
+  border-radius: var(--lvm-radius-card);
+  background: var(--lvm-bg-surface);
+  color: var(--lvm-text-primary);
+  text-align: left;
+  display: grid;
+  gap: 0.25rem;
+  overflow-wrap: anywhere;
+}
+.content-list button[aria-pressed='true'] {
+  border-color: var(--lvm-brand-gold);
+  background: var(--lvm-brand-gold-tint);
+}
+.content-list span {
+  font-size: 0.875rem;
+  color: var(--lvm-text-secondary);
+}
+@media (max-width: 850px) {
+  .content-workspace {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

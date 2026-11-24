@@ -2,7 +2,7 @@ import type { ServiceRecord } from '../domain/service/service'
 
 export type PersistenceStatus = {
   mode: 'local' | 'postgres'
-  phase: 'loading' | 'pending' | 'synced' | 'error'
+  phase: 'loading' | 'saving-local' | 'pending' | 'synced' | 'error'
   message?: string
   conflicts: number
 }

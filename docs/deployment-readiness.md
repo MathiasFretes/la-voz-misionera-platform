@@ -1,50 +1,28 @@
-# Preparación de despliegue después de M8
+# Despliegue de LVM — estado del 21 de noviembre de 2026
 
-**Estado:** plan técnico; no hay despliegue público autorizado. Todavía no existe VPS ni dominio. LVM Service y LVM Worship deben permanecer sin publicar hasta que M9 implemente Auth y permisos.
+El usuario autorizó el VPS, Docker, PostgreSQL y la publicación web. El plan anterior de M8 quedó reemplazado por este despliegue. Service es la administración general de la suite.
 
-## Lo que ya está probado
+## Infraestructura comprobada
 
-- La API de Service y PostgreSQL 17 pasan migraciones, pruebas de persistencia, conflictos y backup/restore en CI desde `main`.
-- El servidor de Service escucha en `127.0.0.1:4318`. El Compose actual expone PostgreSQL solo en `127.0.0.1:5433` y usa credenciales de desarrollo. Ninguno es configuración de producción.
-- `backend/Dockerfile` empaqueta la API y sus migraciones. `deploy/compose.private-smoke.yaml` las ejecuta con PostgreSQL en una red interna, sin publicar puertos del host. El bind `0.0.0.0` solo se configura dentro de ese contenedor; el valor por defecto fuera de él continúa siendo loopback.
-- El build normal de Web Pública muestra una página de preparación. La vista con eventos, prédicas y sedes usa fixtures de preview, no contenido aprobado.
+- Host compartido `srv2137598.hstgr.cloud`, con HTTPS y Caddy.
+- `/` sirve la Web Pública V0; `/app` sirve Worship; `/service/` sirve Service.
+- PostgreSQL 17 y PostgREST están en una red Docker privada, sin puerto de base publicado.
+- `suite-api/` autentica la cuenta compartida mediante cookie HttpOnly y comprueba permisos; sus migraciones no son las migraciones históricas de Supabase.
+- La base nueva se inició por instrucción del usuario. No se importaron ni eliminaron datos externos de Supabase.
+- Hay backup diario local, restauraciones verificadas y una copia externa manual cifrada. Falta automatizar el backup fuera del VPS y el monitoreo.
 
-## Topología objetivo, todavía sin aplicar
+## Separación de responsabilidades
 
-```text
-Internet → HTTPS / reverse proxy → Web Pública publicada
+La API de planificación M8 en `backend/` mantiene sus pruebas y empaquetado privado. No está expuesta por Caddy y no se debe publicar directamente sin integrar autenticación y permisos de la suite. La planificación desplegada usa las rutas autenticadas por iglesia de `suite-api`, PostgreSQL y el diario IndexedDB. Conserva el modo navegador anterior como opción explícita y los intercambios Service/Worship/Presenter 0.1.
 
-Red privada de operación → Service Web → Service API → PostgreSQL
-                          → Worship Web (cuando tenga Auth)
-```
+El CMS conectado usa `suite-api/schema/007_site_editor.sql`: borradores privados separados de la versión pública, publicación/retiro explícitos, revisión esperada e historial privado. El rol normal no puede editar contenido ni leer borradores. No confundir estas tarjetas editoriales con las entidades de iglesia/sede y sus membresías y permisos propios de M9/M10.
 
-Presenter Windows y las futuras apps Android son clientes distribuidos; no se ejecutan como sitios web en el VPS. La landing y los artefactos descargables serán otro flujo de release.
+El sitio público no usa `build:preview` ni publica fixtures M7.9. Reutiliza las pantallas V0; su lectura anónima filtra lo publicado. Los formularios se almacenan en una bandeja privada de Service, sin enviar correo automáticamente.
 
-Antes de crear un Compose de producción o apuntar DNS, se necesitan: VPS y dominio propios, M9 Auth con roles, contenido público real, configuración de secretos, política de backups fuera del servidor, restauración ensayada en otro entorno y monitoreo. La API no debe quedar publicada por un proxy público mientras cualquier visitante pueda leer o modificar servicios.
+## Pendientes de producción
 
-## Reglas para la primera infraestructura
+La identidad por iglesia y la planificación autenticada con conflictos ya están desplegadas y verificadas. Siguen pendientes su adopción en los clientes restantes, la vertical musical automática W2, personas/equipos/sedes organizacionales, el resto del CMS, medios, OAuth/email y pagos. Presenter requiere firma/distribución y QA en PC limpia; Studio requiere macOS. El despliegue web no cierra estos gates.
 
-1. Instalar PostgreSQL en red privada, sin puerto de base de datos publicado a Internet. Credenciales fuera de Git.
-2. Separar migración, arranque y backup en procedimientos repetibles; comprobar `health` contra PostgreSQL.
-3. Servir TLS con un reverse proxy cuando existan dominio y DNS. Reservar subdominios solo después de decidir los nombres finales.
-4. Dejar Service y Worship accesibles únicamente en un entorno privado de prueba hasta que Auth y autorización estén verificados.
-5. No usar `build:preview` de Web Pública para producción ni presentar fixtures como contenido institucional.
-6. Probar backup, borrado controlado y restore en el VPS antes de aceptar datos reales.
+El [roadmap canónico](roadmap-suite.md) y la [auditoría integral](auditoria-suite-2026-11-20.md) son la referencia actual. Los detalles históricos de empaquetado privado y CI se conservan en [M8](m8-final-gate.md); no sustituyen pruebas sobre el VPS.
 
-La documentación de referencia para una futura implementación es [Docker Compose en producción](https://docs.docker.com/compose/how-tos/production/), [secretos de Compose](https://docs.docker.com/reference/compose-file/secrets/) y [Caddy reverse proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy). Este archivo no sustituye una prueba de despliegue en la infraestructura final.
-
-## Prueba privada de empaquetado
-
-El job `private-container` de CI construye la imagen con `npm ci`, ejecuta las migraciones sobre una base nueva y consulta `/health` desde otro contenedor de la misma red. Comprueba también que se aplicaron las dos migraciones y destruye sus volúmenes al terminar. Las credenciales del Compose son exclusivamente de prueba.
-
-Para reproducirlo en un equipo con Docker:
-
-```bash
-docker compose -f deploy/compose.private-smoke.yaml build api
-docker compose -f deploy/compose.private-smoke.yaml up -d db
-docker compose -f deploy/compose.private-smoke.yaml run --rm migrate
-docker compose -f deploy/compose.private-smoke.yaml up -d api
-docker compose -f deploy/compose.private-smoke.yaml down -v
-```
-
-Este Compose no debe utilizarse para datos reales: no configura secretos, backups persistentes, proxy, HTTPS ni Auth.
+La [aceptación de planificación](planning-acceptance.md) detalla los ocho escenarios repetidos contra HTTPS. La migración 010 se restauró en una base desechable y se verificó una copia externa cifrada del backup `lvm_worship_20261121T124543Z`. El snapshot de rollback previo está en `releases/planning-20261121T124119Z`; no requiere eliminar datos nuevos.

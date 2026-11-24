@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useParams, useNavigate } from '@tanstack/react-router'
 import type { Service, ServiceItem } from '../contracts/service'
 import { parseService } from '../contracts/service'
 import { parseWorshipPlan } from '../contracts/worshipPlan'
 import { ItemEditor } from '../features/services/ItemEditor'
 import { useServices } from '../features/services/useServices'
+import { usePlanning } from '../features/services/PlanningContext'
+import { useSuiteUser } from '../features/auth/SuiteAuth'
+import { WorshipReview } from '../features/services/WorshipReview'
 import { ServiceSyncStatus } from '../features/services/ServiceSyncStatus'
 import {
   downloadService,
@@ -43,9 +46,13 @@ const kindLabels: Record<ServiceItem['kind'], string> = {
 }
 
 export function ServiceEditorPage() {
+  const planning = usePlanning()
+  const user = useSuiteUser()
   const { serviceId } = useParams({ strict: false }) as { serviceId: string }
-  const { records, save, persistence, retry, migrationConflicts } =
+  const { records, save, remove, persistence, retry, migrationConflicts } =
     useServices()
+  const navigate = useNavigate()
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const record = records.find((entry) => entry.id === serviceId)
   const [tab, setTab] = useState<'information' | 'order' | 'presentation'>(
     'order',
@@ -85,7 +92,9 @@ export function ServiceEditorPage() {
     try {
       save(next)
       setError('')
-      setNotice('Guardado en este navegador')
+      setNotice(
+        persistence.mode === 'local' ? 'Guardado en este navegador' : '',
+      )
       return true
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'No se pudo guardar')
@@ -192,7 +201,11 @@ export function ServiceEditorPage() {
       </Link>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">Servicio local</p>
+          <p className="eyebrow">
+            {persistence.mode === 'postgres'
+              ? 'Servicio de iglesia'
+              : 'Servicio local'}
+          </p>
           <h1>{record.service.title || 'Sin título'}</h1>
           <p>
             {new Intl.DateTimeFormat('es-PY', {
@@ -204,6 +217,70 @@ export function ServiceEditorPage() {
         </div>
         <span className="save-status">{notice}</span>
       </div>
+      {import.meta.env.VITE_SERVICE_WORSHIP === 'connected' &&
+        user &&
+        planning?.selected &&
+        planning.selected !== 'legacy' && (
+          <WorshipReview
+            userId={user.id}
+            churchId={planning.selected}
+            record={record}
+            persistence={persistence}
+            refreshService={retry}
+          />
+        )}
+      <div className="actions">
+        <button
+          className="button secondary"
+          onClick={() => downloadJson(record, `lvm-borrador-${record.id}.json`)}
+        >
+          Descargar borrador
+        </button>
+        <button
+          className="button danger"
+          onClick={() => setConfirmDelete(true)}
+        >
+          Eliminar servicio
+        </button>
+      </div>
+      {confirmDelete && (
+        <section
+          className="panel form-stack"
+          role="alertdialog"
+          aria-labelledby="delete-service-title"
+        >
+          <h2 id="delete-service-title">¿Eliminar este servicio?</h2>
+          <p>
+            Se quitará de la planificación. Si todavía no se sincronizó, se
+            conservará la operación pendiente hasta confirmar su eliminación.
+          </p>
+          <div className="actions">
+            <button
+              className="button danger"
+              onClick={() => {
+                try {
+                  remove(record.id)
+                  void navigate({ to: '/services' })
+                } catch (error) {
+                  setError(
+                    error instanceof Error
+                      ? error.message
+                      : 'No se pudo eliminar',
+                  )
+                }
+              }}
+            >
+              Confirmar eliminación
+            </button>
+            <button
+              className="button secondary"
+              onClick={() => setConfirmDelete(false)}
+            >
+              Conservar servicio
+            </button>
+          </div>
+        </section>
+      )}
       <div className="tabs" role="tablist" aria-label="Secciones del servicio">
         <button
           role="tab"

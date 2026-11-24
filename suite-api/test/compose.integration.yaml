@@ -1,0 +1,76 @@
+# Dedicated disposable suite. No host ports, external networks or production mounts.
+x-api: &api
+  image: ${LVM_QA_IMAGE:?Set by run-isolated.sh}
+  build: ..
+  secrets: [api_password, jwt_secret]
+  environment:
+    LVM_ORIGIN: https://lvm-qa.invalid
+  healthcheck:
+    test:
+      [
+        CMD,
+        node,
+        -e,
+        "fetch('http://127.0.0.1:4318/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+      ]
+    interval: 2s
+    timeout: 5s
+    retries: 30
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:526f86d93c6ea08fd3f1fe5605650cacc781b2c6013169a0ad8f42c7d3d84f32
+    environment:
+      POSTGRES_DB: lvm_worship
+      POSTGRES_USER: lvm_owner
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets: [postgres_password]
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD, pg_isready, -h, 127.0.0.1, -U, lvm_owner]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  rest:
+    image: postgrest/postgrest:v16.0@sha256:45674266ef004bc6676f98b12132f1da042de8b5237eff4e7af3c7bf6c510bfb
+    user: '1000:1000'
+    environment:
+      PGRST_DB_URI: '@/run/secrets/rest_uri'
+      PGRST_JWT_SECRET: '@/run/secrets/jwt_secret'
+      PGRST_DB_ANON_ROLE: lvm_anon
+      PGRST_DB_SCHEMAS: public
+      PGRST_OPENAPI_MODE: disabled
+    secrets: [rest_uri, jwt_secret]
+  api-off:
+    <<: *api
+  api-disabled:
+    <<: *api
+    environment:
+      LVM_ORIGIN: https://lvm-qa.invalid
+      LVM_NATIVE_AUTH_ENABLED: '0'
+  api-on:
+    <<: *api
+    environment:
+      LVM_ORIGIN: https://lvm-qa.invalid
+      LVM_NATIVE_AUTH_ENABLED: '1'
+  check:
+    image: ${LVM_QA_IMAGE:?Set by run-isolated.sh}
+    profiles: [qa]
+    user: '0:0'
+    entrypoint: [node]
+    volumes: [./:/app/test:ro]
+    secrets: [postgres_password]
+    environment:
+      LVM_ORIGIN: https://lvm-qa.invalid
+      LVM_TEST_URL: http://api-off:4318
+secrets:
+  postgres_password:
+    file: ${LVM_QA_SECRET_DIR:?}/postgres_password
+  api_password:
+    file: ${LVM_QA_SECRET_DIR:?}/api_password
+  jwt_secret:
+    file: ${LVM_QA_SECRET_DIR:?}/jwt_secret
+  rest_uri:
+    file: ${LVM_QA_SECRET_DIR:?}/rest_uri
+networks:
+  default:
+    internal: true

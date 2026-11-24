@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { Button } from '../ui/Button'
+import {
+  canReviewSongs,
+  isGlobalAdministrator,
+  useSuiteUser,
+} from '../features/auth/SuiteAuth'
 
 function Navigation({ close }: { close?: () => void }) {
+  const user = useSuiteUser()
+  const global = isGlobalAdministrator(user)
   return (
     <nav aria-label="Secciones">
       <Link to="/" activeOptions={{ exact: true }} onClick={close}>
@@ -11,14 +18,44 @@ function Navigation({ close }: { close?: () => void }) {
       <Link to="/services" onClick={close}>
         Servicios
       </Link>
-      <Link to="/public-preview" onClick={close}>
-        Contenido público
-      </Link>
-      {import.meta.env.DEV && (
-        <Link to="/development/contract" onClick={close}>
-          Contract Inspector
+      {import.meta.env.VITE_SERVICE_AUTH === '1' && canReviewSongs(user) && (
+        <Link to="/song-review" onClick={close}>
+          Revisión de canciones
         </Link>
       )}
+      {global && (
+        <>
+          <Link
+            to={
+              import.meta.env.VITE_SERVICE_AUTH === '1'
+                ? '/content'
+                : '/public-preview'
+            }
+            onClick={close}
+          >
+            Contenido público
+          </Link>
+          {import.meta.env.VITE_SERVICE_AUTH === '1' && (
+            <Link to="/admin" onClick={close}>
+              Administración
+            </Link>
+          )}
+          {import.meta.env.DEV && (
+            <Link to="/development/contract" onClick={close}>
+              Contract Inspector
+            </Link>
+          )}
+        </>
+      )}
+      {import.meta.env.VITE_SERVICE_AUTH === '1' &&
+        (global ||
+          user?.memberships?.some((membership) =>
+            membership.capabilities.includes('members:read'),
+          )) && (
+          <Link to="/organization" onClick={close}>
+            Mi iglesia
+          </Link>
+        )}
     </nav>
   )
 }
@@ -37,11 +74,15 @@ function Brand({ close }: { close?: () => void }) {
   )
 }
 
-function LocalStatus() {
+function LocalStatus({ local }: { local: boolean }) {
   return (
     <div className="local-status">
       <span className="local-status-dot" aria-hidden="true" />
-      <span>Flujo local · disponible sin conexión</span>
+      <span>
+        {local
+          ? 'Planificación local · disponible sin conexión'
+          : 'Administración central · requiere conexión'}
+      </span>
     </div>
   )
 }
@@ -51,13 +92,23 @@ export function AppShell() {
   const menuTrigger = useRef<HTMLButtonElement>(null)
   const menuDrawer = useRef<HTMLDivElement>(null)
   const { pathname } = useLocation()
-  const section = pathname.startsWith('/services')
-    ? 'Servicios'
-    : pathname.startsWith('/public-preview')
-      ? 'Contenido público'
-      : pathname.startsWith('/development')
-        ? 'Desarrollo'
-        : 'Inicio'
+  const localPath = import.meta.env.VITE_SERVICE_BASEPATH
+    ? pathname.replace(/^\/service(?=\/|$)/, '')
+    : pathname
+  const section = localPath.startsWith('/admin')
+    ? 'Administración'
+    : localPath.startsWith('/song-review')
+      ? 'Revisión de canciones'
+      : localPath.startsWith('/services')
+        ? 'Servicios'
+        : localPath.startsWith('/public-preview') ||
+            localPath.startsWith('/content')
+          ? 'Contenido público'
+          : localPath.startsWith('/organization')
+            ? 'Mi iglesia'
+            : localPath.startsWith('/development')
+              ? 'Desarrollo'
+              : 'Inicio'
 
   useEffect(() => {
     if (menuOpen) menuDrawer.current?.querySelector('a')?.focus()
@@ -83,7 +134,9 @@ export function AppShell() {
         <Brand />
         <Navigation />
         <div className="sidebar-footer">
-          <LocalStatus />
+          <LocalStatus
+            local={section === 'Servicios' || section === 'Inicio'}
+          />
           <small>Service 0.1</small>
         </div>
       </aside>
@@ -137,7 +190,9 @@ export function AppShell() {
               <Brand close={closeMenu} />
               <Navigation close={closeMenu} />
               <div className="sidebar-footer">
-                <LocalStatus />
+                <LocalStatus
+                  local={section === 'Servicios' || section === 'Inicio'}
+                />
                 <small>Service 0.1</small>
               </div>
             </div>
