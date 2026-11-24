@@ -18,7 +18,7 @@ const sources = [
 ]
 const expected = {
   '--lvm-brand-navy': '#1c2a39',
-  '--lvm-brand-navy-raised': '#172033',
+  '--lvm-brand-navy-raised': '#263b52',
   '--lvm-brand-gold': '#c6a15b',
   '--lvm-gold-text-on-light': '#825c18',
   '--lvm-focus-ring': '#b4872e',

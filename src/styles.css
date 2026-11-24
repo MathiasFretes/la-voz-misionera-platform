@@ -1,3 +1,4 @@
+@import '../design-system/brand/identity.css';
 @import url('../design-system/tokens.css');
 
 .song-review-layout {
@@ -76,7 +77,7 @@ a:hover {
   flex-direction: column;
   gap: 28px;
   padding: 24px 20px 20px;
-  background: var(--lvm-brand-navy);
+  background: var(--lvm-brand-gradient);
   color: var(--lvm-text-on-dark);
 }
 .app-sidebar {
@@ -85,37 +86,19 @@ a:hover {
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--lvm-brand-lockup-gap);
   color: var(--lvm-text-on-dark);
 }
 .brand:hover {
   text-decoration: none;
 }
 .brand-mark {
-  display: grid;
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--lvm-brand-gold);
-  position: relative;
-}
-.brand-mark::before,
-.brand-mark::after {
-  position: absolute;
   display: block;
-  border-radius: 1px;
-  background: #fff;
-  content: '';
-}
-.brand-mark::before {
-  width: 2px;
-  height: 16px;
-}
-.brand-mark::after {
-  width: 16px;
-  height: 2px;
+  flex: 0 0 var(--lvm-brand-emblem-size);
+  width: var(--lvm-brand-emblem-size);
+  height: var(--lvm-brand-emblem-size);
+  border-radius: 50%;
+  background: url('/brand/lvm-circle.svg') center / contain no-repeat;
 }
 .brand-name-accent {
   color: var(--lvm-brand-gold);
@@ -125,12 +108,12 @@ a:hover {
   display: block;
 }
 .brand strong {
-  font-size: 14px;
+  font-size: var(--lvm-brand-name-size);
 }
 .brand small {
   margin-top: 3px;
   color: #c9d1df;
-  font-size: 12px;
+  font-size: var(--lvm-brand-product-size);
 }
 .app-sidebar nav,
 .mobile-drawer nav {
@@ -809,21 +792,21 @@ p {
   .mobile-header .brand {
     min-width: 0;
     flex: 1;
-    gap: 8px;
+    gap: var(--lvm-brand-lockup-gap);
     color: var(--lvm-brand-navy);
   }
   .mobile-header .brand-mark {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
+    flex-basis: var(--lvm-brand-emblem-size);
+    width: var(--lvm-brand-emblem-size);
+    height: var(--lvm-brand-emblem-size);
   }
   .mobile-header .brand strong {
     white-space: nowrap;
-    font-size: 12px;
+    font-size: var(--lvm-brand-name-size);
   }
   .mobile-header .brand small {
     color: var(--lvm-text-secondary);
-    font-size: 11px;
+    font-size: var(--lvm-brand-product-size);
   }
   .menu-trigger {
     display: grid;
