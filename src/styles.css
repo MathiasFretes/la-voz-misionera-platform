@@ -76,7 +76,7 @@ a:hover {
   flex-direction: column;
   gap: 28px;
   padding: 24px 20px 20px;
-  background: var(--lvm-brand-navy);
+  background: var(--lvm-brand-gradient);
   color: var(--lvm-text-on-dark);
 }
 .app-sidebar {
@@ -92,30 +92,12 @@ a:hover {
   text-decoration: none;
 }
 .brand-mark {
-  display: grid;
+  display: block;
   flex: 0 0 40px;
   width: 40px;
   height: 40px;
-  place-items: center;
   border-radius: 50%;
-  background: var(--lvm-brand-gold);
-  position: relative;
-}
-.brand-mark::before,
-.brand-mark::after {
-  position: absolute;
-  display: block;
-  border-radius: 1px;
-  background: #fff;
-  content: '';
-}
-.brand-mark::before {
-  width: 2px;
-  height: 16px;
-}
-.brand-mark::after {
-  width: 16px;
-  height: 2px;
+  background: url('/brand/lvm-circle.svg') center / contain no-repeat;
 }
 .brand-name-accent {
   color: var(--lvm-brand-gold);

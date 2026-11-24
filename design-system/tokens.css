@@ -9,7 +9,15 @@
     sans-serif;
 
   --lvm-brand-navy: #1c2a39;
-  --lvm-brand-navy-raised: #172033;
+  --lvm-brand-navy-raised: #263b52;
+  --lvm-brand-gradient: linear-gradient(
+    160deg,
+    #304965 0%,
+    #1c2a39 48%,
+    #0d1624 100%
+  );
+  --lvm-brand-pearl: #f5f3fa;
+  /* 60% neutral surfaces, 30% navy structure, 10% gold actions. */
   --lvm-brand-gold: #c6a15b;
   --lvm-gold-text-on-light: #825c18;
   --lvm-brand-gold-hover: #b48f4a;
