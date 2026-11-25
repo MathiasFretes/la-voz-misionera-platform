@@ -64,3 +64,7 @@ Una observaciÃ³n o `finish` con `passed:true` no certifica el gate: el informe
 La inspección del binario con aapt y apksigner verificó el paquete QA, firma APK v2, JavaScript incluido, CA correspondiente al ensayo y política compilada de dominio exclusivo, con tráfico claro deshabilitado. Pasaron las ocho comprobaciones de API/PostgreSQL y las tres comprobaciones TLS del host. Los fixtures quedaron en cero, los overlays se restauraron y se eliminaron contenedores y secretos temporales.
 
 ADB no detectó un teléfono y no se ejecutó la sesión física. El informe conserva explícitamente esa condición pendiente. El guion actualizado pasó las pruebas de rechazo temprano sin serial y con un dispositivo inexistente, sin crear entornos para esos intentos.
+
+## Ensayo físico posterior: HONOR
+
+El HONOR fue detectado y autorizado después de la compilación anterior. Se creó la sesión desechable `cc23bfa7-a76b-44b0-b327-43e3001585b6`, se reconstruyó e instaló un APK nuevo y se ejecutó el recorrido en Android 16. El [informe físico](qa/native-android-honor-2026-11-25.md) documenta los resultados, solicitudes HTTPS, almacenamiento, diario offline, conflictos, permisos y limpieza. Incluye dos observaciones de interfaz y los límites de la evidencia; no cierra automáticamente M9/W2 ni autoriza integración o publicación.

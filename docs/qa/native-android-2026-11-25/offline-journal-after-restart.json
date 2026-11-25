@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "scope": {
+    "userId": "0fcff482-8f5c-44f0-bdbf-9f739152317f",
+    "churchId": "d580b8a7-7e32-4592-a98a-2f47d08fbde7",
+    "serviceId": "native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+    "branchId": "00000000-0000-4000-8000-000000000000"
+  },
+  "exchange": {
+    "plan": null,
+    "context": {
+      "name": "Ensayo Android QA",
+      "title": "Culto Android QA",
+      "startsAt": "2026-12-01T12:00:00Z",
+      "serviceId": "native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+      "setlistId": "set-native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+      "schemaVersion": "0.1"
+    },
+    "canApply": false,
+    "revision": 0,
+    "canPrepare": true,
+    "serviceRevision": 1,
+    "appliedPlanRevision": null,
+    "appliedServiceRevision": null,
+    "basedOnServiceRevision": null
+  },
+  "draft": {
+    "context": {
+      "name": "Ensayo Android QA",
+      "title": "Culto Android QA",
+      "startsAt": "2026-12-01T12:00:00Z",
+      "serviceId": "native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+      "setlistId": "set-native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+      "schemaVersion": "0.1"
+    },
+    "entries": [
+      {
+        "id": "8f7388e9-9d38-44b2-852c-936fa8967de4",
+        "song": {
+          "id": "80598e71-4a17-41f2-b1ab-17a14646f126",
+          "title": "Fidelidad Android QA",
+          "originalKey": "C",
+          "chordpro_content": "{key:C}\n[C]Tu [G]fidelidad"
+        },
+        "toKey": null
+      },
+      {
+        "id": "65afa394-9ec7-431d-a252-ccae0c779ea8",
+        "song": {
+          "id": "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+          "title": "Alba Android QA",
+          "originalKey": "D",
+          "chordpro_content": "{key:D}\n[D]Sale el sol \ud83d\ude00 [A]hoy"
+        },
+        "toKey": null
+      },
+      {
+        "id": "39f710fc-1860-415a-84dd-4f3738941501",
+        "song": {
+          "id": "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+          "title": "Alba Android QA",
+          "originalKey": "D",
+          "chordpro_content": "{key:D}\n[D]Sale el sol \ud83d\ude00 [A]hoy"
+        },
+        "toKey": null
+      }
+    ]
+  },
+  "generation": 5,
+  "savedGeneration": 0,
+  "localRevision": 7,
+  "pending": {
+    "id": "e5582b7f-b7d7-40db-8ad4-d2b36b0253cb",
+    "generation": 5,
+    "input": {
+      "plan": {
+        "schemaVersion": "0.1",
+        "serviceId": "native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+        "setlistId": "set-native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+        "name": "Ensayo Android QA",
+        "songs": [
+          {
+            "songId": "80598e71-4a17-41f2-b1ab-17a14646f126",
+            "title": "Fidelidad Android QA",
+            "key": "C",
+            "arrangement": [1],
+            "sections": [
+              {
+                "kind": "verse",
+                "label": "Verse",
+                "lines": [
+                  {
+                    "text": "Tu fidelidad",
+                    "chords": [
+                      {
+                        "symbol": "C",
+                        "index": 0
+                      },
+                      {
+                        "symbol": "G",
+                        "index": 3
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "songId": "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+            "title": "Alba Android QA",
+            "key": "D",
+            "arrangement": [1],
+            "sections": [
+              {
+                "kind": "verse",
+                "label": "Verse",
+                "lines": [
+                  {
+                    "text": "Sale el sol \ud83d\ude00 hoy",
+                    "chords": [
+                      {
+                        "symbol": "D",
+                        "index": 0
+                      },
+                      {
+                        "symbol": "A",
+                        "index": 15
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "songId": "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+            "title": "Alba Android QA",
+            "key": "D",
+            "arrangement": [1],
+            "sections": [
+              {
+                "kind": "verse",
+                "label": "Verse",
+                "lines": [
+                  {
+                    "text": "Sale el sol \ud83d\ude00 hoy",
+                    "chords": [
+                      {
+                        "symbol": "D",
+                        "index": 0
+                      },
+                      {
+                        "symbol": "A",
+                        "index": 15
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "revision": 0,
+      "serviceRevision": 1
+    }
+  },
+  "conflict": null
+}

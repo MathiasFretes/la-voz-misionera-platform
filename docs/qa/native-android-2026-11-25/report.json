@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-25",
+  "status": "physical-functional-scenarios-passed-with-ux-observations",
+  "device": {
+    "manufacturer": "HONOR",
+    "model": "ELP-NX9",
+    "android": "16",
+    "serial": "AE6RUT4C25003519"
+  },
+  "build": {
+    "clientCommit": "71850c7f5e0037c928202a503d511e53a70d57f4",
+    "apiOrigin": "https://lvm-qa.invalid:8443/api",
+    "apiCommit": "1e8ea37093a723430067c0144ce05fe722ce9659",
+    "apiImageId": "sha256:40969b843e734d623d10c4d417e80d53f5967499207e6505ee278318672112e3",
+    "gateRunId": "cc23bfa7-a76b-44b0-b327-43e3001585b6",
+    "caSha256": "987464faf9ac54f81a7a865b34d6eb1d6174595e54fdde79cd6604f6337f5032",
+    "caScope": "lvm-qa.invalid",
+    "applicationId": "com.lavozmisionera.qa",
+    "debugSigning": true,
+    "debuggable": true,
+    "embeddedJavaScript": true,
+    "metroRequired": false,
+    "tlsVerificationDisabled": false,
+    "dnsOverride": {
+      "host": "lvm-qa.invalid",
+      "address": "127.0.0.1",
+      "purpose": "ADB reverse to SSH-only isolated QA HTTPS proxy"
+    },
+    "originals": {
+      "gradle": "e4449b894820575f990bb45606c43af9c794761c1750c608281b014455d40f56",
+      "application": "bdce11e4676071963887c5c718f79974ac3ca1e47d7c6dc0b813b5ab268a1722",
+      "strings": "e4aaa85661f0dcee2f6ca21f2b700a2196e622604c6397bbd858e6f09dabf7b5",
+      "mainManifest": "8e010bf544759e9c3b119105a1388c7bf02da09731e9d4276d1f33bfc2b6aa4e",
+      "debugManifest": "fb1795032c764d975376e1612ab7022058eca2268a45efbe731a47a5d3ac0f60",
+      "network": "absent",
+      "ca": "absent",
+      "devLauncher": "13c81a5616dbf78621fe25211c322c57bda21a9fcbca9f3687cd558d8c5cb0e2"
+    },
+    "overlay": {
+      "gradle": "957bcd95154ea803ea9655a4558b79e7aa007329166514fab44eca1d983fc433",
+      "application": "c9a5649ff49a31677801c4673817f096bbde814eff616f1cbb9f02e257d0b8d3",
+      "strings": "41c7d90c6be74a6d3d70a2ea6c86e220765c0530b9b91863fb872fe194e27ee8",
+      "mainManifest": "22a0c3f98327be7ff9fecc31c5835c7ea187a1f0b2cf38e4d20755a79ae568a3",
+      "debugManifest": "a166345ad1dbd21f4e22cb91efe852e4474ead053b019e44e15ca0f70d4a7451",
+      "network": "72868b2a6ba7f770f60e5ee272138f6842fbd8879974bdd88efe546d40d48d5e",
+      "ca": "987464faf9ac54f81a7a865b34d6eb1d6174595e54fdde79cd6604f6337f5032",
+      "devLauncher": "bf381728adabe1a67a295dca1d240c09034de1192da115b42bba94129715d6f7"
+    },
+    "apk": {
+      "sha256": "f8e8b5be137ae7ff8cd4d569fa546f2ddc141d88ee4575cd310cac9b8dc4df84",
+      "bytes": 128071601
+    },
+    "exitCode": 0,
+    "overlaysRestored": true
+  },
+  "cleanup": {
+    "project": "lvm-native-cc23bfa7a76b44b0",
+    "containersRemoved": true,
+    "temporarySecretsRemoved": true,
+    "productionTouched": false,
+    "androidTransportCleanup": true
+  },
+  "physicalWalkthroughExecuted": true,
+  "independentReviewRequired": true,
+  "fullM9W2Completed": false,
+  "checks": [
+    "Native login over QA HTTPS and deep-link into scoped Service plan",
+    "SecureStore AES ciphertext inspected; offline process restart restored session; no auth tokens or session fields in AsyncStorage",
+    "Catalog selection, duplicate occurrences, ordering and key C to G persisted",
+    "Force-stop/relaunch without QA transport retained complete draft and identical pending UUID",
+    "Reconnect and retry accepted e5582b7f-b7d7-40db-8ad4-d2b36b0253cb once; initial proposal history count 1",
+    "HTTP 409 with independent API session; local G retained; explicit cancel/refresh/resend succeeded",
+    "Two accounts and two churches did not show or send another scope journal; original pending draft survived account change",
+    "Suspended membership caused actual phone PUT 403 and unchanged revision 3/history 3",
+    "Revoked QA sessions caused actual phone HTTP 401, credential removal and login screen",
+    "Service applied 3 musical occurrences with transposed G/D chords and retained 2 manual items",
+    "Explicit logout removed QA credential; owned fixtures, containers, secrets and ADB reverse cleaned"
+  ],
+  "observations": [
+    {
+      "id": "UX-1",
+      "severity": "minor",
+      "finding": "Account screen displays English strings despite Spanish settings, including Account, PROFILE, Your icon, Log out, Delete account",
+      "evidence": "Observed UIAutomator screen during the physical test; logout confirmation itself was Spanish"
+    },
+    {
+      "id": "UX-2",
+      "severity": "minor",
+      "finding": "Initial forbidden church load displays generic connection/update error rather than permission-specific text",
+      "evidence": "Phone GET worship returned 403; UI showed Conectate para cargar este culto por primera vez and generic retry text; no previous church data appeared"
+    },
+    {
+      "id": "OBS-1",
+      "severity": "inconclusive-initial-interaction",
+      "finding": "Initial tone picker and first re-login automation required retry; later direct runtime checks passed",
+      "evidence": "Phone also changed to Android Settings during testing; no LVM crash established. C to G was later verified through UI, local journal and PostgreSQL; re-login restored the original draft."
+    }
+  ],
+  "limits": [
+    "One HONOR Android 16, one PC and ADB reverse; not all phones or networks",
+    "Offline means QA transport removed; phone Wi-Fi and mobile data remained unchanged",
+    "Second writer was an independent API session, not a second physical phone",
+    "No physical lost-ACK-after-commit injection; that case remains covered by the separate headless integration",
+    "SecureStore AES and session recovery verified; no independent proof of hardware-backed Keystore or locked-device behavior",
+    "TLS success verified in installed app; negative CA and hostname tests ran on host, not on Android",
+    "No store signing, distribution, main merges or production native activation",
+    "QA APK and noncredential test drafts remain in the separate com.lavozmisionera.qa package; its temporary server and CA are gone"
+  ]
+}
