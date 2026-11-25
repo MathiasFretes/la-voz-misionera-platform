@@ -56,3 +56,11 @@ Sin serial o sin telÃ©fono conectado el lanzador falla antes de crear el clÃ�
 Los comandos interactivos incluyen `open`, `dump`, `click`, `login`, `snapshot`, `offline`, `online`, `otherWrite`, `apply`, `membership`, `observe` y `finish`. Por ejemplo, una lÃ­nea `{"action":"open"}` abre el culto de los fixtures y `{"action":"finish","passed":false}` termina la sesiÃ³n y limpia sus datos. Las credenciales se generan en memoria y no se imprimen. No se admite reanudar fixtures histÃ³ricos ni se utilizan credenciales institucionales.
 
 Una observaciÃ³n o `finish` con `passed:true` no certifica el gate: el informe mantiene `complete:false` y requiere revisar evidencias. Deben demostrarse login, almacenamiento seguro real, ediciÃ³n y reinicio offline, reintento UUID, conflicto, aislamiento, revocaciÃ³n y aplicaciÃ³n en Service. La compilaciÃ³n y las pruebas Node no sustituyen ese recorrido fÃ­sico.
+
+## Evidencia de compilación del 25 de noviembre
+
+[Informe reproducible del APK](qa/native-android-build-2026-11-25.json). La ejecución `9968bb59-2c52-4357-9496-26a3439dda58` utilizó Service `80f5d8abb066af7953735441bef7c708d376a2ae` y Worship `71850c7f5e0037c928202a503d511e53a70d57f4`. Gradle terminó correctamente; el APK mide 128.071.601 bytes y su SHA-256 es `90f24178673e0fff8490bb42fd089e25a0a0997e36d9dd4dde6d71c6b7fee46c`.
+
+La inspección del binario con aapt y apksigner verificó el paquete QA, firma APK v2, JavaScript incluido, CA correspondiente al ensayo y política compilada de dominio exclusivo, con tráfico claro deshabilitado. Pasaron las ocho comprobaciones de API/PostgreSQL y las tres comprobaciones TLS del host. Los fixtures quedaron en cero, los overlays se restauraron y se eliminaron contenedores y secretos temporales.
+
+ADB no detectó un teléfono y no se ejecutó la sesión física. El informe conserva explícitamente esa condición pendiente. El guion actualizado pasó las pruebas de rechazo temprano sin serial y con un dispositivo inexistente, sin crear entornos para esos intentos.

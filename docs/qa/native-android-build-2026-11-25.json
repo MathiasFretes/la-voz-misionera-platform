@@ -1,0 +1,131 @@
+{
+  "date": "2026-11-25",
+  "status": "build-and-headless-integration-passed",
+  "physicalAndroidVerified": false,
+  "physicalReason": "ADB does not currently list an authorized device",
+  "androidBuild": {
+    "clientCommit": "71850c7f5e0037c928202a503d511e53a70d57f4",
+    "apiOrigin": "https://lvm-qa.invalid:8443/api",
+    "apiCommit": "80f5d8abb066af7953735441bef7c708d376a2ae",
+    "apiImageId": "sha256:c4e2ef3ff0030335e5b6d497e22fca43993ba50b72ceb8dbebe4c8d3b57c6829",
+    "gateRunId": "9968bb59-2c52-4357-9496-26a3439dda58",
+    "caSha256": "7dd0d94cb03e2b492d3cb8cd0eea14d73ec71edbc7b88e96371e1c6192851d12",
+    "caScope": "lvm-qa.invalid",
+    "applicationId": "com.lavozmisionera.qa",
+    "debugSigning": true,
+    "debuggable": true,
+    "embeddedJavaScript": true,
+    "metroRequired": false,
+    "tlsVerificationDisabled": false,
+    "dnsOverride": {
+      "host": "lvm-qa.invalid",
+      "address": "127.0.0.1",
+      "purpose": "ADB reverse to SSH-only isolated QA HTTPS proxy"
+    },
+    "originals": {
+      "gradle": "e4449b894820575f990bb45606c43af9c794761c1750c608281b014455d40f56",
+      "application": "bdce11e4676071963887c5c718f79974ac3ca1e47d7c6dc0b813b5ab268a1722",
+      "strings": "e4aaa85661f0dcee2f6ca21f2b700a2196e622604c6397bbd858e6f09dabf7b5",
+      "mainManifest": "8e010bf544759e9c3b119105a1388c7bf02da09731e9d4276d1f33bfc2b6aa4e",
+      "debugManifest": "fb1795032c764d975376e1612ab7022058eca2268a45efbe731a47a5d3ac0f60",
+      "network": "absent",
+      "ca": "absent",
+      "devLauncher": "13c81a5616dbf78621fe25211c322c57bda21a9fcbca9f3687cd558d8c5cb0e2"
+    },
+    "overlay": {
+      "gradle": "957bcd95154ea803ea9655a4558b79e7aa007329166514fab44eca1d983fc433",
+      "application": "c9a5649ff49a31677801c4673817f096bbde814eff616f1cbb9f02e257d0b8d3",
+      "strings": "41c7d90c6be74a6d3d70a2ea6c86e220765c0530b9b91863fb872fe194e27ee8",
+      "mainManifest": "22a0c3f98327be7ff9fecc31c5835c7ea187a1f0b2cf38e4d20755a79ae568a3",
+      "debugManifest": "a166345ad1dbd21f4e22cb91efe852e4474ead053b019e44e15ca0f70d4a7451",
+      "network": "72868b2a6ba7f770f60e5ee272138f6842fbd8879974bdd88efe546d40d48d5e",
+      "ca": "7dd0d94cb03e2b492d3cb8cd0eea14d73ec71edbc7b88e96371e1c6192851d12",
+      "devLauncher": "bf381728adabe1a67a295dca1d240c09034de1192da115b42bba94129715d6f7"
+    },
+    "apk": {
+      "sha256": "90f24178673e0fff8490bb42fd089e25a0a0997e36d9dd4dde6d71c6b7fee46c",
+      "bytes": 128071601
+    },
+    "exitCode": 0,
+    "overlaysRestored": true
+  },
+  "tlsHostVerification": {
+    "scopedCaAccepted": true,
+    "systemTrustRejected": true,
+    "incorrectHostnameRejected": true,
+    "tlsVerificationDisabled": false
+  },
+  "headlessIntegration": {
+    "run": "4ea1be96-eb64-4e76-9934-1f0e069d8976",
+    "clientCommit": "71850c7f5e0037c928202a503d511e53a70d57f4",
+    "apiCommit": "80f5d8abb066af7953735441bef7c708d376a2ae",
+    "apiTree": "d947969dc4501c5d6a8983332054ed821c8754d6",
+    "apiSourceTree": "17bf9d961cd732fb2ed438a6e2b5446fc24d0c93",
+    "apiImageId": "sha256:c4e2ef3ff0030335e5b6d497e22fca43993ba50b72ceb8dbebe4c8d3b57c6829",
+    "disposableProject": "lvm-native-9968bb592c524357",
+    "database": "lvm_worship",
+    "transport": "SSH-only loopback mapper; not Android TLS proof",
+    "secureStorage": "injected memory; not Android Keystore proof",
+    "checks": [
+      "actual native login, independent device tokens, database-backed session and shared web identity",
+      "catalog snapshots, order, repeated occurrences, tones and durable offline restart without server writes",
+      "lost HTTP acknowledgement after a real commit replays the same UUID without a second proposal/history row",
+      "two independent native sessions produce a real 409; explicit cancellation/refresh/resubmission retains local music",
+      "Service applies the actual native proposal; SQL equals canonical merge, valid Service 0.1, manual elements and unique IDs preserved",
+      "account/church journal isolation and authenticated X-LVM-Account mismatch rejection",
+      "membership suspension blocks idempotent replay; header alone, fabricated, expired and revoked tokens cannot write",
+      "durable musical journal contains no device tokens, passwords or authentication session fields"
+    ],
+    "physicalAndroidVerified": false,
+    "finalServiceSha256": "30b43e33a9cb4bce9f969f48a021e2f14889bbf73fe33ed4f27285440e60e202",
+    "postgres": {
+      "proposalRevision": 3,
+      "serviceRevision": 2,
+      "musicalOccurrences": 3,
+      "manualItems": 2,
+      "worshipHistoryRows": 3
+    },
+    "cleanup": {
+      "plans": 0,
+      "songs": 0,
+      "users": 0,
+      "churches": 0,
+      "sessions": 0
+    },
+    "integrationPassed": true
+  },
+  "cleanup": {
+    "project": "lvm-native-9968bb592c524357",
+    "containersRemoved": true,
+    "temporarySecretsRemoved": true,
+    "productionTouched": false,
+    "androidTransportCleanup": null
+  },
+  "binaryInspection": {
+    "tool": "Android SDK 36 aapt and apksigner",
+    "package": "com.lavozmisionera.qa",
+    "label": "LVM QA",
+    "minSdk": 24,
+    "targetSdk": 36,
+    "apkSignatureVerified": true,
+    "signatureScheme": "v2",
+    "embeddedBundleBytes": 4488488,
+    "cleartextTrafficPermitted": false,
+    "qaCaDomain": "lvm-qa.invalid",
+    "qaCaIncludesSubdomains": false,
+    "systemTrustRetainedOutsideQaDomain": true
+  },
+  "localChecks": {
+    "guardTestsPassed": 20,
+    "lintPassed": true,
+    "missingSerialRejectedBeforeSetup": true,
+    "disconnectedDeviceRejectedBeforeSetup": true
+  },
+  "limitations": [
+    "No installed Android navigation or SecureStore/Keystore verification",
+    "No physical TLS or offline/conflict/revocation UI walkthrough",
+    "No store signing or distribution",
+    "Per-run CA server and secrets were removed; APK must be rebuilt for a new live QA run",
+    "No production changes or native authentication activation"
+  ]
+}
