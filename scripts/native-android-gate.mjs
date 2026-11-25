@@ -1,25 +1,46 @@
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { randomUUID } from 'node:crypto'
-import { mkdir, writeFile } from 'node:fs/promises'
+import { createHash, randomUUID } from 'node:crypto'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { createInterface } from 'node:readline'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 import { applyWorshipPlan } from '../suite-api/worship-contract.mjs'
 import { validateServiceRecord } from '../suite-api/service-record.mjs'
-import { passwordHash } from '../suite-api/security.mjs'
+import {
+  loadNativeGateContext,
+  redactNativeGateFailure,
+} from './native-gate-context.mjs'
+import {
+  validateQaDeviceSerial,
+  verifyQaApk,
+} from './native-android-device.mjs'
+import { verifyNativeQaTls } from './native-qa-tls.mjs'
 
 // Fixture credentials stay in this process. The interactive protocol exposes
 // only test IDs, scoped UI metadata and assertions, never passwords/tokens.
-const api = 'http://127.0.0.1:54319/api'
-const database = 'lvm_planning_qa_20261121'
+const serial = validateQaDeviceSerial(process.env.LVM_NATIVE_QA_SERIAL)
+const { manifest, sql } = await loadNativeGateContext()
+assert.ok(manifest.android, 'Physical QA requires the live Android TLS gate')
+const api = manifest.apiUrl
+const database = manifest.database.name
 const pkg = 'com.lavozmisionera.qa'
-const resumeRun = process.argv[2]
-assert.ok(
-  !resumeRun || /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/.test(resumeRun),
-  'Optional argument must be a QA run UUID',
+assert.equal(
+  process.argv.length,
+  2,
+  'Historical fixture resume is not supported',
 )
-const run = resumeRun || randomUUID()
-const output = resolve('test-results/native-gate/android')
+const run = randomUUID()
+const output = resolve(dirname(process.env.LVM_NATIVE_GATE_MANIFEST), 'android')
+const build = JSON.parse(
+  await readFile(resolve(output, 'android-build-manifest.json'), 'utf8'),
+)
+const apk = resolve(output, 'app-debug.apk')
+verifyQaApk(manifest, build, await readFile(apk))
+await verifyNativeQaTls({
+  port: manifest.android.localTlsPort,
+  runId: manifest.runId,
+  ca: await readFile(manifest.android.caPath),
+})
 await mkdir(output, { recursive: true })
 const users = []
 const churches = [randomUUID(), randomUUID()]
@@ -27,29 +48,21 @@ const songIds = [randomUUID(), randomUUID()]
 const actors = {}
 const report = {
   run,
-  clientCommit: '5cd6845fb77e8e8643fe4c0a02705c8143fb27b3',
-  apiCommit: '1949aac195a78c62ee7df017b45dec9f45ac959f',
+  clientCommit: manifest.client.commit,
+  apiCommit: manifest.server.commit,
+  gateRunId: manifest.runId,
+  apkSha256: build.apk.sha256,
+  serial,
   database,
   applicationId: pkg,
   observations: [],
   complete: false,
 }
 const literal = (value) => `'${String(value).replaceAll("'", "''")}'`
-const sql = (statement) =>
-  execFileSync(
-    'ssh',
-    [
-      '-o',
-      'BatchMode=yes',
-      'hostinger-vps',
-      `cd /srv/apps/la-voz-misionera && docker compose exec -T postgres psql -U lvm_owner -d ${database} -v ON_ERROR_STOP=1 -At`,
-    ],
-    { input: statement, encoding: 'utf8' },
-  ).trim()
 const quote = (value) => `'${String(value).replaceAll("'", "'\\''")}'`
 function adb(...args) {
   try {
-    return execFileSync('adb', args, {
+    return execFileSync(process.env.LVM_ADB || 'adb', ['-s', serial, ...args], {
       encoding: 'utf8',
       maxBuffer: 8 * 1024 * 1024,
     })
@@ -58,6 +71,19 @@ function adb(...args) {
   }
 }
 const shell = (...args) => adb('shell', args.map(quote).join(' '))
+function releaseQaReverse() {
+  const mapping = adb('reverse', '--list')
+    .split(/\r?\n/)
+    .map((line) => line.trim().split(/\s+/))
+    .find((fields) => fields[1] === 'tcp:8443')
+  if (!mapping) return
+  assert.equal(
+    mapping[2],
+    `tcp:${manifest.android.localTlsPort}`,
+    'Refusing to remove another reverse mapping',
+  )
+  adb('reverse', '--remove', 'tcp:8443')
+}
 const parseNodes = (xml) =>
   [...xml.matchAll(/<node\b[^>]*>/g)]
     .map((match) =>
@@ -182,74 +208,40 @@ const saveReport = async () => {
 }
 
 assert.equal(sql('SELECT current_database();'), database)
-if (!resumeRun)
-  assert.equal(
-    sql('SELECT count(*) FROM public.users;'),
-    '0',
-    'Physical gate requires cleaned isolated fixtures',
-  )
-if (resumeRun) {
-  // Recover only this fully isolated fixture run, never institutional accounts.
-  const fixture = JSON.parse(
-    sql(
-      `SELECT jsonb_build_object('users',(SELECT jsonb_agg(jsonb_build_object('id',u.id,'email',c.email)) FROM public.users u LEFT JOIN private.credentials c ON c.user_id=u.id),'churches',(SELECT jsonb_agg(jsonb_build_object('id',id,'name',name)) FROM private.churches),'songs',(SELECT jsonb_agg(jsonb_build_object('id',id,'slug',slug)) FROM public.songs));`,
-    ),
-  )
-  assert.equal(fixture.users?.length, 3)
-  assert.equal(fixture.churches?.length, 2)
-  assert.equal(fixture.songs?.length, 2)
-  for (const label of ['admin', 'musician', 'other']) {
-    const actor = fixture.users.find(
-      (user) => user.email === `native-android-${label}-${run}@example.com`,
-    )
-    assert.ok(actor, 'Resume requires exactly the owned QA accounts')
-  }
-  for (const [index, name] of [
-    'Iglesia Android QA',
-    'Otra iglesia Android QA',
-  ].entries()) {
-    const church = fixture.churches.find((value) => value.name === name)
-    const song = fixture.songs.find(
-      (value) => value.slug === `native-android-${index}-${run}`,
-    )
-    assert.ok(church && song, 'Resume fixture identity mismatch')
-    churches[index] = church.id
-    songIds[index] = song.id
-    assert.equal(
-      sql(
-        `SELECT count(*) FROM private.service_plans WHERE church_id=${literal(church.id)} AND id=${literal(service(index).id)};`,
-      ),
-      '1',
-    )
-  }
-  for (const label of ['admin', 'musician', 'other']) {
-    const actor = fixture.users.find(
-      (user) => user.email === `native-android-${label}-${run}@example.com`,
-    )
-    actor.password = randomUUID()
-    const hash = await passwordHash(actor.password)
-    assert.equal(
-      sql(
-        `WITH changed AS (UPDATE private.credentials SET password_hash=${literal(hash)} WHERE user_id=${literal(actor.id)} AND email=${literal(actor.email)} RETURNING user_id) SELECT count(*) FROM changed;`,
-      ),
-      '1',
-    )
-    const login = await call(null, '/native/auth/login', 'POST', {
-      email: actor.email,
-      password: actor.password,
-    })
-    assert.equal(login.status, 200)
-    actor.token = login.data.session.access_token
-    users.push(actor.id)
-    actors[label] = actor
-  }
-  report.resumed = true
-  report.fixtureCredentialRecovery =
-    'QA-only password reset; existing device sessions preserved; not password-revocation evidence'
-}
+assert.equal(
+  sql('SELECT count(*) FROM public.users;'),
+  '0',
+  'Physical gate requires empty disposable fixtures',
+)
+assert.equal(adb('get-state').trim(), 'device')
+const mappings = adb('reverse', '--list')
+assert.ok(
+  !mappings.split(/\r?\n/).some((line) => line.split(/\s+/)[1] === 'tcp:8443'),
+  'Existing ADB reverse mapping must not be replaced',
+)
+adb('install', '-r', apk)
+const installedPath = shell('pm', 'path', pkg)
+  .trim()
+  .split(/\r?\n/)
+  .find((line) => line.startsWith('package:'))
+  ?.slice(8)
+assert.ok(installedPath, 'QA package was not installed')
+const installedApk = execFileSync(
+  process.env.LVM_ADB || 'adb',
+  ['-s', serial, 'exec-out', 'cat', installedPath],
+  { maxBuffer: 256 * 1024 * 1024 },
+)
+assert.equal(
+  createHash('sha256').update(installedApk).digest('hex'),
+  build.apk.sha256,
+)
+report.installedApkVerified = true
+let reverseOwned = false
 await saveReport()
 try {
-  if (!resumeRun) {
+  adb('reverse', 'tcp:8443', `tcp:${manifest.android.localTlsPort}`)
+  reverseOwned = true
+  {
     actors.admin = await account('admin')
     actors.musician = await account('musician')
     actors.other = await account('other')
@@ -299,6 +291,10 @@ try {
     sql(
       `DELETE FROM public.users WHERE id IN (${users.map(literal).join(',')});`,
     )
+  if (reverseOwned) {
+    releaseQaReverse()
+    reverseOwned = false
+  }
   report.interrupted = true
   report.fixturesCleaned = true
   await saveReport()
@@ -378,17 +374,21 @@ async function command(value) {
   if (value.action === 'stop') return shell('am', 'force-stop', pkg)
   if (value.action === 'snapshot') return snapshot()
   if (value.action === 'offline' || value.action === 'online') {
-    const verb = value.action === 'offline' ? 'stop' : 'start'
-    return execFileSync(
-      'ssh',
-      [
-        '-o',
-        'BatchMode=yes',
-        'hostinger-vps',
-        `test "$(docker inspect -f '{{index .Config.Labels "lvm.qa.run"}}' lvm-native-qa-tls)" = native-gate-20261122 && docker ${verb} lvm-native-qa-tls`,
-      ],
-      { encoding: 'utf8' },
-    ).trim()
+    if (value.action === 'offline') {
+      assert.ok(reverseOwned, 'Only the owned QA mapping may be removed')
+      releaseQaReverse()
+      reverseOwned = false
+    } else {
+      assert.ok(!reverseOwned, 'QA mapping is already online')
+      assert.ok(
+        !adb('reverse', '--list')
+          .split(/\r?\n/)
+          .some((line) => line.split(/\s+/)[1] === 'tcp:8443'),
+      )
+      adb('reverse', 'tcp:8443', `tcp:${manifest.android.localTlsPort}`)
+      reverseOwned = true
+    }
+    return { qaTransportOnline: reverseOwned }
   }
   if (value.action === 'otherWrite') {
     const current = await call(actors.musician, `${path(0)}/worship`)
@@ -476,7 +476,10 @@ async function command(value) {
       ),
       '0',
     )
-    report.complete = value.passed === true
+    report.complete = false
+    report.operatorReportedPassed = value.passed === true
+    report.reviewRequired =
+      'Physical evidence requires independent review; an operator boolean is not certification'
     report.fixturesCleaned = true
     await saveReport()
     return { finished: true, fixturesCleaned: true }
@@ -491,10 +494,19 @@ for await (const line of input) {
     console.log(JSON.stringify({ ok: true, result }))
     if (value.action === 'finish') break
   } catch (error) {
-    console.log(JSON.stringify({ ok: false, message: error.message }))
+    console.log(
+      JSON.stringify({
+        ok: false,
+        message: redactNativeGateFailure(error.message),
+      }),
+    )
   }
 }
 input.close()
+if (reverseOwned) {
+  releaseQaReverse()
+  reverseOwned = false
+}
 if (!report.fixturesCleaned) {
   sql(
     `DELETE FROM private.churches WHERE id IN (${churches.map(literal).join(',')}); DELETE FROM public.songs WHERE id IN (${songIds.map(literal).join(',')}); DELETE FROM public.users WHERE id IN (${users.map(literal).join(',')});`,
