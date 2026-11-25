@@ -16,32 +16,34 @@ import { fileURLToPath } from 'node:url'
 import { build } from 'esbuild'
 import { applyWorshipPlan } from '../suite-api/worship-contract.mjs'
 import { validateServiceRecord } from '../suite-api/service-record.mjs'
+import { loadNativeGateContext } from './native-gate-context.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const client = resolve(root, '../LVM Worship')
-const api = 'http://127.0.0.1:54319/api'
-const origin = 'https://srv2137598.hstgr.cloud'
-const database = 'lvm_planning_qa_20261121'
+const { manifest, sql } = await loadNativeGateContext()
+const client = manifest.client.root
+const api = manifest.apiUrl
+const origin = manifest.origin
+const database = manifest.database.name
 const run = randomUUID()
-const output = resolve(root, 'test-results/native-gate')
+const output = resolve(root, 'test-results/native-gate', manifest.runId)
 await mkdir(output, { recursive: true })
 const journalRoot = await mkdtemp(join(tmpdir(), 'lvm-native-journal-'))
-const sql = (statement) =>
-  execFileSync(
-    'ssh',
-    [
-      '-o',
-      'BatchMode=yes',
-      'hostinger-vps',
-      `cd /srv/apps/la-voz-misionera && docker compose exec -T postgres psql -U lvm_owner -d ${database} -v ON_ERROR_STOP=1 -At`,
-    ],
-    { input: statement, encoding: 'utf8' },
-  ).trim()
 const literal = (value) => `'${String(value).replaceAll("'", "''")}'`
 const digest = (value) => createHash('sha256').update(value).digest('hex')
 const clientCommit = execFileSync('git', ['-C', client, 'rev-parse', 'HEAD'], {
   encoding: 'utf8',
 }).trim()
+assert.equal(
+  clientCommit,
+  manifest.client.commit,
+  'Client must match gate provenance',
+)
+assert.equal(
+  execFileSync('git', ['-C', client, 'rev-parse', 'HEAD^{tree}'], {
+    encoding: 'utf8',
+  }).trim(),
+  manifest.client.tree,
+)
 assert.equal(
   execFileSync('git', ['-C', client, 'status', '--porcelain'], {
     encoding: 'utf8',
@@ -66,8 +68,11 @@ const { createDeviceBackend, createWorshipExchangeRepository } = await import(
 const report = {
   run,
   clientCommit,
-  apiCommit: '1949aac195a78c62ee7df017b45dec9f45ac959f',
-  apiTree: 'fe764c27c362129183bf6baffdd0eac563cbdfe4',
+  apiCommit: manifest.server.commit,
+  apiTree: manifest.server.tree,
+  apiSourceTree: manifest.server.apiTree,
+  apiImageId: manifest.server.imageId,
+  disposableProject: manifest.project,
   database,
   transport: 'SSH-only loopback mapper; not Android TLS proof',
   secureStorage: 'injected memory; not Android Keystore proof',
