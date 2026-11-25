@@ -1,0 +1,48 @@
+{
+  "physicalAndroidVerified": false,
+  "disposableCleanup": {
+    "project": "lvm-native-1a0a9c38111d4b7b",
+    "containersRemoved": true,
+    "temporarySecretsRemoved": true,
+    "productionTouched": false
+  },
+  "report": {
+    "run": "0240b6e4-0946-46ee-bfbb-6efb7689f919",
+    "clientCommit": "71850c7f5e0037c928202a503d511e53a70d57f4",
+    "apiCommit": "a622fd0171eb469b2a42ca8bd3820cbd1a8e58a3",
+    "apiTree": "46dc98fdc87013f678873fb183d2884e82d036ad",
+    "apiSourceTree": "17bf9d961cd732fb2ed438a6e2b5446fc24d0c93",
+    "apiImageId": "sha256:cd05291aaa408baf892618fdcda8404cb91386700d5c1a892f1a5992be75db9d",
+    "disposableProject": "lvm-native-1a0a9c38111d4b7b",
+    "database": "lvm_worship",
+    "transport": "SSH-only loopback mapper; not Android TLS proof",
+    "secureStorage": "injected memory; not Android Keystore proof",
+    "checks": [
+      "actual native login, independent device tokens, database-backed session and shared web identity",
+      "catalog snapshots, order, repeated occurrences, tones and durable offline restart without server writes",
+      "lost HTTP acknowledgement after a real commit replays the same UUID without a second proposal/history row",
+      "two independent native sessions produce a real 409; explicit cancellation/refresh/resubmission retains local music",
+      "Service applies the actual native proposal; SQL equals canonical merge, valid Service 0.1, manual elements and unique IDs preserved",
+      "account/church journal isolation and authenticated X-LVM-Account mismatch rejection",
+      "membership suspension blocks idempotent replay; header alone, fabricated, expired and revoked tokens cannot write",
+      "durable musical journal contains no device tokens, passwords or authentication session fields"
+    ],
+    "physicalAndroidVerified": false,
+    "finalServiceSha256": "5d14ab0ea27b420814e2ffddeebe499120afb1021f1e8bf5a1ac92315bd6a670",
+    "postgres": {
+      "proposalRevision": 3,
+      "serviceRevision": 2,
+      "musicalOccurrences": 3,
+      "manualItems": 2,
+      "worshipHistoryRows": 3
+    },
+    "cleanup": {
+      "plans": 0,
+      "songs": 0,
+      "users": 0,
+      "churches": 0,
+      "sessions": 0
+    },
+    "integrationPassed": true
+  }
+}

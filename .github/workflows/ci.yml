@@ -28,6 +28,7 @@ jobs:
       - run: npm run build:suite-api
       - run: git diff --exit-code -- suite-api/service-record.mjs suite-api/worship-contract.mjs
       - run: npm run test:suite-api
+      - run: npm run test:native-gate-context
       - name: Verify church schema, authorization, concurrency controls and idempotency
         run: |
           for migration in suite-api/schema/*.sql; do
