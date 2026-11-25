@@ -1,0 +1,50 @@
+{
+  "run": "78b0737e-b785-47aa-b805-0751379678f5",
+  "clientCommit": "71850c7f5e0037c928202a503d511e53a70d57f4",
+  "apiCommit": "1e8ea37093a723430067c0144ce05fe722ce9659",
+  "gateRunId": "cc23bfa7-a76b-44b0-b327-43e3001585b6",
+  "apkSha256": "f8e8b5be137ae7ff8cd4d569fa546f2ddc141d88ee4575cd310cac9b8dc4df84",
+  "serial": "AE6RUT4C25003519",
+  "database": "lvm_worship",
+  "applicationId": "com.lavozmisionera.qa",
+  "observations": [
+    {
+      "name": "HONOR functional native walkthrough",
+      "evidence": {
+        "loginAndTls": true,
+        "encryptedSecureStoreAndOfflineProcessRestart": true,
+        "credentialsAbsentFromAsyncStorage": true,
+        "catalogOrderDuplicateAndKeyG": true,
+        "offlineUuid": "e5582b7f-b7d7-40db-8ad4-d2b36b0253cb",
+        "singleReplayHistory": true,
+        "conflict409AndExplicitResolution": true,
+        "serviceAppliedSongs": 3,
+        "manualItemsPreserved": 2,
+        "membership403": true,
+        "twoAccountChurchIsolation": true,
+        "sessionRevocation401": true,
+        "reviewRequired": true
+      }
+    }
+  ],
+  "complete": false,
+  "installedApkVerified": true,
+  "fixtures": {
+    "users": [
+      "91999720-9a9f-420a-9f51-371fd60f1230",
+      "0fcff482-8f5c-44f0-bdbf-9f739152317f",
+      "b74cc8f5-1752-4a51-aba4-1edfaaddc188"
+    ],
+    "churches": [
+      "d580b8a7-7e32-4592-a98a-2f47d08fbde7",
+      "adfbb561-2357-4576-8528-265531386408"
+    ],
+    "songs": [
+      "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+      "80598e71-4a17-41f2-b1ab-17a14646f126"
+    ]
+  },
+  "operatorReportedPassed": true,
+  "reviewRequired": "Physical evidence requires independent review; an operator boolean is not certification",
+  "fixturesCleaned": true
+}

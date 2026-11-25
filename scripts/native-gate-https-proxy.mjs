@@ -3,7 +3,10 @@ import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:https'
 import { request } from 'node:http'
 
-assert.equal(process.env.LVM_NATIVE_QA, 'native-gate-20261122')
+assert.match(
+  process.env.LVM_NATIVE_QA || '',
+  /^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/,
+)
 const run = process.env.LVM_NATIVE_QA
 const uuid = /^[a-f0-9-]{36}$/
 const server = createServer(
@@ -13,7 +16,7 @@ const server = createServer(
   },
   (incoming, outgoing) => {
     if (
-      incoming.headers.host !== 'srv2137598.hstgr.cloud:8443' ||
+      incoming.headers.host !== 'lvm-qa.invalid:8443' ||
       !incoming.url?.startsWith('/api/')
     ) {
       outgoing.writeHead(421)
@@ -22,11 +25,11 @@ const server = createServer(
     }
     const upstream = request(
       {
-        hostname: 'lvm-planning-qa-api',
+        hostname: 'api-on',
         port: 4318,
         path: incoming.url,
         method: incoming.method,
-        headers: { ...incoming.headers, host: 'lvm-planning-qa-api:4318' },
+        headers: { ...incoming.headers, host: 'api-on:4318' },
       },
       (result) => {
         // Only request metadata; never log authorization, cookies or request bodies.
@@ -58,5 +61,5 @@ const server = createServer(
   },
 )
 server.listen(8443, '0.0.0.0', () =>
-  console.log('QA TLS proxy ready; Docker must bind host loopback only'),
+  console.log('QA TLS proxy ready on the owned internal network'),
 )

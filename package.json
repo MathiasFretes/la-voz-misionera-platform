@@ -16,8 +16,9 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:planning-journal": "node scripts/verify-planning-journal.mjs",
-    "test:native-gate-context": "node --test scripts/native-gate-context.test.mjs",
+    "test:native-gate-context": "node --test scripts/native-gate-context.test.mjs scripts/native-android-overlay.test.mjs scripts/native-android-device.test.mjs",
     "test:native-connected:isolated": "node scripts/run-native-connected-isolated.mjs",
+    "build:native-android:isolated": "node scripts/run-native-connected-isolated.mjs --android-build",
     "test:suite-api": "node --test suite-api/test/security.test.mjs suite-api/test/site-content.test.mjs suite-api/test/planning.test.mjs suite-api/test/worship-exchange.test.mjs suite-api/test/native-session.test.mjs",
     "fixture": "tsx scripts/generate-service-fixture.ts",
     "test:e2e": "playwright test --config playwright.config.ts",
@@ -34,7 +35,8 @@
     "build:backend": "tsc --project tsconfig.backend.json",
     "build:backend:runtime": "npm run build:backend && node scripts/build-backend-runtime.mjs",
     "test:backend": "vitest run --config backend/vitest.config.ts",
-    "test:db-e2e": "playwright test --config playwright.db.config.ts"
+    "test:db-e2e": "playwright test --config playwright.db.config.ts",
+    "test:native-android:isolated": "node scripts/run-native-connected-isolated.mjs --android-device"
   },
   "dependencies": {
     "@fontsource/poppins": "^5.3.0",

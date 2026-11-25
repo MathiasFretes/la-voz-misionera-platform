@@ -1,0 +1,367 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/health",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/native/auth/login",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/sessions",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 200,
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 200,
+    "operation": "e5582b7f-b7d7-40db-8ad4-d2b36b0253cb",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 409,
+    "operation": "fe37c374-9c79-430a-93fe-f663a49fa872",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 200,
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 200,
+    "operation": "7b05f2fa-612c-4a01-8fa4-8ef7648d419b",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 403,
+    "operation": "b7b50f77-1543-405c-af3c-25cc4caf1a81",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/churches/adfbb561-2357-4576-8528-265531386408/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-1/worship",
+    "status": 403,
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/users",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/users",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/native/auth/logout",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/native/auth/login",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/users",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/users",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/churches/adfbb561-2357-4576-8528-265531386408/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-1/worship",
+    "status": 200,
+    "account": "b74cc8f5-1752-4a51-aba4-1edfaaddc188"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 403,
+    "account": "b74cc8f5-1752-4a51-aba4-1edfaaddc188"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 401
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "POST",
+    "path": "/api/native/auth/login",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/users",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/users",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/churches/adfbb561-2357-4576-8528-265531386408/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-1/worship",
+    "status": 403,
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 403,
+    "operation": "b7b50f77-1543-405c-af3c-25cc4caf1a81",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/personal_songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/data/songs",
+    "status": 200
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 403,
+    "operation": "b7b50f77-1543-405c-af3c-25cc4caf1a81",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "GET",
+    "path": "/api/native/auth/session",
+    "status": 200
+  },
+  {
+    "method": "PUT",
+    "path": "/api/churches/d580b8a7-7e32-4592-a98a-2f47d08fbde7/services/native-android-78b0737e-b785-47aa-b805-0751379678f5-0/worship",
+    "status": 403,
+    "operation": "b7b50f77-1543-405c-af3c-25cc4caf1a81",
+    "account": "0fcff482-8f5c-44f0-bdbf-9f739152317f"
+  },
+  {
+    "method": "POST",
+    "path": "/api/native/auth/logout",
+    "status": 200
+  }
+]

@@ -2,25 +2,48 @@ import assert from 'node:assert/strict'
 import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { openSync, closeSync, statfsSync } from 'node:fs'
-import { mkdir, readFile, writeFile, stat } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { mkdir, readFile, writeFile, stat, rm } from 'node:fs/promises'
 import { dirname, join, resolve, delimiter } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { loadNativeGateContext } from './native-gate-context.mjs'
+import {
+  qaApiOrigin,
+  qaHostname,
+  patchQaAndroidManifest,
+  qaNetworkSecurityXml,
+} from './native-android-overlay.mjs'
+import { verifyNativeQaTls } from './native-qa-tls.mjs'
 
 // Local test overlay only: no product source, SDK upgrade, store submission or
 // trust-all TLS settings. Generated CNG/SDK files are restored in finally.
 const serviceRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const clientRoot = resolve(serviceRoot, '../LVM Worship')
+const { manifest: gate } = await loadNativeGateContext()
+assert.ok(gate.android, 'Use npm run build:native-android:isolated')
+assert.equal(gate.android.apiOrigin, qaApiOrigin)
+const ca = await readFile(gate.android.caPath)
+const sha = (value) => createHash('sha256').update(value).digest('hex')
+assert.equal(sha(ca), gate.android.caSha256)
+await verifyNativeQaTls({
+  port: gate.android.localTlsPort,
+  runId: gate.runId,
+  ca,
+})
+const clientRoot = gate.client.root
 const mobile = join(clientRoot, 'apps/mobile')
 const android = join(mobile, 'android')
-const output = join(tmpdir(), 'native-gate-20261122')
+const output = join(
+  serviceRoot,
+  'test-results/native-gate',
+  gate.runId,
+  'android',
+)
 await mkdir(output, { recursive: true })
-const sha = (value) => createHash('sha256').update(value).digest('hex')
 const clientCommit = execFileSync(
   'git',
   ['-C', clientRoot, 'rev-parse', 'HEAD'],
   { encoding: 'utf8' },
 ).trim()
+assert.equal(clientCommit, gate.client.commit)
 assert.equal(
   execFileSync('git', ['-C', clientRoot, 'status', '--porcelain'], {
     encoding: 'utf8',
@@ -40,6 +63,13 @@ const files = {
     'app/src/main/java/com/lavozmisionera/app/MainApplication.kt',
   ),
   strings: join(android, 'app/src/main/res/values/strings.xml'),
+  mainManifest: join(android, 'app/src/main/AndroidManifest.xml'),
+  debugManifest: join(android, 'app/src/debug/AndroidManifest.xml'),
+  network: join(
+    android,
+    'app/src/main/res/xml/lvm_qa_network_security_config.xml',
+  ),
+  ca: join(android, 'app/src/main/res/raw/lvm_qa_ca.pem'),
   devLauncher: join(
     mobile,
     'node_modules/expo-dev-launcher/android/src/debug/java/expo/modules/devlauncher/DevLauncherPackageDelegate.kt',
@@ -49,7 +79,11 @@ const originals = Object.fromEntries(
   await Promise.all(
     Object.entries(files).map(async ([key, file]) => [
       key,
-      await readFile(file),
+      await readFile(file).catch((error) => {
+        if (['network', 'ca'].includes(key) && error.code === 'ENOENT')
+          return null
+        throw error
+      }),
     ]),
   ),
 )
@@ -60,7 +94,12 @@ assert.match(
 assert.ok(!originals.application.toString().includes('LVM_NATIVE_GATE'))
 const manifest = {
   clientCommit,
-  apiOrigin: 'https://srv2137598.hstgr.cloud:8443/api',
+  apiOrigin: qaApiOrigin,
+  apiCommit: gate.server.commit,
+  apiImageId: gate.server.imageId,
+  gateRunId: gate.runId,
+  caSha256: gate.android.caSha256,
+  caScope: qaHostname,
   applicationId: 'com.lavozmisionera.qa',
   debugSigning: true,
   debuggable: true,
@@ -68,7 +107,7 @@ const manifest = {
   metroRequired: false,
   tlsVerificationDisabled: false,
   dnsOverride: {
-    host: 'srv2137598.hstgr.cloud',
+    host: qaHostname,
     address: '127.0.0.1',
     purpose: 'ADB reverse to SSH-only isolated QA HTTPS proxy',
   },
@@ -76,8 +115,8 @@ const manifest = {
   overlay: {},
 }
 for (const [key, value] of Object.entries(originals)) {
-  await writeFile(join(output, `original-${key}`), value)
-  manifest.originals[key] = sha(value)
+  if (value !== null) await writeFile(join(output, `original-${key}`), value)
+  manifest.originals[key] = value === null ? 'absent' : sha(value)
 }
 await writeFile(
   join(output, 'android-build-manifest.json'),
@@ -95,6 +134,8 @@ const overlay = {
     `
 // LVM_NATIVE_GATE: embedded production JS with debug storage inspection.
 tasks.withType(com.facebook.react.tasks.BundleHermesCTask).configureEach {
+    inputs.property("lvmQaClientCommit", "${clientCommit}")
+    inputs.property("lvmQaApiOrigin", "${qaApiOrigin}")
     devEnabled.set(false)
     doFirst { if (devEnabled.get()) throw new GradleException("QA must bundle production JavaScript") }
 }
@@ -113,7 +154,7 @@ tasks.withType(com.facebook.react.tasks.BundleHermesCTask).configureEach {
       com.facebook.react.modules.network.OkHttpClientProvider.createClientBuilder()
         .dns(object : okhttp3.Dns {
           override fun lookup(hostname: String): List<java.net.InetAddress> =
-            if (hostname == "srv2137598.hstgr.cloud") listOf(java.net.InetAddress.getByName("127.0.0.1"))
+            if (hostname == "${qaHostname}") listOf(java.net.InetAddress.getByName("127.0.0.1"))
             else okhttp3.Dns.SYSTEM.lookup(hostname)
         }).build()
     }`,
@@ -121,6 +162,10 @@ tasks.withType(com.facebook.react.tasks.BundleHermesCTask).configureEach {
   strings: originals.strings
     .toString()
     .replace('>La Voz Misionera</string>', '>LVM QA</string>'),
+  mainManifest: patchQaAndroidManifest(originals.mainManifest.toString()),
+  debugManifest: patchQaAndroidManifest(originals.debugManifest.toString()),
+  network: qaNetworkSecurityXml(),
+  ca,
   // Same official no-op delegate used by Expo's release variant. This prevents
   // the debug launcher from replacing the bundled app with its Metro home.
   devLauncher: await readFile(
@@ -132,10 +177,12 @@ tasks.withType(com.facebook.react.tasks.BundleHermesCTask).configureEach {
   ),
 }
 assert.ok(overlay.application.includes('useDevSupport = false'))
+assert.ok(overlay.strings.includes('>LVM QA</string>'))
 const log = join(output, 'android-build.log')
 let exitCode
 try {
   for (const [key, value] of Object.entries(overlay)) {
+    await mkdir(dirname(files[key]), { recursive: true })
     await writeFile(files[key], value)
     manifest.overlay[key] = sha(value)
   }
@@ -181,15 +228,24 @@ try {
   }
   assert.equal(exitCode, 0, `Gradle failed; inspect ${log}`)
   const apk = join(android, 'app/build/outputs/apk/debug/app-debug.apk')
+  const archivedApk = join(output, 'app-debug.apk')
+  await writeFile(archivedApk, await readFile(apk))
   manifest.apk = {
-    path: apk,
+    path: archivedApk,
     sha256: sha(await readFile(apk)),
     bytes: (await stat(apk)).size,
   }
   console.log(JSON.stringify(manifest.apk, null, 2))
 } finally {
-  for (const [key, value] of Object.entries(originals))
-    await writeFile(files[key], value)
+  for (const [key, value] of Object.entries(originals)) {
+    if (value === null) await rm(files[key], { force: true })
+    else await writeFile(files[key], value)
+    const restored = await readFile(files[key]).catch((error) => {
+      if (error.code === 'ENOENT') return null
+      throw error
+    })
+    assert.deepEqual(restored, value, `QA overlay was not restored: ${key}`)
+  }
   manifest.exitCode = exitCode
   manifest.overlaysRestored = true
   await writeFile(

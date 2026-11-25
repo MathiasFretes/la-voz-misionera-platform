@@ -1,0 +1,124 @@
+{
+  "id": "native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+  "venue": "QA",
+  "service": {
+    "id": "native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+    "items": [
+      {
+        "id": "welcome",
+        "kind": "ANNOUNCEMENT",
+        "announcement": {
+          "body": "Comunidad",
+          "title": "Bienvenida Android QA"
+        }
+      },
+      {
+        "id": "lvm-worship:native-android-78b0737e-b785-47aa-b805-0751379678f5-0:1",
+        "kind": "SONG",
+        "song": {
+          "id": "80598e71-4a17-41f2-b1ab-17a14646f126",
+          "key": "G",
+          "title": "Fidelidad Android QA",
+          "sections": [
+            {
+              "kind": "verse",
+              "label": "Verse",
+              "lines": [
+                {
+                  "text": "Tu fidelidad",
+                  "chords": [
+                    {
+                      "index": 0,
+                      "symbol": "G"
+                    },
+                    {
+                      "index": 3,
+                      "symbol": "D"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lvm-worship:native-android-78b0737e-b785-47aa-b805-0751379678f5-0:2",
+        "kind": "SONG",
+        "song": {
+          "id": "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+          "key": "D",
+          "title": "Alba Android QA",
+          "sections": [
+            {
+              "kind": "verse",
+              "label": "Verse",
+              "lines": [
+                {
+                  "text": "Sale el sol 😀 hoy",
+                  "chords": [
+                    {
+                      "index": 0,
+                      "symbol": "D"
+                    },
+                    {
+                      "index": 15,
+                      "symbol": "A"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "lvm-worship:native-android-78b0737e-b785-47aa-b805-0751379678f5-0:3",
+        "kind": "SONG",
+        "song": {
+          "id": "bf69a48e-858d-44b3-9dec-a250c890a9ab",
+          "key": "D",
+          "title": "Alba Android QA",
+          "sections": [
+            {
+              "kind": "verse",
+              "label": "Verse",
+              "lines": [
+                {
+                  "text": "Sale el sol 😀 hoy",
+                  "chords": [
+                    {
+                      "index": 0,
+                      "symbol": "D"
+                    },
+                    {
+                      "index": 15,
+                      "symbol": "A"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "message",
+        "kind": "SERMON",
+        "sermon": {
+          "body": "Esperanza",
+          "title": "Mensaje Android QA"
+        }
+      }
+    ],
+    "title": "Culto Android QA",
+    "setlist": {
+      "id": "set-native-android-78b0737e-b785-47aa-b805-0751379678f5-0",
+      "name": "Ensayo Android QA"
+    },
+    "startsAt": "2026-12-01T12:00:00Z",
+    "schemaVersion": "0.1"
+  },
+  "revision": 2,
+  "worshipAfterItemId": "welcome"
+}

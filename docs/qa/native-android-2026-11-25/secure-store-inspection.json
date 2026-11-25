@@ -1,0 +1,13 @@
+{
+  "entries": [
+    {
+      "key": "key_v1-lvm.device.session.lvm-qa.invalid_8443",
+      "scheme": "aes",
+      "hasCiphertext": true,
+      "hasIv": true,
+      "hasTagLength": true,
+      "hasPlainNativeToken": false
+    }
+  ],
+  "plaintextSessionFieldsAbsent": true
+}
